@@ -1,4 +1,4 @@
-# TDDD83-markesstacken
+# tdd83-labs-antha372-wiler441
 
 
 
@@ -15,14 +15,14 @@ Already a pro? Just edit this README.md and make it your own. Want to make it ea
 
 ```
 cd existing_repo
-git remote add origin https://gitlab.liu.se/marli209/tddd83-markesstacken.git
+git remote add origin https://gitlab.liu.se/wiler441/tdd83-labs-antha372-wiler441.git
 git branch -M main
 git push -uf origin main
 ```
 
 ## Integrate with your tools
 
-- [ ] [Set up project integrations](https://gitlab.liu.se/marli209/tddd83-markesstacken/-/settings/integrations)
+- [ ] [Set up project integrations](https://gitlab.liu.se/wiler441/tdd83-labs-antha372-wiler441/-/settings/integrations)
 
 ## Collaborate with your team
 

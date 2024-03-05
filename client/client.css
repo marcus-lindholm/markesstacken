@@ -1,0 +1,31 @@
+p {
+    /* Stilar för element av typen "p" */
+ }
+ 
+ #welcome-paragraph {
+    /* Stilar för element med id="welcome-paragraph" */
+ }
+ 
+ .extra-big {
+    /* Stilar för element med class="extra-big" */
+ }
+ /* Styles for the opening hours list */
+#opening-hours {
+    margin-top: 20px;
+}
+
+#opening-hours h2 {
+    font-size: 24px;
+    color: #333;
+}
+
+#opening-hours ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#opening-hours li {
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #666;
+}
