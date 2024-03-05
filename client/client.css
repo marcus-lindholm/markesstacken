@@ -29,3 +29,13 @@ p {
     font-size: 18px;
     color: #666;
 }
+
+/*NAVBAR*/
+
+.navlogo{
+    max-width: 100px;
+}
+
+.navbar{
+    background-color: #7a96ab;
+}
