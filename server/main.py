@@ -302,7 +302,7 @@ def client():
 
 
 if __name__ == "__main__":
-    app.run(port=5000) # På MacOS, byt till 5001 eller dylikt
+    app.run(port=5001) # På MacOS, byt till 5001 eller dylikt
 
 print("Test")
 
