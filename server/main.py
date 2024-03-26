@@ -1,4 +1,5 @@
  #!/usr/bin/env python3
+import datetime
 from flask import Flask
 from flask import jsonify
 from flask import abort
@@ -9,7 +10,6 @@ from flask_bcrypt import generate_password_hash
 from flask_bcrypt import check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
-
 app = Flask(__name__, static_folder='../client', static_url_path='/')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -19,45 +19,146 @@ bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 db = SQLAlchemy(app)
 
-
-class User(db.Model):
+class Customer(db.Model): #what if we are not logged in and place an order
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False)
-    is_admin = db.Column(db.Boolean, default=False, nullable=True)
-    password_hash = db.Column(db.String, nullable=False)
-    cars = db.relationship('Car', backref='user_cars', lazy=True)
-
-    def __repr__(self):
-        return f'<User {self.id}: {self.name} ({self.email})>'
-
-    def serialize(self):
-        return dict(id=self.id, name=self.name, email=self.email, is_admin=self.is_admin)
+    name = db.Column(db.String, nullable=False)
+    password = db.Column(db.String, nullable=False)
+    orderID = db.Column(db.Integer, db.ForeignKey('order.id'), nullable = True)
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password).decode('utf8')
+        self.password = generate_password_hash(password).decode('utf8')
 
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-
-class Car(db.Model):
+class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    make = db.Column(db.String, nullable=False)
-    model = db.Column(db.String, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = True)
+    date = db.Column(db.Integer, nullable=False)
+    receipt = db.Column(db.String, nullable=False)
+    billingAmount = db.Column(db.Float, nullable=False)
+    customerID = db.relationship('Customer', backref='orders', lazy = True)
+    orderID = db.Column(db.Integer, db.ForeignKey('sale.id'), nullable = False)
 
-    user = db.relationship('User', backref='user_cars', lazy=True)
+class Patch(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    description = db.Column(db.String, nullable=True)
+    price = db.Column(db.Float, nullable=False)
+    #img = db.Column(db.LargeBinary, nullable=False) eget image library (imgID)
+    subcategory = db.relationship('Subcategory', backref='patches', lazy=True)
+    patchID = db.Column(db.Integer, db.ForeignKey('sale.id'), nullable = False)
 
-    def __repr__(self):
-        return f'<Car {self.id}: {self.make} {self.model}>'
+class Sale(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    orderID = db.relationship('Order', backref='order_id', lazy=True, uselist = False)
+    patchID = db.relationship('Patch', backref='patch_id', lazy=True)
+    quantity = db.Column(db.Float, nullable=False) #q per patch
 
-    def serialize(self):
-        return dict(id=self.id, make=self.make, model=self.model, user_id=self.user_id)
-    
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    subcategoryID = db.Column(db.Integer, db.ForeignKey('subcategory.id'), nullable = True)
+
+class Subcategory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    category = db.relationship('Category', backref='subcategory_id', lazy=True, uselist = False)
+    patchID = db.Column(db.Integer, db.ForeignKey('patch.id'), nullable = False)
+
+""" 
+uselist = False makes every subcategory have exactly one category 
+"""
+
 with app.app_context(): 
     db.create_all()
     db.session.commit()
+
+# Create some test data
+with app.app_context():
+    db.create_all()
+
+    # Create Categories
+    category1 = Category(name='Category 1')
+    category2 = Category(name='Category 2')
+
+
+    # Create Subcategories
+    subcategory1 = Subcategory(name='Subcategory 1', category=category1)
+    subcategory2 = Subcategory(name='Subcategory 2', category=category2)
+
+    # Create Customers
+    customer1 = Customer(email='customer1@example.com', name='John Doe', password="")
+    customer2 = Customer(email='customer2@example.com', name='Jane Smith', password="")
+
+    # Set passwords for Customers        
+    customer1.set_password("abc123")
+    customer2.set_password("test999")
+    
+    # Create Orders
+    order1 = Order(date=int(datetime.now().timestamp()), recipe='Recipe 1', billingAmount=50.0, customerID=[customer1])
+    order2 = Order(date=int(datetime.now().timestamp()), recipe='Recipe 2', billingAmount=75.0, customerID=[customer2])
+
+    # Create Patches
+    patch1 = Patch(name='Patch 1', description='Description 1', price=10.0, subcategory=[subcategory1])
+    patch2 = Patch(name='Patch 2', description='Description 2', price=15.0, subcategory=[subcategory2])
+
+    sale1 = Sale(orderID=order1, patchID=[patch1], amount=10.0)
+    sale2 = Sale(orderID=order2, patchID=[patch2], amount=15.0)
+
+    # Add changes
+
+    db.session.add(category1)
+    db.session.add(category2)
+    db.session.add(subcategory1)
+    db.session.add(subcategory2)
+    db.session.add(customer1)
+    db.session.add(customer2)
+    db.session.add(order1)
+    db.session.add(order2)
+    db.session.add(patch1)
+    db.session.add(patch2)
+    db.session.add(sale1)
+    db.session.add(sale2)
+
+    # Commit changes
+    db.session.commit()
+
+# class User(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.String, nullable=False)
+#     email = db.Column(db.String, nullable=False)
+#     is_admin = db.Column(db.Boolean, default=False, nullable=True)
+#     password_hash = db.Column(db.String, nullable=False)
+#     cars = db.relationship('Car', backref='user_cars', lazy=True)
+
+#     def __repr__(self):
+#         return f'<User {self.id}: {self.name} ({self.email})>'
+
+#     def serialize(self):
+#         return dict(id=self.id, name=self.name, email=self.email, is_admin=self.is_admin)
+
+#     def set_password(self, password):
+#         self.password_hash = generate_password_hash(password).decode('utf8')
+
+#     def check_password(self, password):
+#         return check_password_hash(self.password_hash, password)
+
+
+# class Car(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     make = db.Column(db.String, nullable=False)
+#     model = db.Column(db.String, nullable=False)
+#     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = True)
+
+#     user = db.relationship('User', backref='user_cars', lazy=True)
+
+#     def __repr__(self):
+#         return f'<Car {self.id}: {self.make} {self.model}>'
+
+#     def serialize(self):
+#         return dict(id=self.id, make=self.make, model=self.model, user_id=self.user_id)
+    
+# with app.app_context(): 
+#     db.create_all()
+#     db.session.commit()
 
 
 @app.route('/hello')
