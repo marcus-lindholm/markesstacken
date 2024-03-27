@@ -4,7 +4,7 @@ var guserId;
 function ShowHomePage() {
   $(".nav-link.login, .nav-link.sign-up").toggleClass('d-none', signedIn);
   $(".nav-link.logout, .nav-link.cars").toggleClass('d-none', !signedIn);
-  $(".container").html($("#view-home").html());
+  //$(".container").html($("#view-home").html());
 }
 
 function ShowContactPage() {
