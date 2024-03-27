@@ -1,5 +1,5 @@
  #!/usr/bin/env python3
-import datetime
+from datetime import datetime
 from flask import Flask
 from flask import jsonify
 from flask import abort
@@ -19,146 +19,44 @@ bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 db = SQLAlchemy(app)
 
-class Customer(db.Model): #what if we are not logged in and place an order
+class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False)
-    password = db.Column(db.String, nullable=False)
-    orderID = db.Column(db.Integer, db.ForeignKey('order.id'), nullable = True)
+    email = db.Column(db.String, nullable=False)
+    is_admin = db.Column(db.Boolean, default=False, nullable=True)
+    password_hash = db.Column(db.String, nullable=False)
+    cars = db.relationship('Car', backref='user_cars', lazy=True)
+
+    def __repr__(self):
+        return f'<User {self.id}: {self.name} ({self.email})>'
+
+    def serialize(self):
+        return dict(id=self.id, name=self.name, email=self.email, is_admin=self.is_admin)
 
     def set_password(self, password):
-        self.password = generate_password_hash(password).decode('utf8')
+        self.password_hash = generate_password_hash(password).decode('utf8')
 
-class Order(db.Model):
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+
+class Car(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Integer, nullable=False)
-    receipt = db.Column(db.String, nullable=False)
-    billingAmount = db.Column(db.Float, nullable=False)
-    customerID = db.relationship('Customer', backref='orders', lazy = True)
-    orderID = db.Column(db.Integer, db.ForeignKey('sale.id'), nullable = False)
+    make = db.Column(db.String, nullable=False)
+    model = db.Column(db.String, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = True)
 
-class Patch(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    description = db.Column(db.String, nullable=True)
-    price = db.Column(db.Float, nullable=False)
-    #img = db.Column(db.LargeBinary, nullable=False) eget image library (imgID)
-    subcategory = db.relationship('Subcategory', backref='patches', lazy=True)
-    patchID = db.Column(db.Integer, db.ForeignKey('sale.id'), nullable = False)
+    user = db.relationship('User', backref='user_cars', lazy=True)
 
-class Sale(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    orderID = db.relationship('Order', backref='order_id', lazy=True, uselist = False)
-    patchID = db.relationship('Patch', backref='patch_id', lazy=True)
-    quantity = db.Column(db.Float, nullable=False) #q per patch
+    def __repr__(self):
+        return f'<Car {self.id}: {self.make} {self.model}>'
 
-class Category(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    subcategoryID = db.Column(db.Integer, db.ForeignKey('subcategory.id'), nullable = True)
-
-class Subcategory(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    category = db.relationship('Category', backref='subcategory_id', lazy=True, uselist = False)
-    patchID = db.Column(db.Integer, db.ForeignKey('patch.id'), nullable = False)
-
-""" 
-uselist = False makes every subcategory have exactly one category 
-"""
-
+    def serialize(self):
+        return dict(id=self.id, make=self.make, model=self.model, user_id=self.user_id)
+    
 with app.app_context(): 
     db.create_all()
     db.session.commit()
-
-# Create some test data
-with app.app_context():
-    db.create_all()
-
-    # Create Categories
-    category1 = Category(name='Category 1')
-    category2 = Category(name='Category 2')
-
-
-    # Create Subcategories
-    subcategory1 = Subcategory(name='Subcategory 1', category=category1)
-    subcategory2 = Subcategory(name='Subcategory 2', category=category2)
-
-    # Create Customers
-    customer1 = Customer(email='customer1@example.com', name='John Doe', password="")
-    customer2 = Customer(email='customer2@example.com', name='Jane Smith', password="")
-
-    # Set passwords for Customers        
-    customer1.set_password("abc123")
-    customer2.set_password("test999")
-    
-    # Create Orders
-    order1 = Order(date=int(datetime.now().timestamp()), recipe='Recipe 1', billingAmount=50.0, customerID=[customer1])
-    order2 = Order(date=int(datetime.now().timestamp()), recipe='Recipe 2', billingAmount=75.0, customerID=[customer2])
-
-    # Create Patches
-    patch1 = Patch(name='Patch 1', description='Description 1', price=10.0, subcategory=[subcategory1])
-    patch2 = Patch(name='Patch 2', description='Description 2', price=15.0, subcategory=[subcategory2])
-
-    sale1 = Sale(orderID=order1, patchID=[patch1], amount=10.0)
-    sale2 = Sale(orderID=order2, patchID=[patch2], amount=15.0)
-
-    # Add changes
-
-    db.session.add(category1)
-    db.session.add(category2)
-    db.session.add(subcategory1)
-    db.session.add(subcategory2)
-    db.session.add(customer1)
-    db.session.add(customer2)
-    db.session.add(order1)
-    db.session.add(order2)
-    db.session.add(patch1)
-    db.session.add(patch2)
-    db.session.add(sale1)
-    db.session.add(sale2)
-
-    # Commit changes
-    db.session.commit()
-
-# class User(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String, nullable=False)
-#     email = db.Column(db.String, nullable=False)
-#     is_admin = db.Column(db.Boolean, default=False, nullable=True)
-#     password_hash = db.Column(db.String, nullable=False)
-#     cars = db.relationship('Car', backref='user_cars', lazy=True)
-
-#     def __repr__(self):
-#         return f'<User {self.id}: {self.name} ({self.email})>'
-
-#     def serialize(self):
-#         return dict(id=self.id, name=self.name, email=self.email, is_admin=self.is_admin)
-
-#     def set_password(self, password):
-#         self.password_hash = generate_password_hash(password).decode('utf8')
-
-#     def check_password(self, password):
-#         return check_password_hash(self.password_hash, password)
-
-
-# class Car(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     make = db.Column(db.String, nullable=False)
-#     model = db.Column(db.String, nullable=False)
-#     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = True)
-
-#     user = db.relationship('User', backref='user_cars', lazy=True)
-
-#     def __repr__(self):
-#         return f'<Car {self.id}: {self.make} {self.model}>'
-
-#     def serialize(self):
-#         return dict(id=self.id, make=self.make, model=self.model, user_id=self.user_id)
-    
-# with app.app_context(): 
-#     db.create_all()
-#     db.session.commit()
 
 
 @app.route('/hello')
@@ -216,105 +114,105 @@ def login():
 
 
 
-@app.route('/cars/<int:car_id>', methods=['PUT', 'GET', 'DELETE'], endpoint='get_car_by_id')
-@jwt_required()
-def get_car_by_id(car_id):
-    current_user = get_jwt_identity()
-    car = Car.query.get_or_404(car_id)
+# @app.route('/cars/<int:car_id>', methods=['PUT', 'GET', 'DELETE'], endpoint='get_car_by_id')
+# @jwt_required()
+# def get_car_by_id(car_id):
+#     current_user = get_jwt_identity()
+#     car = Car.query.get_or_404(car_id)
  
-    if request.method == 'GET':
-        car_data = car.serialize()
+#     if request.method == 'GET':
+#         car_data = car.serialize()
 
-        if car.user:
-            car_data['user'] = car.user.serialize()
-        else:
-            car_data['user'] = None
+#         if car.user:
+#             car_data['user'] = car.user.serialize()
+#         else:
+#             car_data['user'] = None
 
-        car_data.pop('user_id', None)
+#         car_data.pop('user_id', None)
 
-        return jsonify(car_data)
+#         return jsonify(car_data)
 
-    elif request.method == 'PUT':
-        data = request.get_json()
+#     elif request.method == 'PUT':
+#         data = request.get_json()
 
-        if 'make' in data:
-            car.make = data['make']
+#         if 'make' in data:
+#             car.make = data['make']
             
-        if 'model' in data:
-            car.model = data['model']
+#         if 'model' in data:
+#             car.model = data['model']
 
-        if 'user_id' in data:
-            user_id = data['user_id']
-            user = None  # Initialize user variable
+#         if 'user_id' in data:
+#             user_id = data['user_id']
+#             user = None  # Initialize user variable
 
-            if user_id:  # Check if user_id is provided
-                user = User.query.get(user_id)
+#             if user_id:  # Check if user_id is provided
+#                 user = User.query.get(user_id)
 
-                if user is None:
-                    abort(404)
+#                 if user is None:
+#                     abort(404)
 
-            car.user_id = user.id if user else None
+#             car.user_id = user.id if user else None
 
-        db.session.commit()
-        return jsonify(car.serialize()), 200
+#         db.session.commit()
+#         return jsonify(car.serialize()), 200
 
 
-    elif request.method == 'DELETE':
-        db.session.delete(car)
-        db.session.commit()
-        return jsonify("Success!"), 200
+#     elif request.method == 'DELETE':
+#         db.session.delete(car)
+#         db.session.commit()
+#         return jsonify("Success!"), 200
 
-@app.route('/cars/<int:car_id>/booking', methods=['POST'], endpoint = 'book_car')
-@jwt_required()
-def book_car(car_id):
+# @app.route('/cars/<int:car_id>/booking', methods=['POST'], endpoint = 'book_car')
+# @jwt_required()
+# def book_car(car_id):
 
-    car = Car.query.get_or_404(car_id)
+#     car = Car.query.get_or_404(car_id)
 
-    if request.method == 'POST':
-        current_user = get_jwt_identity()
-        data = request.get_json()
+#     if request.method == 'POST':
+#         current_user = get_jwt_identity()
+#         data = request.get_json()
 
-        if car.user_id:
-            abort(400, "Car already booked")
+#         if car.user_id:
+#             abort(400, "Car already booked")
 
-        car.user_id = data['user_id']
-        db.session.commit()
+#         car.user_id = data['user_id']
+#         db.session.commit()
 
-        return jsonify({"message": "Car booked successfully"}), 200
+#         return jsonify({"message": "Car booked successfully"}), 200
 
-@app.route('/cars', methods=['GET', 'POST'], endpoint = 'cars')
-@jwt_required()
-def cars():
+# @app.route('/cars', methods=['GET', 'POST'], endpoint = 'cars')
+# @jwt_required()
+# def cars():
 
-  if request.method == 'GET':
-     # Handle GET request
-    cars = Car.query.all()
-    car_list = []
+#   if request.method == 'GET':
+#      # Handle GET request
+#     cars = Car.query.all()
+#     car_list = []
 
-    for car in cars:
-        car_data = car.serialize()
+#     for car in cars:
+#         car_data = car.serialize()
 
-        if car.user:
+#         if car.user:
      
-            car_data['user_id'] = car.user.serialize()
-        else:
+#             car_data['user_id'] = car.user.serialize()
+#         else:
 
-            car_data['user_id'] = None
+#             car_data['user_id'] = None
 
-        car_list.append(car_data)
+#         car_list.append(car_data)
 
-    return jsonify(car_list)
+#     return jsonify(car_list)
 
-  elif request.method == 'POST' :
+#   elif request.method == 'POST' :
 
-    data = request.get_json()
-    user_id = data.get('user_id', None)
+#     data = request.get_json()
+#     user_id = data.get('user_id', None)
 
-    new_car = Car(make=data['make'], model=data['model'], user_id=user_id)
-    db.session.add(new_car)
-    db.session.commit()
+#     new_car = Car(make=data['make'], model=data['model'], user_id=user_id)
+#     db.session.add(new_car)
+#     db.session.commit()
 
-    return jsonify(new_car.serialize()), 201 
+#     return jsonify(new_car.serialize()), 201 
 
 @app.route('/users', methods=['GET', 'POST'], endpoint = 'users')
 @jwt_required()
@@ -364,10 +262,10 @@ def get_user_by_id(user_id):
     elif request.method == 'DELETE':
         user_id = user.id
 
-        cars_to_reset = Car.query.filter_by(user_id=user_id).all()
+        # cars_to_reset = Car.query.filter_by(user_id=user_id).all()
 
-        for car in cars_to_reset:
-            car.user = None
+        # for car in cars_to_reset:
+        #     car.user = None
 
         db.session.delete(user)
         db.session.commit()
@@ -404,6 +302,4 @@ def client():
 
 if __name__ == "__main__":
     app.run(port=5001) # På MacOS, byt till 5001 eller dylikt
-
-print("Test")
 

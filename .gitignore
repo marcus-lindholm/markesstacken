@@ -5,4 +5,4 @@ __pycache__
 venv/
 
 # Database
-server/database.db
+server/instance/database.db
