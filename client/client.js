@@ -1,10 +1,61 @@
 var signedIn = false;
 var guserId;
 
+//drop-down for profile 
+$(document).ready(function () {
+  $('.dropdown-toggle').dropdown();
+});
+
+//PAGES 
+
 function ShowHomePage() {
   $(".nav-link.login, .nav-link.sign-up").toggleClass('d-none', signedIn);
   $(".nav-link.logout, .nav-link.cars").toggleClass('d-none', !signedIn);
-  //$(".container").html($("#view-home").html());
+  $(".container").html($("#view-home").html());
+}
+
+function ShowAboutusPage() {
+  $(".container").html($("#view-aboutus").html());
+}
+
+function ShowFavoritesPage() {
+  $(".container").html($("#view-favorites").html());
+}
+
+function ShowPurchasePage() {
+  $(".container").html($("#view-purchase").html());
+}
+
+function ShowSellPage() {
+  $(".container").html($("#view-sell").html());
+}
+
+function ShowShoppingcartPage() {
+  $(".container").html($("#view-shoppingcart").html());
+}
+
+function ShowOrdersPage() {
+  $(".container").html($("#view-orders").html());
+}
+
+function ShowReturnsPage(){
+  $(".container").html($("#view-returns").html());
+}
+
+function ShowProfileinfoPage(){
+  $(".container").html($("#view-profileinfo").html());
+}
+
+function ShowSettingsPage(){
+  $(".container").html($("#view-settings").html());
+}
+
+function ShowLogoutPage(){
+  $(".container").html($("#view-logout").html());
+}
+
+function ShowQuestionsPage(){
+  $(".container").html($("#view-questions").html());
 }
 
 function ShowContactPage() {
@@ -36,17 +87,19 @@ function showAlert(type, heading, message) {
 }
 
 
-function ShowCarsPage() {
-  $(".container").html($("#view-cars").html());
 
-  displayCarList();
+// function ShowCarsPage() {
+//   $(".container").html($("#view-cars").html());
 
-  if (JSON.parse(sessionStorage.getItem('auth')).user.is_admin) {
-    $(".add-car-btn").show();
-  } else {
-    $(".add-car-btn").hide();
-  }
-}
+//   displayCarList();
+
+//   if (JSON.parse(sessionStorage.getItem('auth')).user.is_admin) {
+//     $(".add-car-btn").show();
+//   } else {
+//     $(".add-car-btn").hide();
+//   }
+// }
+
 
 
 
@@ -378,8 +431,9 @@ $(document).ready(function () {
   $(".nav-link.login, .nav-link.sign-up").toggleClass('d-none', signedIn);
 
   // Navigation click event handlers
-  $(".nav-link.home").click(function () {
 
+  //NAVBAR-LINKS
+  $(".nav-link.home").click(function () {
       ShowHomePage();
   });
 
@@ -387,22 +441,72 @@ $(document).ready(function () {
       ShowContactPage();
   });
 
-  $(".nav-link.cars").click(function () {
-      ShowCarsPage();
+  $(".navbar-brand.logo").click(function () {
+    ShowHomePage();
+});
+
+  $(".nav-link.purchase").click(function () {
+      ShowPurchasePage();
   });
+
+  $(".nav-link.sell").click(function () {
+    ShowSellPage();
+});
+
+  $(".nav-link.aboutus").click(function () {
+    ShowAboutusPage();
+});
+
   $(".nav-link.sign-up").click(function () {
     if (!signedIn) {
       ShowSignUpPage();
     }
   });
+
   $(".nav-link.login").click(function () {
     if (!signedIn) {
       ShowLoginPage();
     }
   });
+
   $(".nav-link.logout").click(function () {
     ShowLogoutPage();
 });
+
+$(".nav-link.favorites").click(function () {
+  ShowFavoritesPage();
+});
+
+$(".nav-link.shoppingcart").click(function () {
+  ShowShoppingcartPage();
+});
+
+$(".nav-item.dropdown .dropdown-menu .orders").click(function () {
+  ShowOrdersPage();
+});
+
+$(".nav-item.dropdown .dropdown-menu .returns").click(function () {
+  ShowReturnsPage();
+});
+
+$(".nav-item.dropdown .dropdown-menu .profileinfo").click(function () {
+  ShowProfileinfoPage();
+});
+
+$(".nav-item.dropdown .dropdown-menu .settings").click(function () {
+  ShowSettingsPage();
+});
+
+$(".nav-item.dropdown .dropdown-menu .logout").click(function () {
+  ShowLogoutPage();
+});
+
+//FOOTER-LINKS
+$(".footer-link.questions").click(function () {
+  ShowQuestionsPage();
+});
+
+
 });
 $(document).on("click", ".refresh-car-btn", function () {
   refreshCarList();

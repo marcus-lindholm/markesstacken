@@ -45,6 +45,7 @@ p {
     position: sticky;
     top: 0;
     background-color: #C8E0EA;
+    z-index: 1000;
     /*background: linear-gradient(to bottom, rgba(200, 224, 234, 1), rgba(200, 224, 234, 0.3)); /* Adjust colors and opacity as needed */
 
 }
@@ -74,6 +75,11 @@ p {
     padding: 80px; 
     width: 100%; /* Make the footer span the full width of the viewport */
 }
+
+.footer-link {
+    color: black; /* Set link color */
+    text-decoration: none; /* Remove default underline */
+  }
 
 .space-between {
     padding-right: 20px; /* Adjust the value as needed */
