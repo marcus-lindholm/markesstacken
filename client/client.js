@@ -58,6 +58,10 @@ function ShowQuestionsPage(){
   $(".container").html($("#view-questions").html());
 }
 
+function ShowQuestionsReturnsPage(){
+  $(".container").html($("#returns-section").html());
+}
+
 function ShowContactPage() {
   $(".container").html($("#view-contact").html());
 
@@ -502,9 +506,15 @@ $(".nav-item.dropdown .dropdown-menu .logout").click(function () {
 });
 
 //FOOTER-LINKS
+$(".footer-link.shippingReturns").click(function () {
+  ShowQuestionsReturnsPage();
+});
+
 $(".footer-link.questions").click(function () {
   ShowQuestionsPage();
 });
+
+
 
 
 });

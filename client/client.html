@@ -203,20 +203,22 @@
                     <div class="col-md-4">
                       <br>
                         <h5>Vanliga Frågor</h5>
-                        <a href="#" class="footer-link questions">Vanliga Frågor</a>
-                          <p>Frakt och retur</p>
-                          <p>Betalning</p>
-                          <p>Hur säljer jag mina märken?​<p>
-                          <p>Hur köper jag märken?​<p>
-                          <p>Hur hämtar jag mina märken?<p>
+                        <a href="#" class="footer-link shippingReturns"><br>Frakt och retur</a>
+                        <a href="#" class="footer-link payment"><br>Betalning</a>
+                        <a href="#" class="footer-link howToSell"><br>Hur säljer jag mina märken?</a>
+                        <a href="#" class="footer-link howToBuy"><br>Hur köper jag märken?</a>
+                        <a href="#" class="footer-link howToGet"><br>Hur hämtar jag mina märken?</a>
                     </div>
                    <div class="col-md-4">
                     <br>
                     <h5>Om Märkesstacken</h5>
-                        <p>Vi är ett gäng studenter som kände att den nuvarande situationen med att köpa och sälja märken inte var den smidigaste lösningen. Därför gick vi ihop och skapade Märkesstacken For Students By Students.</p>
+                        <p>Vi är ett gäng studenter som kände att den nuvarande situationen med att 
+                          köpa och sälja märken inte var den smidigaste lösningen. 
+                          Därför gick vi ihop och skapade Märkesstacken For Students By Students.</p>
                         <p></p>
                     <h5>Kontakt</h5>
                     <p>Tel: 076 762486​</p>
+                    </p>Mail: markesstacken@markesstacken.se​​</p>
                     </p>Linköpings universitet 581 83​​</p>
                    </div>
                    <div class="col-md-4">
@@ -303,13 +305,12 @@
 
     <!--VIEW-LOGOUT-->
     <script id="view-logout" type="text/html">
-      <h2>This will log you out of the page</h2>
+      <h2>Vill du logga ut?</h2>
       <form id="logoutForm" action="/logout" method="POST">
 
-        <button type="submit" style="font-size: 16px; color: white; background-color: red; padding: 10px 20px; border: none;">Logout</button>
+        <button type="submit" style="font-size: 16px; color: white; background-color: red; padding: 10px 20px; border: none;">Logga ut</button>
 
       </form>
-      <h2>Be carful!</h2>
     </script>
     
   
@@ -340,55 +341,37 @@
 
     <!--VIEW-CONTACT-->
     <script id="view-contact" type="text/html">
-      <h1>Contact Us</h1>
+      <h1>Kontakta oss</h1>
 
       <!-- Contact Information -->
       <div class="row">
         <div class="col-md-6">
-          <h2>Contact Information - CSMO</h2>
-          <p><strong>Name:</strong> Anton Hanstrom</p>
-          <p><strong>Email:</strong> Antonha@live.se</p>
-          <p><strong>Phone:</strong> +46 708821623</p>
-          <p><strong>Address:</strong> Vasavägen 44G, Linkoping</p>
+          <h3>Kontaktinformation</h3>
+          <p><strong>Mail:</strong> markesstacken@markesstacken.se</p>
+          <p><strong>Telefon:</strong> +46 708821623</p>
+          <p><strong>Address:</strong> Linköpings Universitet</p>
         </div>
-
-        <div class="col-md-6">
-          <h2>Contact Information - CGLO</h2>
-          <p><strong>Name:</strong> William Eriksson</p>
-          <p><strong>Email:</strong> wiler441@student.liu.se</p>
-          <p><strong>Phone:</strong> +46 703920615</p>
-          <p><strong>Address:</strong> Björnkärrsgatan 7J, Linköping</p>
-        </div>
-
-        <div class="col-md-6">
-          <h2>Contact Information - COO</h2>
-          <p><strong>Name:</strong> Jung Kook</p>
-          <p><strong>Email:</strong> jungkook@BTS.com</p>
-          <p><strong>Phone:</strong> +82 10 8880609</p>
-          <p><strong>Address:</strong> 456 Wangsimini-Ro, Seoul</p>
-        </div>
-
 
       </div>
 
       <!-- Contact Form -->
       <div class="row mt-4">
           <div class="col-md-6">
-              <h2>Contact Form</h2>
+              <h2>Skicka in en fråga</h2>
               <form class="contact-form">
                   <div class="form-group">
-                      <label for="name">Name</label>
-                      <input type="text" class="form-control" id="name" placeholder="Enter your name">
+                      <label for="name">Namn</label>
+                      <input type="text" class="form-control" id="name" placeholder="Fyll i namn">
                   </div>
                   <div class="form-group">
-                      <label for="email">Email</label>
-                      <input type="email" class="form-control" id="email" placeholder="Enter your email">
+                      <label for="email">Mail</label>
+                      <input type="email" class="form-control" id="email" placeholder="Fyll i mailadress">
                   </div>
                   <div class="form-group">
-                      <label for="message">Message</label>
-                      <textarea class="form-control" id="message" rows="3" placeholder="Enter your message"></textarea>
+                      <label for="message">Meddelande</label>
+                      <textarea class="form-control" id="message" rows="3" placeholder="Skriv din fråga"></textarea>
                   </div>
-                  <button type="submit" class="btn btn-primary">Send Message</button>
+                  <button type="submit" class="btn btn-primary">Skicka</button>
               </form>
           </div>
       </div>
@@ -407,6 +390,64 @@
     <!--VIEW-PURCHASE-->
     <script id="view-purchase" type="text/html">
       <h1>View-Purchase</h1>
+
+      <div class="card-group">
+      <div class="card" style="width: 18rem;">
+        <img src="Images/logo.png" class="card-img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title">Produkt 1</h5>
+          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+          <div class="form-group">
+            <label for="quantity">Antal:</label>
+            <input type="number" id="quantity" class="form-control" value="1" min="1">
+          </div>
+          <button class="btn btn-light">Lägg till i varukorgen</button>  
+          <!--Like-button-->
+          <button class="btn btn-outline-dark">
+            <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+              <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="card" style="width: 18rem;">
+        <img src="Images/logo.png" class="card-img-top" alt="..." width="50px">
+        <div class="card-body">
+          <h5 class="card-title">Produkt 2</h5>
+          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+          <div class="form-group">
+            <label for="quantity">Antal:</label>
+            <input type="number" id="quantity" class="form-control" value="1" min="1">
+          </div>
+          <button class="btn btn-light">Lägg till i varukorgen</button>  
+          <button class="btn btn-light">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+              <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+            </svg>
+          </button>        
+        </div>
+      </div>
+
+      <div class="card" style="width: 18rem;">
+        <img src="Images/logo.png" class="card-img-top" alt="..." width="50px">
+        <div class="card-body">
+          <h5 class="card-title">Produkt 3</h5>
+          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+          <div class="form-group">
+            <label for="quantity">Antal:</label>
+            <input type="number" id="quantity" class="form-control" value="1" min="1">
+          </div>
+          <button class="btn btn-light">Lägg till i varukorgen</button>  
+          <button class="btn btn-light">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+              <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+            </svg>
+          </button>      
+        </div>
+
+    </div>
+
     </script>
 
      <!--VIEW-FAVORITES-->
@@ -447,6 +488,41 @@
       <!--VIEW-QUESTIONS-->
       <script id="view-questions" type="text/html">
         <h1>View-Questions</h1>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g</li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g</li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g</li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g</li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <div id="returns-section">
+          <h2>Info about Returns</h2>
+        </div>
       </script>
 
   
