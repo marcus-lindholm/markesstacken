@@ -6,7 +6,7 @@ $(document).ready(function () {
   $('.dropdown-toggle').dropdown();
 });
 
-//PAGES 
+//HOME-PAGE
 
 function ShowHomePage() {
   $(".nav-link.login, .nav-link.sign-up").toggleClass('d-none', signedIn);
@@ -14,54 +14,83 @@ function ShowHomePage() {
   $(".container").html($("#view-home").html());
 }
 
+//ABOUTUS-PAGE
 function ShowAboutusPage() {
   $(".container").html($("#view-aboutus").html());
 }
 
+//FAVORITES-PAGE
 function ShowFavoritesPage() {
   $(".container").html($("#view-favorites").html());
 }
 
+//PURCHASE-PAGE
 function ShowPurchasePage() {
   $(".container").html($("#view-purchase").html());
 }
 
+//SELL-PAGE
 function ShowSellPage() {
   $(".container").html($("#view-sell").html());
 }
 
+function ShowContactPage() {
+  $(".container").html($("#view-contact").html());
+}
+
+//SHOPPINGCART-PAGE
 function ShowShoppingcartPage() {
   $(".container").html($("#view-shoppingcart").html());
 }
 
+//ORDERS-PAGE
 function ShowOrdersPage() {
   $(".container").html($("#view-orders").html());
 }
 
+//RETURNS-PAGE
 function ShowReturnsPage(){
   $(".container").html($("#view-returns").html());
 }
 
+//PROFILE-PAGE
 function ShowProfileinfoPage(){
   $(".container").html($("#view-profileinfo").html());
 }
 
+//SETTINGS-PAGE
 function ShowSettingsPage(){
   $(".container").html($("#view-settings").html());
 }
 
+//LOGOUT-PAGE
 function ShowLogoutPage(){
   $(".container").html($("#view-logout").html());
 }
 
+//QUESTION-PAGES
 function ShowQuestionsPage(){
   $(".container").html($("#view-questions").html());
 }
 
-function ShowQuestionsReturnsPage(){
-  $(".container").html($("#returns-section").html());
+//FAQ-PAGES
+function ShowQuestionsShippingAndReturnsPage(){
+  $(".container").html($("#shipping-and-returns-section").html());
+}
+function ShowQuestionsPaymentPage(){
+  $(".container").html($("#payment-section").html());
+}
+function ShowQuestionsSellingPage(){
+  $(".container").html($("#selling-section").html());
+}
+function ShowQuestionsBuyingPage(){
+  $(".container").html($("#buying-section").html());
+}
+function ShowQuestionsCollectingPage(){
+  $(".container").html($("#collecting-section").html());
 }
 
+//CONTACT-PAGE
 function ShowContactPage() {
   $(".container").html($("#view-contact").html());
 
@@ -77,6 +106,7 @@ function ShowContactPage() {
   });
 }
 
+//??
 function showAlert(type, heading, message) {
   var alertHTML = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">';
   alertHTML += '<strong>' + heading + '</strong> ' + message;
@@ -106,7 +136,7 @@ function showAlert(type, heading, message) {
 
 
 
-
+//FUNCTIONS
 function refreshCarList() {
 
   $(".car-list").empty();
@@ -425,6 +455,8 @@ function ShowLogoutPage() {
 
 }
 
+//CLICK-EVENTS
+
 $(document).ready(function () {
   // Show home page on initial load
   ShowHomePage();
@@ -507,13 +539,33 @@ $(".nav-item.dropdown .dropdown-menu .logout").click(function () {
 
 //FOOTER-LINKS
 $(".footer-link.shippingReturns").click(function () {
-  ShowQuestionsReturnsPage();
+  ShowQuestionsPage();
+  ShowQuestionsShippingAndReturnsPage();
 });
 
 $(".footer-link.questions").click(function () {
   ShowQuestionsPage();
 });
 
+$(".footer-link.buying").click(function () {
+  ShowQuestionsPage();
+  ShowQuestionsBuyingPage();
+});
+
+$(".footer-link.selling").click(function () {
+  ShowQuestionsPage();
+  ShowQuestionsSellingPage();
+});
+
+$(".footer-link.payment").click(function () {
+  ShowQuestionsPage();
+  ShowQuestionsPaymentPage();
+});
+
+$(".footer-link.collecting").click(function () {
+  ShowQuestionsPage();
+  ShowQuestionsCollectingPage();
+});
 
 
 
