@@ -386,123 +386,157 @@
 
    <!--VIEW-SELLING PAGE-->
 
-    <!--VIEW-SELL-->
-     <script id="view-sell" type="text/html">
-    
-          <h1>Säljformulär</h1>
-          <form id="sellForm" enctype="multipart/form-data">
-            <div>
-              <label for="productName">Product Name:</label>
-              <input type="text" id="productName" name="productName" required>
-            </div>
-            <div>
-              <label for="productDescription">Product Description:</label>
-              <textarea id="productDescription" name="productDescription" required></textarea>
-            </div>
-            <div>
-              <label for="productPrice">Product Price:</label>
-              <input type="number" id="productPrice" name="productPrice" min="0" step="0.01" required>
-            </div>
-            <div>
+    <script id="view-sell" type="text/html"></div>
+      <h1>Säljformulär</h1>
+      <form id="sellForm" enctype="multipart/form-data" class="nice-form">
+          <div class="form-group">
+              <label for="productName">Produktnamn:</label>
+              <input type="text" id="productName" name="productName" class="form-control" required>
+          </div>
+          <div class="form-group">
+              <label for="productDescription">Produktbeskrivning:</label>
+              <textarea id="productDescription" name="productDescription" class="form-control" rows="4" required></textarea>
+          </div>
+          <div class="form-group">
+              <label for="productPrice">Prisförslag:</label>
+              <input type="number" id="productPrice" name="productPrice" min="0" step="0.01" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="productQuantity">Kvantitet:</label>
+            <input type="number" id="productQuantity" name="productQuantity" min="0" step="0.01" class="form-control" required>
+        </div>
+          <div class="form-group">
               <label for="productImage">Product Image:</label>
-              <input type="file" id="productImage" name="productImage" accept="image/*" required>
-            </div>
-            <div>
-              <button type="submit">Submit</button>
-            </div>
-          </form>
-      </div>
-  </div>
-</script>
+              <input type="file" id="productImage" name="productImage" accept="image/*" class="form-control-file" required>
+          </div>
+          <div class="form-group">
+            <label for="productOtherNotes">Övriga noteringar:</label>
+            <textarea id="productOtherNotes" name="productOtherNotes" class="form-control" rows="4" required></textarea>
+        </div>
+          <div class="form-group">
+              <button type="submit" class="btn btn-primary">Skicka</button>
+          </div>
+      </form>
+    </div>
+  </script>
+
 
     <!--VIEW-ABOUTUS-->
     <script id="view-aboutus" type="text/html">
-      <h1>View-Aboutus</h1>
-    </script>
-
-    
-    <!--VIEW-PURCHASE-->
-    <script id="view-purchase" type="text/html">
-      <h1>View-Purchase</h1>
-
-        <div class="row">
-          <!-- Sidebar -->
-          <div class="col-md-3">
-            <div id="sidebar">
-              <h2>Filters</h2>
-              <!-- Add your filter options here -->
-              <div class="form-group">
-                <label for="filterCategory">Category:</label>
-                <select class="form-control" id="filterCategory">
-                  <option value="">All</option>
-                  <option value="Category 1">Category 1</option>
-                  <option value="Category 2">Category 2</option>
-                  <!-- Add more options as needed -->
-                </select>
-              </div>
-              <!-- Add more filter options as needed -->
-            </div>
-      
-
-      <div class="card-group">
-      <div class="card" style="width: 18rem;">
-        <img src="Images/logo.png" class="card-img-top" alt="...">
-        <div class="card-body">
-          <h5 class="card-title">Produkt 1</h5>
-          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-          <div class="form-group">
-            <label for="quantity">Antal:</label>
-            <input type="number" id="quantity" class="form-control" value="1" min="1">
-          </div>
-          <button class="btn btn-light">Lägg till i varukorgen</button>  
-          <!--Like-button-->
-          <button class="btn btn-outline-dark">
-            <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
-              <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
-            </svg>
-          </button>
+   
+      <div class="aboutus-container">
+        <div class="aboutus-text">
+            <h1>About Us</h1>
+            <p>hej.</p>
         </div>
-      </div>
-
-      <div class="card" style="width: 18rem;">
-        <img src="Images/logo.png" class="card-img-top" alt="..." width="50px">
-        <div class="card-body">
-          <h5 class="card-title">Produkt 2</h5>
-          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-          <div class="form-group">
-            <label for="quantity">Antal:</label>
-            <input type="number" id="quantity" class="form-control" value="1" min="1">
-          </div>
-          <button class="btn btn-light">Lägg till i varukorgen</button>  
-          <button class="btn btn-light">
-            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
-              <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
-            </svg>
-          </button>        
+        <div class="aboutus-image">
+            <img src="Images/logo.png" alt="About Us Image">
         </div>
-      </div>
-
-      <div class="card" style="width: 18rem;">
-        <img src="Images/logo.png" class="card-img-top" alt="..." width="50px">
-        <div class="card-body">
-          <h5 class="card-title">Produkt 3</h5>
-          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-          <div class="form-group">
-            <label for="quantity">Antal:</label>
-            <input type="number" id="quantity" class="form-control" value="1" min="1">
-          </div>
-          <button class="btn btn-light">Lägg till i varukorgen</button>  
-          <button class="btn btn-light">
-            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
-              <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
-            </svg>
-          </button>      
-        </div>
-
     </div>
 
-
     </script>
+
+
+    <!--VIEW-PURCHASE PAGE-->
+<script id="view-purchase" type="text/html">
+  <h1>View-Purchase</h1>
+
+  <div class="row">
+    <!-- Sidebar filter-->
+    <div class="col-md-3">
+      <div id="sidebar">
+        <h2>Filters</h2>
+   
+        <div class="form-group">
+          <label for="filterCategory">Category:</label>
+          <select class="form-control" id="filterCategory">
+            <option value="">All</option>
+            <option value="Category 1">Category 1</option>
+            <option value="Category 2">Category 2</option>
+          
+          </select>
+        </div>
+   
+      </div>
+    </div>
+
+    <!-- Products -->
+    <div class="col-md-9">
+      <div class="row">
+        <!-- Product 1 -->
+        <div class="col-md-4">
+          <div class="card">
+            <img src="Images/logo.png" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">Product 1</h5>
+              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+              <div class="form-group">
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" class="form-control" value="1" min="1">
+              </div>
+              <button class="btn btn-light">Add to Cart</button>  
+              <!-- Like-button -->
+              <button class="btn btn-outline-dark">
+                <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                  <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 2 -->
+        <div class="col-md-4">
+          <div class="card">
+            <img src="Images/logo.png" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">Product 2</h5>
+              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+              <div class="form-group">
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" class="form-control" value="1" min="1">
+              </div>
+              <button class="btn btn-light">Add to Cart</button>  
+              <!-- Like-button -->
+              <button class="btn btn-outline-dark">
+                <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                  <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 3 -->
+        <div class="col-md-4">
+          <div class="card">
+            <img src="Images/logo.png" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">Product 3</h5>
+              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+              <div class="form-group">
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" class="form-control" value="1" min="1">
+              </div>
+              <button class="btn btn-light">Add to Cart</button>  
+              <!-- Like-button -->
+              <button class="btn btn-outline-dark">
+                <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                  <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+  
+
+
+      </div>
+    </div>
+  </div>
+</script>
+
+
 
       <!--VIEW-PURCHASE-DONE-->
       <script id="view-purchase-done" type="text/html">

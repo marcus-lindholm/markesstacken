@@ -102,3 +102,85 @@ p {
     width: 40px;
     text-align: center;
   }
+
+
+
+
+/* CSS styles for the form */
+.nice-form {
+    max-width: 600px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+.form-control-file {
+    width: 100%;
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+.btn-primary {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    border: 1px solid #007bff;
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+
+
+.aboutus-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 20px; /* Space between columns */
+    max-width: 800px;
+    margin: auto;
+}
+
+.aboutus-text {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.aboutus-text h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.aboutus-text p {
+    font-size: 18px;
+    line-height: 1.6;
+    text-align: justify;
+}
+.aboutus-image {
+    text-align: center;
+}
+
+.aboutus-image img {
+    max-width: 100%;
+    height: auto;
+}
