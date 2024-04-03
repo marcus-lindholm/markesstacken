@@ -21,26 +21,28 @@ db = SQLAlchemy(app)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    password = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False)
     firstName = db.Column(db.String, nullable=False)
     lastName = db.Column(db.String, nullable=False)
-    #ShoppingCartID = db.relationship('ShoppingCart', backref='shopping_cart', lazy=True, uselist=False)
-    #paymentID = db.Column(db.Integer, db.ForeignKey('payment.id'), nullable=True)
-    #orderID = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=True)
+    is_admin = db.Column(db.Boolean, default=False, nullable=True)
+    password_hash = db.Column(db.String, nullable=False)
+    shoppingcart_id = db.Column(db.Integer, db.ForeignKey('shopping_cart.id'), nullable=True)
+    shoppingcart = db.relationship('ShoppingCart', backref='shopping_cart', lazy=True, uselist=False)
+    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=True)
+    orders = db.relationship('Order', backref='order_id', lazy=True, uselist=True)
 
     def __repr__(self):
         return f'<User {self.id}: {self.name} ({self.email})>'
 
     def serialize(self):
-        return dict(id=self.id, name=self.name, email=self.email, is_admin=self.is_admin)
+        return dict(id=self.id, firstName=self.firstName, lastName=self.lastName, email=self.email, is_admin=self.is_admin, 
+                    orders=[order.serialize() for order in self.orders] if self.orders else None, shoppingcart=self.shoppingcart.serialize() if self.shoppingcart else None)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password).decode('utf8')
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-
 
 class Car(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -61,7 +63,6 @@ class Subcategory(db.Model):
     name = db.Column(db.String, nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
     category = db.relationship('Category', backref='subcategories', lazy=True)
-    productID = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=True) #nullable???
 
     def __repr__(self):
         return f'<Subcategory {self.id}: {self.name}: {self.category}>'
@@ -85,24 +86,85 @@ class Category(db.Model):
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
     price = db.Column(db.Float, nullable=False)
-    description = db.Column(db.String, nullable=True)
     quantity = db.Column(db.Integer, nullable=False)
-    image = db.Column(db.LargeBinary, nullable=True)
+    name = db.Column(db.String, nullable=False)
+    description = db.Column(db.String, nullable=True)
+    img = db.Column(db.LargeBinary, nullable=True) #eget image library (imgID)
+    subcategory_id = db.Column(db.Integer, db.ForeignKey('subcategory.id'), nullable=True)
+    subcategory = db.relationship('Subcategory', backref='products', lazy=True, foreign_keys=[subcategory_id])
 
     def __repr__(self):
-        return f'<Product {self.id}: {self.name} ({self.price})>'
-
+        return f'<Product {self.id}: {self.name}: {self.price}>'
+    
     def serialize(self):
-        return dict(id=self.id, name=self.name, price=self.price, description=self.description)
+        return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity,
+            description=self.description, img=self.img, subcategory=self.subcategory.serialize() if self.subcategory else None)
+        
+class CartItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)    
+    quantity = db.Column(db.Integer, nullable=False) #quantity of each product
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    product = db.relationship('Product', backref='cartitems', lazy=True)
+    shoppingcart_id = db.Column(db.Integer, db.ForeignKey('shopping_cart.id'), nullable=False)
+    shoppingcart = db.relationship('ShoppingCart', backref='cartitems', lazy=True)
 
+    def __repr__(self):
+        return f'<CartItem {self.id}: {self.quantity}'
+    
+    def serialize(self):
+        return dict(id=self.id, quantity=self.quantity, product=self.product.serialize() if self.product else None)
+
+class ShoppingCart(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    def __repr__(self):
+        return f'<ShoppingCart {self.id}>'
+    
+    def serialize(self):
+        return {
+            'id': self.id,
+            'cartitems': [cartitem.serialize() for cartitem in self.cartitems]
+        }
+
+class Order(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    shoppingcart_id = db.Column(db.Integer, db.ForeignKey('shopping_cart.id'), nullable=False)
+    shoppingcart = db.relationship('ShoppingCart', backref='orders', lazy=True)
+    payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'), nullable=False)
+    payment = db.relationship('Payment', backref='orders', lazy=True)
+    
+    def __repr__(self):
+        return f'<Order {self.id}>'
+    
+    def serialize(self):
+        return {
+            'id': self.id,
+            'shoppingcart': self.shoppingcart.serialize() if self.shoppingcart else None,
+            'payment': self.payment.serialize() if self.payment else None
+        }
+
+class Payment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    paymentDate = db.Column(db.DateTime, nullable=False) 
+    paymentAmount = db.Column(db.Float, nullable=False)
+
+    def __repr__(self):
+        return f'<Payment {self.id}: {self.paymentAmount}'
+    
+    def serialize(self):
+        return {
+            'id': self.id,
+            'paymentDate': self.paymentDate,
+            'paymentAmount': self.paymentAmount
+        }
+    
 with app.app_context():
     db.drop_all() #Remove before production
     db.create_all()
     db.session.commit()
 
-    #THIS IS FOR DEFAULT CATEGORIES OR TESTING
+    #THIS IS ONLY FOR DEFAULT CLASSES AND/OR TESTING
     category1 = Category(name='Kravaller')
     category2 = Category(name='Övrigt')
     db.session.add(category1)
@@ -111,8 +173,193 @@ with app.app_context():
     subcat2 = Subcategory(name='Festivallen', category=category1)
     db.session.add(subcat1)
     db.session.add(subcat2)
+    product1 = Product(name='UK 2022', price=30, quantity=100, description='Märke från UK 2022.', subcategory=subcat1)
+    product2 = Product(name='Festivallen 1995', price=50, quantity=10, description='Märke från Festivallen 1995.', subcategory=subcat2)
+    db.session.add(product1)
+    db.session.add(product2)
+    shoppingcart1 = ShoppingCart()
+    db.session.add(shoppingcart1)
+    cartitem1 = CartItem(quantity=2, product=product1, shoppingcart_id=1)
+    cartitem2 = CartItem(quantity=3, product=product2, shoppingcart_id=1)
+    db.session.add(cartitem1)
+    db.session.add(cartitem2)
+    user1 = User(email='johndoe@mail.com', firstName='John', lastName='Doe', is_admin=False, shoppingcart_id=1)
+    user1.set_password('password')
+    db.session.add(user1)
+    payment1 = Payment(paymentDate=datetime.now(), paymentAmount=100.0)
+    db.session.add(payment1)
+    order1 = Order(shoppingcart=shoppingcart1, payment=payment1)
+    db.session.add(order1)
+    user1.orders.append(order1)
 
     db.session.commit()
+
+@app.route('/payments', methods=['GET', 'POST'], endpoint='payments')
+#@jwt_required()
+def payments():
+    if request.method == 'GET':
+        payments = Payment.query.all()
+        payment_list = [payment.serialize() for payment in payments]
+        return jsonify(payment_list)
+
+    elif request.method == 'POST' and get_jwt_identity().is_admin:
+        data = request.get_json()
+        new_payment = Payment(paymentDate=datetime.now(), paymentAmount=data['paymentAmount'])
+        db.session.add(new_payment)
+        db.session.commit()
+        return jsonify(new_payment.serialize()), 201
+
+@app.route('/orders', methods=['GET', 'POST'], endpoint='orders')
+#@jwt_required()
+def orders():
+    if request.method == 'GET':
+        orders = Order.query.all()
+        order_list = [order.serialize() for order in orders]
+        return jsonify(order_list)
+
+    elif request.method == 'POST' and get_jwt_identity().is_admin:
+        data = request.get_json()
+        new_order = Order()
+        db.session.add(new_order)
+        db.session.commit()
+        return jsonify(new_order.serialize()), 201
+
+@app.route('/orders/<int:order_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='order_by_id')
+#@jwt_required()
+def order_by_id(order_id):
+    order = Order.query.get_or_404(order_id)
+
+    if request.method == 'GET':
+        return jsonify(order.serialize())
+
+    elif request.method == 'PUT' and get_jwt_identity().is_admin:
+        data = request.get_json()
+        if 'shoppingcart_id' in data:
+            order.shoppingcart_id = data['shoppingcart_id']
+        db.session.commit()
+        return jsonify(order.serialize()), 200
+
+    elif request.method == 'DELETE' and get_jwt_identity().is_admin:
+        db.session.delete(order)
+        db.session.commit()
+        return jsonify("Success!"), 200
+
+@app.route('/shoppingcarts', methods=['GET', 'POST'], endpoint='shoppingcarts')
+#@jwt_required()
+def shoppingcarts():
+    if request.method == 'GET':
+        shoppingcarts = ShoppingCart.query.all()
+        shoppingcart_list = [shoppingcart.serialize() for shoppingcart in shoppingcarts]
+        return jsonify(shoppingcart_list)
+
+    elif request.method == 'POST' and get_jwt_identity().is_admin:
+        data = request.get_json()
+        new_shoppingcart = ShoppingCart()
+        db.session.add(new_shoppingcart)
+        db.session.commit()
+        return jsonify(new_shoppingcart.serialize()), 201
+
+@app.route('/shoppingcarts/<int:shoppingcart_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='shoppingcart_by_id')
+#@jwt_required()
+def shoppingcart_by_id(shoppingcart_id):
+    shoppingcart = ShoppingCart.query.get_or_404(shoppingcart_id)
+
+    if request.method == 'GET':
+        return jsonify(shoppingcart.serialize())
+
+    elif request.method == 'PUT' and get_jwt_identity().is_admin:
+        data = request.get_json()
+        if 'cartitems' in data:
+            shoppingcart.cartitems = data['cartitems']
+        db.session.commit()
+        return jsonify(shoppingcart.serialize()), 200
+
+    elif request.method == 'DELETE' and get_jwt_identity().is_admin:
+        db.session.delete(shoppingcart)
+        db.session.commit()
+        return jsonify("Success!"), 200
+
+@app.route('/cartitems', methods=['GET', 'POST'], endpoint='cartitems')
+#@jwt_required()
+def cartitems():
+    if request.method == 'GET':
+        cartitems = CartItem.query.all()
+        cartitem_list = [cartitem.serialize() for cartitem in cartitems]
+        return jsonify(cartitem_list)
+
+    elif request.method == 'POST' and get_jwt_identity().is_admin:
+        data = request.get_json()
+        new_cartitem = CartItem(quantity=data['quantity'], product_id=data['product_id'])
+        db.session.add(new_cartitem)
+        db.session.commit()
+        return jsonify(new_cartitem.serialize()), 201
+
+@app.route('/cartitems/<int:cartitem_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='cartitem_by_id')
+#@jwt_required()
+def cartitem_by_id(cartitem_id):
+    cartitem = CartItem.query.get_or_404(cartitem_id)
+
+    if request.method == 'GET':
+        return jsonify(cartitem.serialize())
+
+    elif request.method == 'PUT' and get_jwt_identity().is_admin:
+        data = request.get_json()
+        if 'quantity' in data:
+            cartitem.quantity = data['quantity']
+        if 'product_id' in data:
+            cartitem.product_id = data['product_id']
+        db.session.commit()
+        return jsonify(cartitem.serialize()), 200
+
+    elif request.method == 'DELETE' and get_jwt_identity().is_admin:
+        db.session.delete(cartitem)
+        db.session.commit()
+        return jsonify("Success!"), 200
+
+@app.route('/products', methods=['GET', 'POST'], endpoint='products')
+#@jwt_required()
+def products():
+    if request.method == 'GET':
+        products = Product.query.all()
+        product_list = [product.serialize() for product in products]
+        return jsonify(product_list)
+
+    elif request.method == 'POST' and get_jwt_identity().is_admin:
+        data = request.get_json()
+        new_product = Product(name=data['name'], price=data['price'], quantity=data['quantity'], description=data['description'], img=data['img'])
+        db.session.add(new_product)
+        db.session.commit()
+        return jsonify(new_product.serialize()), 201
+
+@app.route('/products/<int:product_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='product_by_id')
+#@jwt_required()
+def product_by_id(product_id):
+    product = Product.query.get_or_404(product_id)
+
+    if request.method == 'GET':
+        return jsonify(product.serialize())
+
+    elif request.method == 'PUT' and get_jwt_identity().is_admin:
+        data = request.get_json()
+        if 'name' in data:
+            product.name = data['name']
+        if 'price' in data:
+            product.price = data['price']
+        if 'quantity' in data:
+            product.quantity = data['quantity']
+        if 'description' in data:
+            product.description = data['description']
+        if 'img' in data:
+            product.img = data['img']
+        if 'subcategory_id' in data:
+            product.subcategory_id = data['subcategory_id']
+        db.session.commit()
+        return jsonify(product.serialize()), 200
+
+    elif request.method == 'DELETE' and get_jwt_identity().is_admin:
+        db.session.delete(product)
+        db.session.commit()
+        return jsonify("Success!"), 200 
 
 @app.route('/subcategories', methods=['GET', 'POST'], endpoint='subcategories')
 #@jwt_required()
