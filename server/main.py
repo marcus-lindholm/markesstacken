@@ -21,11 +21,13 @@ db = SQLAlchemy(app)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
+    password = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False)
-    is_admin = db.Column(db.Boolean, default=False, nullable=True)
-    password_hash = db.Column(db.String, nullable=False)
-    cars = db.relationship('Car', backref='user_cars', lazy=True)
+    firstName = db.Column(db.String, nullable=False)
+    lastName = db.Column(db.String, nullable=False)
+    #ShoppingCartID = db.relationship('ShoppingCart', backref='shopping_cart', lazy=True, uselist=False)
+    #paymentID = db.Column(db.Integer, db.ForeignKey('payment.id'), nullable=True)
+    #orderID = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=True)
 
     def __repr__(self):
         return f'<User {self.id}: {self.name} ({self.email})>'
@@ -53,15 +55,136 @@ class Car(db.Model):
 
     def serialize(self):
         return dict(id=self.id, make=self.make, model=self.model, user_id=self.user_id)
+
+class Subcategory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
+    category = db.relationship('Category', backref='subcategories', lazy=True)
+    productID = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=True) #nullable???
+
+    def __repr__(self):
+        return f'<Subcategory {self.id}: {self.name}: {self.category}>'
     
-with app.app_context(): 
+    def serialize(self):
+        return dict(
+            id=self.id, 
+            name=self.name, 
+            category=self.category.serialize() if self.category else None
+        )
+
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+
+    def __repr__(self):
+        return f'<Category {self.id}: {self.name}>'
+
+    def serialize(self):
+        return dict(id=self.id, name=self.name)
+
+class Product(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    description = db.Column(db.String, nullable=True)
+    quantity = db.Column(db.Integer, nullable=False)
+    image = db.Column(db.LargeBinary, nullable=True)
+
+    def __repr__(self):
+        return f'<Product {self.id}: {self.name} ({self.price})>'
+
+    def serialize(self):
+        return dict(id=self.id, name=self.name, price=self.price, description=self.description)
+
+with app.app_context():
+    db.drop_all() #Remove before production
     db.create_all()
     db.session.commit()
 
+    #THIS IS FOR DEFAULT CATEGORIES OR TESTING
+    category1 = Category(name='Kravaller')
+    category2 = Category(name='Övrigt')
+    db.session.add(category1)
+    db.session.add(category2)
+    subcat1 = Subcategory(name='UK', category=category1)
+    subcat2 = Subcategory(name='Festivallen', category=category1)
+    db.session.add(subcat1)
+    db.session.add(subcat2)
 
-@app.route('/hello')
-def hello():
-    return jsonify("Hello, World!")
+    db.session.commit()
+
+@app.route('/subcategories', methods=['GET', 'POST'], endpoint='subcategories')
+#@jwt_required()
+def subcategories():
+    if request.method == 'GET':
+        subcategories = Subcategory.query.all()
+        subcategory_list = [subcategory.serialize() for subcategory in subcategories]
+        return jsonify(subcategory_list)
+
+    elif request.method == 'POST' and get_jwt_identity().is_admin:
+        data = request.get_json()
+        new_subcategory = Subcategory(name=data['name'], category_id=data['category_id'])
+        db.session.add(new_subcategory)
+        db.session.commit()
+        return jsonify(new_subcategory.serialize()), 201
+
+@app.route('/subcategories/<int:subcategory_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='subcategory_by_id')
+#@jwt_required()
+def subcategory_by_id(subcategory_id):
+    subcategory = Subcategory.query.get_or_404(subcategory_id)
+
+    if request.method == 'GET':
+        return jsonify(subcategory.serialize())
+
+    elif request.method == 'PUT' and get_jwt_identity().is_admin:
+        data = request.get_json()
+        if 'name' in data:
+            subcategory.name = data['name']
+        if 'category_id' in data:
+            subcategory.category_id = data['category_id']
+        db.session.commit()
+        return jsonify(subcategory.serialize()), 200
+
+    elif request.method == 'DELETE' and get_jwt_identity().is_admin:
+        db.session.delete(subcategory)
+        db.session.commit()
+        return jsonify("Success!"), 200
+
+@app.route('/categories', methods=['GET', 'POST'], endpoint='categories')
+#@jwt_required()
+def categories():
+    if request.method == 'GET':
+        categories = Category.query.all()
+        category_list = [category.serialize() for category in categories]
+        return jsonify(category_list)
+
+    elif request.method == 'POST' and get_jwt_identity().is_admin:
+        data = request.get_json()
+        new_category = Category(name=data['name'])
+        db.session.add(new_category)
+        db.session.commit()
+        return jsonify(new_category.serialize()), 201
+    
+@app.route('/categories/<int:category_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='category_by_id')
+#@jwt_required()
+def category_by_id(category_id):
+    category = Category.query.get_or_404(category_id)
+
+    if request.method == 'GET':
+        return jsonify(category.serialize())
+
+    elif request.method == 'PUT' and get_jwt_identity().is_admin:
+        data = request.get_json()
+        if 'name' in data:
+            category.name = data['name']
+        db.session.commit()
+        return jsonify(category.serialize()), 200
+
+    elif request.method == 'DELETE' and get_jwt_identity().is_admin:
+        db.session.delete(category)
+        db.session.commit()
+        return jsonify("Success!"), 200
 
 @app.route('/sign-up', methods=['POST'])
 def sign_up():
@@ -74,7 +197,7 @@ def sign_up():
     password = data['password']
 
     # Create a new user
-    new_user = User(email=email, name=name, is_admin=True)
+    new_user = User(email=email, name=name)
     new_user.set_password(password)
 
     # Save the new user to the database
@@ -110,8 +233,6 @@ def login():
         return jsonify(response)
     else:
         return jsonify({"error": "Invalid email or password"}), 401  # 401 Unauthorized
-
-
 
 
 # @app.route('/cars/<int:car_id>', methods=['PUT', 'GET', 'DELETE'], endpoint='get_car_by_id')
@@ -215,10 +336,8 @@ def login():
 #     return jsonify(new_car.serialize()), 201 
 
 @app.route('/users', methods=['GET', 'POST'], endpoint = 'users')
-@jwt_required()
+#@jwt_required()
 def users():
-
-
     if request.method == 'GET':
         # Handle GET request
         users = User.query.all()
