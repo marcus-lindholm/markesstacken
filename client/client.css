@@ -214,3 +214,22 @@ p {
     max-width: 100%;
     height: auto;
 }
+
+/*SHOPPING-CART*/
+
+#plus-button{
+    padding: 0.2rem 0.5rem; /* Adjust the padding to make the buttons smaller */
+    font-size: 0.8rem; 
+}
+
+/* Remove the default spinners from number input fields */
+/*Removes the increase/decrese-buttons inside the field of the forms APPLIES TO ALL FORMS*/
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0; /* Optional: Remove any additional margin */
+}
+
+
+
+

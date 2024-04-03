@@ -43,6 +43,12 @@ function ShowShoppingcartPage() {
   $(".container").html($("#view-shoppingcart").html());
 }
 
+//CHECKOUT-PAGE
+
+function ShowCheckoutPage() {
+  $(".container").html($("#view-checkout").html());
+}
+
 //ORDERS-PAGE
 function ShowOrdersPage() {
   $(".container").html($("#view-orders").html());
@@ -510,7 +516,8 @@ $(document).ready(function () {
 });
 
 $(".nav-link.favorites").click(function () {
-  ShowFavoritesPage();
+  //ShowFavoritesPage();
+  ShowCheckoutPage();
 });
 
 $(".nav-link.shoppingcart").click(function () {
@@ -566,6 +573,12 @@ $(".footer-link.collecting").click(function () {
   ShowQuestionsPage();
   ShowQuestionsCollectingPage();
 });
+
+//SHOPPING-CART and CHECKOUT
+$("#checkout-button").click(function () {
+  ShowQuestionsPage();
+});
+
 
 
 
