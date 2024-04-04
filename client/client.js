@@ -7,7 +7,6 @@ $(document).ready(function () {
 });
 
 //HOME-PAGE
-
 function ShowHomePage() {
   $(".nav-link.login, .nav-link.sign-up").toggleClass('d-none', signedIn);
   $(".nav-link.logout, .nav-link.cars").toggleClass('d-none', !signedIn);
@@ -44,9 +43,8 @@ function ShowShoppingcartPage() {
 }
 
 //CHECKOUT-PAGE
-
 function ShowCheckoutPage() {
-  $(".container").html($("#view-checkout").html());
+ $(".container").html($("#view-checkout").html());
 }
 
 //ORDERS-PAGE
@@ -112,7 +110,7 @@ function ShowContactPage() {
   });
 }
 
-//??
+//ALERTS
 function showAlert(type, heading, message) {
   var alertHTML = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">';
   alertHTML += '<strong>' + heading + '</strong> ' + message;
@@ -516,8 +514,7 @@ $(document).ready(function () {
 });
 
 $(".nav-link.favorites").click(function () {
-  //ShowFavoritesPage();
-  ShowCheckoutPage();
+  ShowFavoritesPage();
 });
 
 $(".nav-link.shoppingcart").click(function () {
@@ -575,15 +572,15 @@ $(".footer-link.collecting").click(function () {
 });
 
 //SHOPPING-CART and CHECKOUT
-$("#checkout-button").click(function () {
-  ShowQuestionsPage();
+$(document).on("click", "#checkout-button", function() {
+  ShowCheckoutPage();
 });
 
 
+});
 
 
-});
-$(document).on("click", ".refresh-car-btn", function () {
-  refreshCarList();
-});
+// $(document).on("click", ".refresh-car-btn", function () {
+//   refreshCarList();
+// });
 
