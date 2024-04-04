@@ -444,14 +444,15 @@ def category_by_id(category_id):
 def sign_up():
     data = request.get_json()
 
-    if 'email' not in data or 'name' not in data or 'password' not in data:
+    if 'email' not in data or 'firstName' not in data and 'lastName' not in data or 'password' not in data:
         return jsonify({"error": "Missing required fields"}), 400  # 400 Bad Request
     email = data['email']
-    name = data['name']
+    firstName = data['firstName']
+    lastName = data['lastName']
     password = data['password']
 
     # Create a new user
-    new_user = User(email=email, name=name)
+    new_user = User(email=email, firstName=firstName, lastName=lastName)
     new_user.set_password(password)
 
     # Save the new user to the database
@@ -682,7 +683,6 @@ def get_cars_by_user(user_id):
 @app.route("/")
 def client():
     return app.send_static_file("client.html")
-
 
 
 if __name__ == "__main__":
