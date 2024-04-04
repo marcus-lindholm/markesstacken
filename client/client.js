@@ -458,6 +458,9 @@ function ShowLoginPage() {
           console.log(response);
           sessionStorage.setItem('auth', JSON.stringify(response));
 
+             // Update isLoggedIn variable to true after successful login
+          isLoggedIn = true;
+
           console.log(signedIn);
           signedIn = sessionStorage.getItem('auth') !== null;
           console.log(signedIn);
@@ -487,13 +490,15 @@ function ShowLogoutPage() {
 
     sessionStorage.removeItem('auth');
 
+    isLoggedIn = false;
+
     signedIn = sessionStorage.getItem('auth') !== null;
     ShowHomePage();
+    updateDropdown(isLoggedIn);
     
   });
 
 } 
-
 
 
 //------------------------------------------
@@ -505,9 +510,13 @@ $(document).ready(function () {
   signedIn = sessionStorage.getItem('auth') !== null;
   console.log(signedIn);
   
+  //check if logged in
+  isLoggedIn = sessionStorage.getItem('auth') !== null;
+
   var isLoggedIn = false; // Set this to true if the user is logged in
 
   updateDropdown(isLoggedIn);
+
 
    $(".navbar-brand.logo").click(function() {
      isLoggedIn = true;
