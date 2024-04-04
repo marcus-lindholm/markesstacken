@@ -1,3 +1,7 @@
+body {
+    font-family: Lato, sans-serif; /* Typsnitt: Lato */
+}
+
 p {
     /* Stilar för element av typen "p" */
  }
@@ -9,6 +13,7 @@ p {
  .extra-big {
     /* Stilar för element med class="extra-big" */
  }
+ 
  /* Styles for the opening hours list */
 #opening-hours {
     margin-top: 20px;
@@ -33,9 +38,203 @@ p {
 /*NAVBAR*/
 
 .navlogo{
-    max-width: 100px;
+    max-width: 80px;
 }
 
 .navbar{
-    background-color: #7a96ab;
+    position: sticky;
+    top: 0;
+    background-color: #C8E0EA;
+    /*background-color: white;*/
+    border-bottom: 2px solid #C8E0EA;
+    z-index: 1000;
+    /*background: linear-gradient(to bottom, rgba(200, 224, 234, 1), rgba(200, 224, 234, 0.3)); /* Adjust colors and opacity as needed */
+
 }
+
+  
+
+/* Hoover line*/
+.navbar-nav .nav-link:not(.search-button) {
+    margin-right: 10px;
+    position: relative; 
+    color: #585757; 
+    text-decoration: none;
+    /*font-weight: bold; */
+}
+
+.navbar-nav .nav-link:not(.searchbar):hover::before {
+    content: '';
+    position: absolute;
+    bottom: -2px; 
+    left: 0;
+    width: 100%; 
+    height: 2px; 
+    background-color: #333;
+    transform: scaleX(0);
+    transition: transform 0.3s ease; 
+}
+
+.navbar-nav .nav-link:not(.search-button):hover::before {
+    transform: scaleX(1); 
+}
+
+
+
+
+
+
+
+.navbar-nav .nav-link {
+    margin-right: 10px; /* Adjust the margin value as needed */ 
+}
+
+.custom-vertical-align {
+    margin-top: 7px; /* Adjust the top margin to move the text vertically */
+}
+
+.search-button {
+        background-color: transparent; /* Remove the background color */
+        border: none; /* Remove the border */
+        cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+
+
+
+/*FOOTER*/
+.footer {
+    background-color: #F9F3E4;
+    padding: 80px; 
+    width: 100%; /* Make the footer span the full width of the viewport */
+}
+
+.footer-link {
+    color: black; /* Set link color */
+    text-decoration: none; /* Remove default underline */
+  }
+
+  .footer-link:hover {
+    color: rgb(16, 47, 99); /* Change to the desired color */
+}
+
+.space-between {
+    padding-right: 20px; /* Adjust the value as needed */
+  }
+
+
+
+  /*VIEW-PURCHASE*/
+  .card {
+    /*margin: 30px;*/
+  }
+
+  .card-img-top {
+    max-width: 150px;
+  }
+
+  .quantity {
+    width: 40px;
+    text-align: center;
+  }
+
+
+
+
+/* CSS styles for the form */
+.nice-form {
+    max-width: 600px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+.form-control-file {
+    width: 100%;
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+.btn-primary {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    border: 1px solid #007bff;
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+
+
+.aboutus-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 20px; /* Space between columns */
+    max-width: 800px;
+    margin: auto;
+}
+
+.aboutus-text {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.aboutus-text h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.aboutus-text p {
+    font-size: 18px;
+    line-height: 1.6;
+    text-align: justify;
+}
+.aboutus-image {
+    text-align: center;
+}
+
+.aboutus-image img {
+    max-width: 100%;
+    height: auto;
+}
+
+/*SHOPPING-CART*/
+
+#plus-button{
+    padding: 0.2rem 0.5rem; /* Adjust the padding to make the buttons smaller */
+    font-size: 0.8rem; 
+}
+
+/* Remove the default spinners from number input fields */
+/*Removes the increase/decrese-buttons inside the field of the forms APPLIES TO ALL FORMS*/
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0; /* Optional: Remove any additional margin */
+}
+
+
+
+

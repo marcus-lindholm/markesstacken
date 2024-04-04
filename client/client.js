@@ -1,12 +1,110 @@
 var signedIn = false;
 var guserId;
 
+//drop-down for profile 
+$(document).ready(function () {
+  $('.dropdown-toggle').dropdown();
+});
+
+//HOME-PAGE
 function ShowHomePage() {
   $(".nav-link.login, .nav-link.sign-up").toggleClass('d-none', signedIn);
   $(".nav-link.logout, .nav-link.cars").toggleClass('d-none', !signedIn);
   $(".container").html($("#view-home").html());
 }
 
+//LOGIN-PAGE
+function ShowLoginPage() {
+  $(".container").html($("#view-login").html());
+}
+
+//REGISTER-PAGE
+function ShowRegisterPage() {
+  $(".container").html($("#view-register").html());
+}
+
+//ABOUTUS-PAGE
+function ShowAboutusPage() {
+  $(".container").html($("#view-aboutus").html());
+}
+
+//FAVORITES-PAGE
+function ShowFavoritesPage() {
+  $(".container").html($("#view-favorites").html());
+}
+
+//PURCHASE-PAGE
+function ShowPurchasePage() {
+  $(".container").html($("#view-purchase").html());
+}
+
+//SELL-PAGE
+function ShowSellPage() {
+  $(".container").html($("#view-sell").html());
+}
+
+function ShowContactPage() {
+  $(".container").html($("#view-contact").html());
+}
+
+//SHOPPINGCART-PAGE
+function ShowShoppingcartPage() {
+  $(".container").html($("#view-shoppingcart").html());
+}
+
+//CHECKOUT-PAGE
+function ShowCheckoutPage() {
+ $(".container").html($("#view-checkout").html());
+}
+
+//ORDERS-PAGE
+function ShowOrdersPage() {
+  $(".container").html($("#view-orders").html());
+}
+
+//RETURNS-PAGE
+function ShowReturnsPage(){
+  $(".container").html($("#view-returns").html());
+}
+
+//PROFILE-PAGE
+function ShowProfileinfoPage(){
+  $(".container").html($("#view-profileinfo").html());
+}
+
+//SETTINGS-PAGE
+function ShowSettingsPage(){
+  $(".container").html($("#view-settings").html());
+}
+
+//LOGOUT-PAGE
+function ShowLogoutPage(){
+  $(".container").html($("#view-logout").html());
+}
+
+//QUESTION-PAGES
+function ShowQuestionsPage(){
+  $(".container").html($("#view-questions").html());
+}
+
+//FAQ-PAGES
+function ShowQuestionsShippingAndReturnsPage(){
+  $(".container").html($("#shipping-and-returns-section").html());
+}
+function ShowQuestionsPaymentPage(){
+  $(".container").html($("#payment-section").html());
+}
+function ShowQuestionsSellingPage(){
+  $(".container").html($("#selling-section").html());
+}
+function ShowQuestionsBuyingPage(){
+  $(".container").html($("#buying-section").html());
+}
+function ShowQuestionsCollectingPage(){
+  $(".container").html($("#collecting-section").html());
+}
+
+//CONTACT-PAGE
 function ShowContactPage() {
   $(".container").html($("#view-contact").html());
 
@@ -22,6 +120,7 @@ function ShowContactPage() {
   });
 }
 
+//ALERTS
 function showAlert(type, heading, message) {
   var alertHTML = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">';
   alertHTML += '<strong>' + heading + '</strong> ' + message;
@@ -36,20 +135,22 @@ function showAlert(type, heading, message) {
 }
 
 
-function ShowCarsPage() {
-  $(".container").html($("#view-cars").html());
 
-  displayCarList();
+// function ShowCarsPage() {
+//   $(".container").html($("#view-cars").html());
 
-  if (JSON.parse(sessionStorage.getItem('auth')).user.is_admin) {
-    $(".add-car-btn").show();
-  } else {
-    $(".add-car-btn").hide();
-  }
-}
+//   displayCarList();
+
+//   if (JSON.parse(sessionStorage.getItem('auth')).user.is_admin) {
+//     $(".add-car-btn").show();
+//   } else {
+//     $(".add-car-btn").hide();
+//   }
+// }
 
 
 
+//FUNCTIONS
 function refreshCarList() {
 
   $(".car-list").empty();
@@ -368,6 +469,8 @@ function ShowLogoutPage() {
 
 }
 
+//CLICK-EVENTS
+
 $(document).ready(function () {
   // Show home page on initial load
   ShowHomePage();
@@ -378,8 +481,9 @@ $(document).ready(function () {
   $(".nav-link.login, .nav-link.sign-up").toggleClass('d-none', signedIn);
 
   // Navigation click event handlers
-  $(".nav-link.home").click(function () {
 
+  //NAVBAR-LINKS
+  $(".nav-link.home").click(function () {
       ShowHomePage();
   });
 
@@ -387,24 +491,108 @@ $(document).ready(function () {
       ShowContactPage();
   });
 
-  $(".nav-link.cars").click(function () {
-      ShowCarsPage();
+  $(".navbar-brand.logo").click(function () {
+    ShowHomePage();
+});
+
+  $(".nav-link.purchase").click(function () {
+      ShowPurchasePage();
   });
-  $(".nav-link.sign-up").click(function () {
-    if (!signedIn) {
-      ShowSignUpPage();
-    }
+
+  $(".nav-link.sell").click(function () {
+    ShowSellPage();
+});
+
+  $(".nav-link.aboutus").click(function () {
+    ShowAboutusPage();
+});
+
+  $(".nav-link.register").click(function () {
+    //if (!signedIn) {
+    //  ShowRegisterPage();
+   // }
+   ShowRegisterPage();
   });
+
   $(".nav-link.login").click(function () {
-    if (!signedIn) {
-      ShowLoginPage();
-    }
+   // if (!signedIn) {
+   //   ShowLoginPage();
+   // }
+   ShowLoginPage();
   });
+
   $(".nav-link.logout").click(function () {
     ShowLogoutPage();
 });
+
+$(".nav-link.favorites").click(function () {
+  ShowFavoritesPage();
 });
-$(document).on("click", ".refresh-car-btn", function () {
-  refreshCarList();
+
+$(".nav-link.shoppingcart").click(function () {
+  ShowShoppingcartPage();
 });
+
+$(".nav-item.dropdown .dropdown-menu .orders").click(function () {
+  ShowOrdersPage();
+});
+
+$(".nav-item.dropdown .dropdown-menu .returns").click(function () {
+  ShowReturnsPage();
+});
+
+$(".nav-item.dropdown .dropdown-menu .profileinfo").click(function () {
+  ShowProfileinfoPage();
+});
+
+$(".nav-item.dropdown .dropdown-menu .settings").click(function () {
+  ShowSettingsPage();
+});
+
+$(".nav-item.dropdown .dropdown-menu .logout").click(function () {
+  ShowLogoutPage();
+});
+
+//FOOTER-LINKS
+$(".footer-link.shippingReturns").click(function () {
+  ShowQuestionsPage();
+  ShowQuestionsShippingAndReturnsPage();
+});
+
+$(".footer-link.questions").click(function () {
+  ShowQuestionsPage();
+});
+
+$(".footer-link.buying").click(function () {
+  ShowQuestionsPage();
+  ShowQuestionsBuyingPage();
+});
+
+$(".footer-link.selling").click(function () {
+  ShowQuestionsPage();
+  ShowQuestionsSellingPage();
+});
+
+$(".footer-link.payment").click(function () {
+  ShowQuestionsPage();
+  ShowQuestionsPaymentPage();
+});
+
+$(".footer-link.collecting").click(function () {
+  ShowQuestionsPage();
+  ShowQuestionsCollectingPage();
+});
+
+//SHOPPING-CART and CHECKOUT
+$(document).on("click", "#checkout-button", function() {
+  ShowCheckoutPage();
+});
+
+
+});
+
+
+// $(document).on("click", ".refresh-car-btn", function () {
+//   refreshCarList();
+// });
 

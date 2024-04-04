@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="client.css">
 
-    <title>Welcome to the world of Cars!</title>
+    <title>Märkesstacken</title>
 </head>
 <body>
   <div class="modal fade" id="editCarModal" tabindex="-1" role="dialog" aria-labelledby="editCarModalLabel" aria-hidden="true">
@@ -72,46 +72,205 @@
   </div>
   
 
-  
+ <!--NAVBAR-SECTION-->
     <nav class="navbar navbar-expand-lg navbar-light">
-        <a class="navbar-brand" href="#">
-          <!--Logotyp-->
-          <img class="navlogo" src="Images/logo.png">
+        
+      <!--Logotype and Home-button-->
+        <a class="navbar-brand logo" href="#">
+          <img class="navlogo" src="Images/logo.png" >  
         </a>
+  
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
+
+        <div class="d-flex flex-row-reverse">
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+      </div>
+
             <div class="collapse navbar-collapse" id="navbarNav">
-              <ul class="navbar-nav">
-                <!-- "Hem" -->
-                <li class="nav-item active">
-                    <a class="nav-link home" href="#">Hem <span class="sr-only">(current)</span></a>
+              <ul class="navbar-nav ml-auto">
+                  
+                <!--"Köp"-->
+                <li class="nav-item">
+                  <a class="nav-link purchase custom-vertical-align" href="#">KÖP</a>
+                </li>
+                <!--"Sälj"-->
+                <li class="nav-item">
+                  <a class="nav-link sell custom-vertical-align" href="#">SÄLJ</a>
+                 <!-- "Om oss" -->
+                 <li class="nav-item">
+                  <a class="nav-link aboutus custom-vertical-align" href="#">OM OSS</a>
                 </li>
                 <!-- "Kontakt" -->
                 <li class="nav-item">
-                    <a class="nav-link contact" href="#">Kontakt</a>
+                  <a class="nav-link contact custom-vertical-align" href="#">KONTAKT</a>
                 </li>
-                <li class="nav-item">
-                  <a class="nav-link cars" href="#">Bilar</a>
+                 <!-- Search Bar -->
+                 <li class="nav-item">
+                  <a class="nav-link searchbar">
+                 <form class="form-inline my-2 my-lg-0">
+                  <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                 <button class="btn btn-outline-primary my-2 my-sm-0 search-button" type="submit">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="black" class="bi bi-search" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                  </svg>
+                 </button>
+                </form>
+               </a>
                 </li>
+
+                <!--Profile Dropdown Logged In-->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                      <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
+                  </svg>
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">    <!--Koppla användarnamn med backend, if-sats?-->
+                 <span class="dropdown-item disabled">Användarnamn</span> 
+                  <a class="dropdown-item orders" href="#">Beställningar</a>
+                  <a class="dropdown-item returns" href="#">Returer</a>
+                  <a class="dropdown-item profileinfo" href="#">Kontouppgifter</a>
+                  <a class="dropdown-item settings" href="#">Inställningar</a>
+                  <a class="dropdown-item logout" href="#">Logga ut</a>
+              </div>
+          </li>
+
+                    <!--Profile Dropdown Logged out WORKING-PROGRESS-->
+                    <!--
+                    <li class="nav-item dropdown-logged-out">
+                      <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                              <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
+                          </svg>
+                      </a>
+                      <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">    Koppla användarnamn med backend, if-sats?-->
+                          <!--a class="dropdown-item login" href="#">Logga In</a>
+                          <a class="dropdown-item register" href="#">Registrera dig</a>
+                      </div>
+                  </li-->
+                
+                         
+          
+            <!--Favorites-->
+            <li class="nav-item">
+              <a class="nav-link favorites">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-bag-heart" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M10.5 3.5a2.5 2.5 0 0 0-5 0V4h5zm1 0V4H15v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V4h3.5v-.5a3.5 3.5 0 1 1 7 0M14 14V5H2v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1M8 7.993c1.664-1.711 5.825 1.283 0 5.132-5.825-3.85-1.664-6.843 0-5.132"/>
+                </svg>
+            </a>
+            </li>
+           
+                <!--Shopping cart-->
                 <li class="nav-item">
-                  <a class="nav-link sign-up" href="#">Registrera</a>
+                  <a class="nav-link shoppingcart">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-basket" viewBox="0 0 16 16">
+                      <path d="M5.757 1.071a.5.5 0 0 1 .172.686L3.383 6h9.234L10.07 1.757a.5.5 0 1 1 .858-.514L13.783 6H15a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1v4.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 13.5V9a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h1.217L5.07 1.243a.5.5 0 0 1 .686-.172zM2 9v4.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V9zM1 7v1h14V7zm3 3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 4 10m2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 6 10m2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 8 10m2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5m2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5"/>
+                     </svg>
+                  </a>
                 </li>
-                <li class="nav-item">
-                  <a class="nav-link login" href="#">Logga in</a>
-                <li class="nav-item">
-                  <a class="nav-link logout" href="#">Logga ut</a>
-                </li>
-              
-            </ul>
-        </div>
+                
+              </ul>    
+      </div>
     </nav>
+  
+    
 
     <div class="container" id="content-container">
-        
+
+      <main class="main-content">
+        <h2>Opening Hours</h2>
+        <ul>
+            <li>Monday: 9:00 AM - 6:00 PM</li>
+            <li>Tuesday: 9:00 AM - 6:00 PM</li>
+            <li>Wednesday: 9:00 AM - 6:00 PM</li>
+            <li>Thursday: 9:00 AM - 8:00 PM</li>
+            <li>Friday - Sunday: Closed</li>
+            <li>g </li>
+            <li>g </li>
+            <li>g </li>
+            <li>g</li>
+            <li>g </li>
+            <li>g </li>
+            <li>g </li>
+            <li>g </li>
+        </ul>
+      </main>
+
     </div>
-
-
+      
+   <!--FOOTER-->
+    <div class="footer-container" id="footer-container">
+      <footer class="footer">
+          <!--<div class="container" id="footer-container"-->
+          <h3> <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+            <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286m1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94"/>
+          </svg>
+          Hjälp och information</h3>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <br>
+                        
+                          <h5><a href="#" class="footer-link questions">Vanliga frågor</a></h5>
+                      
+                        <a href="#" class="footer-link shippingReturns"><br>Frakt och retur</a>
+                        <a href="#" class="footer-link payment"><br>Betalning</a>
+                        <a href="#" class="footer-link selling"><br>Hur säljer jag mina märken?</a>
+                        <a href="#" class="footer-link buying"><br>Hur köper jag märken?</a>
+                        <a href="#" class="footer-link collecting"><br>Hur hämtar jag mina märken?</a>
+                    </div>
+                   <div class="col-md-4">
+                    <br>
+                    <h5>Om Märkesstacken</h5>
+                        <p>Vi är ett gäng studenter som kände att den nuvarande situationen med att 
+                          köpa och sälja märken inte var den smidigaste lösningen. 
+                          Därför gick vi ihop och skapade Märkesstacken For Students By Students.</p>
+                        <p></p>
+                    <h5>Kontakt</h5>
+                    <p>Tel: 076 762486​</p>
+                    </p>Mail: markesstacken@markesstacken.se​​</p>
+                    </p>Linköpings universitet 581 83​​</p>
+                   </div>
+                   <div class="col-md-4">
+                    <br>
+                        <h5>Sociala medier</h5>
+                          <!--Instagram-symbol-->
+                          <p>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-instagram" viewBox="0 0 16 16">
+                            <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334"/>
+                          </svg>
+                          markesstacken
+                         </p>
+                          <!--Facebook-symbol-->
+                          <p>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-facebook" viewBox="0 0 16 16">
+                              <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951"/>
+                            </svg>
+                            Märkesstacken</p>
+                        <h5>Betalningsalternativ</h5>
+                        <!--Paypal-symbol-->
+                        <p>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-paypal" viewBox="0 0 16 16">
+                            <path d="M14.06 3.713c.12-1.071-.093-1.832-.702-2.526C12.628.356 11.312 0 9.626 0H4.734a.7.7 0 0 0-.691.59L2.005 13.509a.42.42 0 0 0 .415.486h2.756l-.202 1.28a.628.628 0 0 0 .62.726H8.14c.429 0 .793-.31.862-.731l.025-.13.48-3.043.03-.164.001-.007a.35.35 0 0 1 .348-.297h.38c1.266 0 2.425-.256 3.345-.91q.57-.403.993-1.005a4.94 4.94 0 0 0 .88-2.195c.242-1.246.13-2.356-.57-3.154a2.7 2.7 0 0 0-.76-.59l-.094-.061ZM6.543 8.82a.7.7 0 0 1 .321-.079H8.3c2.82 0 5.027-1.144 5.672-4.456l.003-.016q.326.186.548.438c.546.623.679 1.535.45 2.71-.272 1.397-.866 2.307-1.663 2.874-.802.57-1.842.815-3.043.815h-.38a.87.87 0 0 0-.863.734l-.03.164-.48 3.043-.024.13-.001.004a.35.35 0 0 1-.348.296H5.595a.106.106 0 0 1-.105-.123l.208-1.32z"/>
+                          </svg>
+                        </p>
+                        <p>
+                        <!--Kreditkort-symbol-->
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-credit-card" viewBox="0 0 16 16">
+                            <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1z"/>
+                            <path d="M2 10a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"/>
+                          </svg>
+                        </p>
+                   </div>
+                  </div>
+                  <!--</div-->
+        </footer>
+      </div>
+    </div>
 
     <script src="server-stub.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
@@ -120,6 +279,13 @@
 
     <script src="client.js"></script>
 
+      <!-- Bootstrap Bundle with Popper -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+    <!--VIEW-SIGNUP-->
     <script id="view-sign-up" type="text/html">
       <h2>Register</h2>
       <form id="registerForm" action="/sign-up" method="POST">
@@ -137,6 +303,7 @@
     </script>
 
 
+    <!--VIEW-LOGIN-->
     <script id="view-login" type="text/html">
       <h2>Login</h2>
       <form id="loginForm" action="/login" method="POST">
@@ -150,20 +317,21 @@
       </form>
     </script>
 
+    <!--VIEW-LOGOUT-->
     <script id="view-logout" type="text/html">
-      <h2>This will log you out of the page</h2>
+      <h2>Vill du logga ut?</h2>
       <form id="logoutForm" action="/logout" method="POST">
 
-        <button type="submit" style="font-size: 16px; color: white; background-color: red; padding: 10px 20px; border: none;">Logout</button>
+        <button type="submit" style="font-size: 16px; color: white; background-color: red; padding: 10px 20px; border: none;">Logga ut</button>
 
       </form>
-      <h2>Be carful!</h2>
     </script>
     
-
+  
+    <!--VIEW-HOME-->
     <script id="view-home" type="text/html">
-        <h1>World Of Cars!</h1>
-        <p>Welcome to our website, by Samsung!</p>
+        <h1>Märkesstacken</h1>
+        <p>For Students By Students</p>
 
         <div id="opening-hours">
             <h2>Opening Hours</h2>
@@ -173,82 +341,719 @@
                 <li>Wednesday: 9:00 AM - 6:00 PM</li>
                 <li>Thursday: 9:00 AM - 8:00 PM</li>
                 <li>Friday - Sunday: Closed</li>
+                <li>g </li>
+                <li>g </li>
+                <li>g </li>
+                <li>g</li>
+                <li>g </li>
+                <li>g </li>
+                <li>g </li>
+                <li>g </li>
             </ul>
           </div>
     </script>
 
+    <!--VIEW-LOGIN-->
+    <script id="view-login" type="text/html">
+      <h1>View-Login</h1>
+    </script>
+
+    <!--VIEW-REGISTER-->
+    <script id="view-register" type="text/html">
+      <h1>View-Register</h1>
+    </script>
+
+    <!--VIEW-ADMIN-->
+    <script id="view-admin" type="text/html">
+      <h1>View-Admin</h1>
+    </script>
+
+    <!--VIEW-CONTACT-->
     <script id="view-contact" type="text/html">
-      <h1>Contact Us</h1>
+      <h1>Kontakta oss</h1>
 
       <!-- Contact Information -->
       <div class="row">
         <div class="col-md-6">
-          <h2>Contact Information - CSMO</h2>
-          <p><strong>Name:</strong> Anton Hanstrom</p>
-          <p><strong>Email:</strong> Antonha@live.se</p>
-          <p><strong>Phone:</strong> +46 708821623</p>
-          <p><strong>Address:</strong> Vasavägen 44G, Linkoping</p>
+          <h3>Kontaktinformation</h3>
+          <p><strong>Mail:</strong> markesstacken@markesstacken.se</p>
+          <p><strong>Telefon:</strong> +46 708821623</p>
+          <p><strong>Address:</strong> Linköpings Universitet</p>
         </div>
-
-        <div class="col-md-6">
-          <h2>Contact Information - CGLO</h2>
-          <p><strong>Name:</strong> William Eriksson</p>
-          <p><strong>Email:</strong> wiler441@student.liu.se</p>
-          <p><strong>Phone:</strong> +46 703920615</p>
-          <p><strong>Address:</strong> Björnkärrsgatan 7J, Linköping</p>
-        </div>
-
-        <div class="col-md-6">
-          <h2>Contact Information - COO</h2>
-          <p><strong>Name:</strong> Jung Kook</p>
-          <p><strong>Email:</strong> jungkook@BTS.com</p>
-          <p><strong>Phone:</strong> +82 10 8880609</p>
-          <p><strong>Address:</strong> 456 Wangsimini-Ro, Seoul</p>
-        </div>
-
 
       </div>
 
       <!-- Contact Form -->
       <div class="row mt-4">
           <div class="col-md-6">
-              <h2>Contact Form</h2>
+              <h2>Skicka in en fråga</h2>
               <form class="contact-form">
                   <div class="form-group">
-                      <label for="name">Name</label>
-                      <input type="text" class="form-control" id="name" placeholder="Enter your name">
+                      <label for="name">Namn</label>
+                      <input type="text" class="form-control" id="name" placeholder="Fyll i namn">
                   </div>
                   <div class="form-group">
-                      <label for="email">Email</label>
-                      <input type="email" class="form-control" id="email" placeholder="Enter your email">
+                      <label for="email">Mail</label>
+                      <input type="email" class="form-control" id="email" placeholder="Fyll i mailadress">
                   </div>
                   <div class="form-group">
-                      <label for="message">Message</label>
-                      <textarea class="form-control" id="message" rows="3" placeholder="Enter your message"></textarea>
+                      <label for="message">Meddelande</label>
+                      <textarea class="form-control" id="message" rows="3" placeholder="Skriv din fråga"></textarea>
                   </div>
-                  <button type="submit" class="btn btn-primary">Send Message</button>
+                  <button type="submit" class="btn btn-primary">Skicka</button>
               </form>
           </div>
       </div>
+
+      <iframe
+  width="600"
+  height="450"
+  frameborder="0" style="border:0"
+  src="https://www.google.com/maps/embed/v1/place?q=place_id&key=YOUR_API_KEY" allowfullscreen>
+</iframe>
+
     </script>
 
-    <script id="view-cars" type="text/html">
-      <h1>Our Cars</h1>
+   <!--VIEW-SELLING PAGE-->
+
+    <script id="view-sell" type="text/html"></div>
+      <h1>Säljformulär</h1>
+      <form id="sellForm" enctype="multipart/form-data" class="nice-form">
+          <div class="form-group">
+              <label for="productName">Produktnamn:</label>
+              <input type="text" id="productName" name="productName" class="form-control" required>
+          </div>
+          <div class="form-group">
+              <label for="productDescription">Produktbeskrivning:</label>
+              <textarea id="productDescription" name="productDescription" class="form-control" rows="4" required></textarea>
+          </div>
+          <div class="form-group">
+              <label for="productPrice">Prisförslag:</label>
+              <input type="number" id="productPrice" name="productPrice" min="0" step="0.01" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="productQuantity">Kvantitet:</label>
+            <input type="number" id="productQuantity" name="productQuantity" min="0" step="0.01" class="form-control" required>
+        </div>
+          <div class="form-group">
+              <label for="productImage">Product Image:</label>
+              <input type="file" id="productImage" name="productImage" accept="image/*" class="form-control-file" required>
+          </div>
+          <div class="form-group">
+            <label for="productOtherNotes">Övriga noteringar:</label>
+            <textarea id="productOtherNotes" name="productOtherNotes" class="form-control" rows="4" required></textarea>
+        </div>
+          <div class="form-group">
+              <button type="submit" class="btn btn-primary">Skicka</button>
+          </div>
+      </form>
+    </div>
+  </script>
+
+
+    <!--VIEW-ABOUTUS-->
+    <script id="view-aboutus" type="text/html">
+   
+      <div class="aboutus-container">
+        <div class="aboutus-text">
+            <h1>About Us</h1>
+            <p>hej.</p>
+        </div>
+        <div class="aboutus-image">
+            <img src="Images/logo.png" alt="About Us Image">
+        </div>
+    </div>
+
+    </script>
+
+    <!--VIEW-PURCHASE PAGE-->
+<script id="view-purchase" type="text/html">
+  <h1>View-Purchase</h1>
+
+  <div class="row">
+    <!-- Sidebar filter-->
+    <div class="col-md-3">
+      <div id="sidebar">
+        <h2>Filters</h2>
+   
+        <div class="form-group">
+          <label for="filterCategory">Category:</label>
+          <select class="form-control" id="filterCategory">
+            <option value="">All</option>
+            <option value="Category 1">Category 1</option>
+            <option value="Category 2">Category 2</option>
+          
+          </select>
+        </div>
+   
+      </div>
+    </div>
+
+    <!-- Products -->
+    <div class="col-md-9">
+      <div class="row">
+
+        <!-- Product 1 -->
+<div class="col-md-4">
+  <div class="card">
+    <img src="Images/logo.png" class="card-img-top" alt="...">
+    <div class="card-body">
+      <h5 class="card-title">Product 1</h5>
+      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+      
       <div class="d-flex align-items-center mb-3">
-        <button class="btn btn-primary add-car-btn" data-toggle="modal" data-target="#addCarModal">Add Car</button>
-        <button class="btn btn-primary refresh-car-btn ml-2">Refresh Car</button> 
-
-
-
+        <label for="quantity" class="me-2">Antal:</label>
+        <div class="input-group">
+          <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepDown()" id="minus-button">
+            <i class="fas fa-minus"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
+                <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
+            </svg>
+          </button>
+          <input type="number" id="quantity" class="form-control" value="1" min="1">
+          <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepUp()" id="plus-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+            </svg>
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
       </div>
       
+      <button class="btn btn-light">Add to Cart</button>
+      
+      <!-- Like-button -->
+      <button class="btn btn-outline-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+          <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
 
-      <div class="car-list">
+
+         <!-- Product 2 -->
+<div class="col-md-4">
+  <div class="card">
+    <img src="Images/logo.png" class="card-img-top" alt="...">
+    <div class="card-body">
+      <h5 class="card-title">Product 2</h5>
+      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+      
+      <div class="d-flex align-items-center mb-3">
+        <label for="quantity" class="me-2">Antal:</label>
+        <div class="input-group">
+          <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepDown()" id="minus-button">
+            <i class="fas fa-minus"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
+                <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
+            </svg>
+          </button>
+          <input type="number" id="quantity" class="form-control" value="1" min="1">
+          <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepUp()" id="plus-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+            </svg>
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
       </div>
+      
+      <button class="btn btn-light">Add to Cart</button>
+      
+      <!-- Like-button -->
+      <button class="btn btn-outline-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+          <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+         <!-- Product 3 -->
+<div class="col-md-4">
+  <div class="card">
+    <img src="Images/logo.png" class="card-img-top" alt="...">
+    <div class="card-body">
+      <h5 class="card-title">Product 3</h5>
+      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+      
+      <div class="d-flex align-items-center mb-3">
+        <label for="quantity" class="me-2">Antal:</label>
+        <div class="input-group">
+          <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepDown()" id="minus-button">
+            <i class="fas fa-minus"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
+                <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
+            </svg>
+          </button>
+          <input type="number" id="quantity" class="form-control" value="1" min="1">
+          <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepUp()" id="plus-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+            </svg>
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+      </div>
+      
+      <button class="btn btn-light">Add to Cart</button>
+      
+      <!-- Like-button -->
+      <button class="btn btn-outline-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+          <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+          <!-- Product 4 -->
+<div class="col-md-4">
+  <div class="card">
+    <img src="Images/logo.png" class="card-img-top" alt="...">
+    <div class="card-body">
+      <h5 class="card-title">Product 4</h5>
+      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+      
+      <div class="d-flex align-items-center mb-3">
+        <label for="quantity" class="me-2">Antal:</label>
+        <div class="input-group">
+          <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepDown()" id="minus-button">
+            <i class="fas fa-minus"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
+                <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
+            </svg>
+          </button>
+          <input type="number" id="quantity" class="form-control" value="1" min="1">
+          <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepUp()" id="plus-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+            </svg>
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+      </div>
+      
+      <button class="btn btn-light">Add to Cart</button>
+      
+      <!-- Like-button -->
+      <button class="btn btn-outline-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+          <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</script>
+
+
+
+      <!--VIEW-PURCHASE-DONE-->
+      <script id="view-purchase-done" type="text/html">
+        <h1>View-Purchase-Done</h1>
+      </script>
+
+     <!--VIEW-FAVORITES-->
+     <script id="view-favorites" type="text/html">
+      <h1>View-Favorites</h1>
     </script>
 
-    <script>
-  
+     <!--VIEW-SHOPPINGCART-->
+     <script id="view-shoppingcart" type="text/html">
+    
+    <section class="h-100 gradient-custom">
+      <div class="container py-5">
+        <div class="row d-flex justify-content-center my-4">
+          <div class="col-md-8">
+            <div class="card mb-4">
+              <div class="card-header py-3">
+                <h5 class="mb-0">Varukorg (antal varor)</h5>
+              </div>
+              <div class="card-body">
+                <!-- Single item -->
+                <div class="row">
+                  <div class="col-lg-3 col-md-12 mb-4 mb-lg-0">
+                    <!-- Image -->
+                    <div class="bg-image hover-overlay hover-zoom ripple rounded" data-mdb-ripple-color="light">
+                      <img src="https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Vertical/12a.webp"
+                        class="w-100" alt="Blue Jeans Jacket" />
+                      <a href="#!">
+                        <div class="mask" style="background-color: rgba(251, 251, 251, 0.2)"></div>
+                      </a>
+                    </div>
+                    <!-- Image -->
+                  </div>
+    
+                  <div class="col-lg-5 col-md-6 mb-4 mb-lg-0">
+                    <!-- Data -->
+                    <p><strong>Blue denim shirt</strong></p>
+                    <p>Color: blue</p>
+                    <p>Size: M</p>
+                    <button type="button" class="btn btn-outline-dark btn-sm me-1 mb-2" data-mdb-toggle="tooltip"
+                      title="Remove item">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                        <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                      </svg>
+                      <i class="fas fa-trash"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-dark btn-sm mb-2" data-mdb-toggle="tooltip"
+                      title="Move to the wish list">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+                      </svg>
+                      <i class="fas fa-heart"></i>
+                    </button>
+                    <!-- Data -->
+                  </div>
+    
+                 
+                    <!-- Quantity -->
+                    <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+                      <label for="quantity" class="me-2">Antal:</label>
+                      <div class="input-group">
+                        <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepDown()" id="minus-button">
+                          <i class="fas fa-minus"></i>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
+                              <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
+                          </svg>
+                        </button>
+                        <input type="number" id="quantity" class="form-control" value="1" min="1">
+                        <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepUp()" id="plus-button">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                          </svg>
+                          <i class="fas fa-plus"></i>
+                        </button>
+                      </div>
+                  </div>
+                  
+    
+                    <!-- Price -->
+                    <p class="text-start text-md-center">
+                      <strong>$17.99</strong>
+                    </p>
+                    <!-- Price -->
+                  </div>
+                </div>
+                <!-- Single item -->
+    
+                <hr class="my-4" />
+    
+              
+            </div>
+            <div class="card mb-4">
+              <div class="card-body">
+                <p><strong>Förväntat leveransdatum</strong></p>
+                <p class="mb-0">??</p>
+              </div>
+            </div>
+            <div class="card mb-4 mb-lg-0">
+              <div class="card-body">
+                <p><strong>We accept</strong></p>
+                <img class="me-2" width="45px"
+                  src="https://mdbcdn.b-cdn.net/wp-content/plugins/woocommerce-gateway-stripe/assets/images/visa.svg"
+                  alt="Visa" />
+                <img class="me-2" width="45px"
+                  src="https://mdbcdn.b-cdn.net/wp-content/plugins/woocommerce-gateway-stripe/assets/images/mastercard.svg"
+                  alt="Mastercard" />
+                <img class="me-2" width="45px"
+                  src="https://mdbcdn.b-cdn.net/wp-content/plugins/woocommerce/includes/gateways/paypal/assets/images/paypal.webp"
+                  alt="PayPal" />
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card mb-4">
+              <div class="card-header py-3">
+                <h5 class="mb-0">Totalsumma</h5>
+              </div>
+              <div class="card-body">
+                <ul class="list-group list-group-flush">
+                  <li
+                    class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0">
+                    Orderkostnad
+                    <span>$53.98</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                    Fraktkostnad
+                    <span>Gratis</span>
+                  </li>
+                  <li
+                    class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3">
+                    <div>
+                      <strong>Totalkostnad</strong>
+                      <strong>
+                        <p class="mb-0">(inklusive moms)</p>
+                      </strong>
+                    </div>
+                    <span><strong>$53.98</strong></span>
+                  </li>
+                </ul>
+                <button id="checkout-button" class="btn btn-outline-dark">Gå till kassan</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </script>
+
+    <!--VIEW-CHECKOUT-->
+    <script id="view-checkout" type="text/html">
+      <h1>Kassa</h1>
+
+      <div class="container">
+        <div class="row">
+            <div class="col-md-4 order-md-2 mb-4">
+                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">Varukorg</span>
+                    <span class="badge badge-secondary badge-pill">3</span>
+                </h4>
+                <ul class="list-group mb-3">
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0">Product name</h6>
+                            <small class="text-muted">Brief description</small>
+                        </div>
+                        <span class="text-muted">$12</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0">Second product</h6>
+                            <small class="text-muted">Brief description</small>
+                        </div>
+                        <span class="text-muted">$8</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0">Third item</h6>
+                            <small class="text-muted">Brief description</small>
+                        </div>
+                        <span class="text-muted">$5</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between bg-light">
+                        <div class="text-success">
+                            <h6 class="my-0">Kampanjkod</h6>
+                            <small>EXEMPELKOD</small>
+                        </div>
+                        <span class="text-success">-$5</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Total (USD)</span>
+                        <strong>$20</strong>
+                    </li>
+                </ul>
+                <form class="card p-2">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Kampanjkod">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-secondary">Aktivera</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-8 order-md-1">
+                <h4 class="mb-3">Fraktuppgifter</h4>
+                <form class="needs-validation" novalidate="">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="firstName">Förnamn<span class="text-muted">*</span></label>
+                            <input type="text" class="form-control" id="firstName" placeholder="Förnamn" value="" required="">
+                            <div class="invalid-feedback"> Valid first name is required. </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="lastName">Efternamn<span class="text-muted">*</span></label>
+                            <input type="text" class="form-control" id="lastName" placeholder="Efternamn" value="" required="">
+                            <div class="invalid-feedback"> Valid last name is required. </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email">Email <span class="text-muted">*</span></label>
+                        <input type="email" class="form-control" id="email" placeholder="namn@example.com" requierd="">
+                        <div class="invalid-feedback"> Please enter a valid email address for shipping updates. </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address">Adress<span class="text-muted">*</span></label>
+                        <input type="text" class="form-control" id="address" placeholder="1234 Main St" required="">
+                        <div class="invalid-feedback"> Fyll i din adress. </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address2">Adress 2 <span class="text-muted">(Optional)</span></label>
+                        <input type="text" class="form-control" id="address2" placeholder="">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5 mb-3">
+                            <label for="country">Land<span class="text-muted">*</span></label>
+                            <select class="custom-select d-block w-100" id="country" required="">
+                                <option value="">Välj...</option>
+                                <option>Sweden</option>
+                                <option>Norway</option>
+                            </select>
+                            <div class="invalid-feedback"> Please select a valid country. </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="state">Stad<span class="text-muted">*</span></label>
+                            <input type="text" class="form-control" id="state" placeholder="" required="">
+                            </select>
+                            <div class="invalid-feedback"> Please provide a valid state. </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="zip">Postnummer<span class="text-muted">*</span></label>
+                            <input type="text" class="form-control" id="zip" placeholder="" required="">
+                            <div class="invalid-feedback"> Zip code required. </div>
+                        </div>
+                        <p>Uppgifter markerade med * är obligatoriska.</p>
+                    </div>
+                    <hr class="mb-4">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="same-address">
+                        <label class="custom-control-label" for="same-address">Fraktadress samma som fakturaadress.</label>
+                    </div>
+                    <hr class="mb-4">
+                    <h4 class="mb-3">Betalning</h4>
+                    <div class="d-block my-3">
+                        <div class="custom-control custom-radio">
+                            <input id="credit" name="paymentMethod" type="radio" class="custom-control-input" checked="" required="">
+                            <label class="custom-control-label" for="credit">Credit card</label>
+                        </div>
+                        <div class="custom-control custom-radio">
+                            <input id="debit" name="paymentMethod" type="radio" class="custom-control-input" required="">
+                            <label class="custom-control-label" for="debit">Debit card</label>
+                        </div>
+                        <div class="custom-control custom-radio">
+                            <input id="paypal" name="paymentMethod" type="radio" class="custom-control-input" required="">
+                            <label class="custom-control-label" for="paypal">PayPal</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="cc-name">Namn på kortet</label>
+                            <input type="text" class="form-control" id="cc-name" placeholder="" required="">
+                            <small class="text-muted">Full name as displayed on card</small>
+                            <div class="invalid-feedback"> Name on card is required </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="cc-number">Kortnummer</label>
+                            <input type="text" class="form-control" id="cc-number" placeholder="" required="">
+                            <div class="invalid-feedback"> Credit card number is required </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="cc-expiration">Giltigt (MM/ÅÅ)</label>
+                            <input type="text" class="form-control" id="cc-expiration" placeholder="" required="">
+                            <div class="invalid-feedback"> Expiration date required </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="cc-cvv">CVV</label>
+                            <input type="text" class="form-control" id="cc-cvv" placeholder="" required="">
+                            <div class="invalid-feedback"> Security code required </div>
+                        </div>
+                    </div>
+                    <hr class="mb-4">
+                    <button class="btn btn-primary btn-lg btn-block" type="submit">Fortsätt till betalning</button>
+                </form>
+            </div>
+        </div>
+        <footer class="my-5 pt-5 text-muted text-center text-small">
+            <p class="mb-1">© 2017-2019 Company Name</p>
+            <ul class="list-inline">
+                <li class="list-inline-item"><a href="#">Privacy</a></li>
+                <li class="list-inline-item"><a href="#">Terms</a></li>
+                <li class="list-inline-item"><a href="#">Support</a></li>
+            </ul>
+        </footer>
+    </div>
+</script>
+
+     <!--VIEW-ORDERS-->
+     <script id="view-orders" type="text/html">
+      <h1>View-Orders</h1>
     </script>
+
+     <!--VIEW-RETURNS-->
+     <script id="view-returns" type="text/html">
+      <h1>View-Returns</h1>
+    </script>
+
+     <!--VIEW-PROFILE INFO-->
+     <script id="view-profileinfo" type="text/html">
+      <h1>View-profileinfo</h1>
+    </script>
+
+     <!--VIEW-SETTINGS-->
+     <script id="view-settings" type="text/html">
+      <h1>View-settings</h1>
+    </script>
+
+     <!--VIEW-LOGOUT-->
+     <script id="view-logout" type="text/html">
+      <h1>View-logout</h1>
+    </script>
+      
+      <!--VIEW-QUESTIONS-->
+      <script id="view-questions" type="text/html">
+        <h1>View-Questions</h1>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g</li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g</li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g</li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g</li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        <li>g </li>
+        
+         <div id="shipping-and-returns-section">
+          <h2>Info about Returns</h2>
+        </div>
+        <div id="payment-section">
+          <h2>Info about Payment</h2>
+        </div>
+        <div id="selling-section">
+          <h2>Info about Selling</h2>
+        </div>
+        <div id="buying-section">
+          <h2>Info about Buying</h2>
+        </div>
+        <div id="collecting-section">
+          <h2>Info about Collecting patches</h2>
+        </div>
+      </script>
+
+   
 </body>
 </html>
