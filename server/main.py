@@ -91,7 +91,7 @@ class Product(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=True)
-    img = db.Column(db.LargeBinary, nullable=True) #eget image library (imgID)
+    #img = db.Column(db.LargeBinary, nullable=True) #eget image library (imgID)
     subcategory_id = db.Column(db.Integer, db.ForeignKey('subcategory.id'), nullable=True)
     subcategory = db.relationship('Subcategory', backref='products', lazy=True, foreign_keys=[subcategory_id])
     year = db.Column(db.Integer, nullable=True)
@@ -336,9 +336,9 @@ def products():
         product_list = [product.serialize() for product in products]
         return jsonify(product_list)
 
-    elif request.method == 'POST' and get_jwt_identity().is_admin:
+    elif request.method == 'POST': #and get_jwt_identity().is_admin:
         data = request.get_json()
-        new_product = Product(name=data['name'], price=data['price'], quantity=data['quantity'], description=data['description'], img=data['img'])
+        new_product = Product(name=data['name'], price=data['price'], quantity=data['quantity'], description=data['description'])
         db.session.add(new_product)
         db.session.commit()
         return jsonify(new_product.serialize()), 201
@@ -449,14 +449,15 @@ def category_by_id(category_id):
 def sign_up():
     data = request.get_json()
 
-    if 'email' not in data or 'name' not in data or 'password' not in data:
+    if 'email' not in data or 'firstName' not in data and 'lastName' not in data or 'password' not in data:
         return jsonify({"error": "Missing required fields"}), 400  # 400 Bad Request
     email = data['email']
-    name = data['name']
+    firstName = data['firstName']
+    lastName = data['lastName']
     password = data['password']
 
     # Create a new user
-    new_user = User(email=email, name=name)
+    new_user = User(email=email, firstName=firstName, lastName=lastName)
     new_user.set_password(password)
 
     # Save the new user to the database
@@ -688,7 +689,6 @@ def get_cars_by_user(user_id):
 @app.route("/")
 def client():
     return app.send_static_file("client.html")
-
 
 
 if __name__ == "__main__":

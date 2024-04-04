@@ -6,6 +6,7 @@ $(document).ready(function () {
   $('.dropdown-toggle').dropdown();
 });
 
+//-------------------------------------------------
 //HOME-PAGE
 function ShowHomePage() {
   $(".nav-link.login, .nav-link.sign-up").toggleClass('d-none', signedIn);
@@ -13,21 +14,13 @@ function ShowHomePage() {
   $(".container").html($("#view-home").html());
 }
 
-//LOGIN-PAGE
-function ShowLoginPage() {
-  $(".container").html($("#view-login").html());
-}
-
-//REGISTER-PAGE
-function ShowRegisterPage() {
-  $(".container").html($("#view-register").html());
-}
-
+//-------------------------------------------------
 //ABOUTUS-PAGE
 function ShowAboutusPage() {
   $(".container").html($("#view-aboutus").html());
 }
 
+//-------------------------------------------------
 //FAVORITES-PAGE
 function ShowFavoritesPage() {
   $(".container").html($("#view-favorites").html());
@@ -149,46 +142,86 @@ function ShowContactPage() {
   $(".container").html($("#view-contact").html());
 }
 
+function addProduct(){
+  console.log("adding product");
+  const name = document.getElementById("product-name").value;
+  console.log(name);
+  const description = document.getElementById("product-description").value;
+  const price = document.getElementById("product-price").value;
+  const quantity = document.getElementById("product-quantity").value;
+  //const img = document.getElementById("product-img").value;
+
+  console.log(name, description, price, quantity);
+
+  $.ajax({
+    url: '/products',
+    type: 'POST',
+    //headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    contentType: 'application/json',
+    data: JSON.stringify({
+      name: name,
+      description: description, 
+      price: price,
+      quantity: quantity}),
+    success: function (response) {
+        console.log(response);
+        showAlert("success", "Product Added!", "Nice!");
+    },
+    error: function (error) {
+        console.error(error);
+    }
+  });
+
+}
+
 //SHOPPINGCART-PAGE
 function ShowShoppingcartPage() {
   $(".container").html($("#view-shoppingcart").html());
 }
 
+//-------------------------------------------------
 //CHECKOUT-PAGE
 function ShowCheckoutPage() {
  $(".container").html($("#view-checkout").html());
 }
 
+//-------------------------------------------------
 //ORDERS-PAGE
 function ShowOrdersPage() {
   $(".container").html($("#view-orders").html());
 }
 
+//-------------------------------------------------
 //RETURNS-PAGE
 function ShowReturnsPage(){
   $(".container").html($("#view-returns").html());
 }
 
+//-------------------------------------------------
 //PROFILE-PAGE
 function ShowProfileinfoPage(){
   $(".container").html($("#view-profileinfo").html());
 }
 
+//-------------------------------------------------
 //SETTINGS-PAGE
 function ShowSettingsPage(){
   $(".container").html($("#view-settings").html());
 }
 
+//-------------------------------------------------
 //LOGOUT-PAGE
 function ShowLogoutPage(){
   $(".container").html($("#view-logout").html());
 }
 
+//-------------------------------------------------
 //QUESTION-PAGES
 function ShowQuestionsPage(){
   $(".container").html($("#view-questions").html());
 }
 
+//-------------------------------------------------
 //FAQ-PAGES
 function ShowQuestionsShippingAndReturnsPage(){
   $(".container").html($("#shipping-and-returns-section").html());
@@ -206,6 +239,7 @@ function ShowQuestionsCollectingPage(){
   $(".container").html($("#collecting-section").html());
 }
 
+//-------------------------------------------------
 //CONTACT-PAGE
 function ShowContactPage() {
   $(".container").html($("#view-contact").html());
@@ -222,6 +256,7 @@ function ShowContactPage() {
   });
 }
 
+//-------------------------------------------------
 //ALERTS
 function showAlert(type, heading, message) {
   var alertHTML = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">';
@@ -236,22 +271,7 @@ function showAlert(type, heading, message) {
   }, 5000);
 }
 
-
-
-// function ShowCarsPage() {
-//   $(".container").html($("#view-cars").html());
-
-//   displayCarList();
-
-//   if (JSON.parse(sessionStorage.getItem('auth')).user.is_admin) {
-//     $(".add-car-btn").show();
-//   } else {
-//     $(".add-car-btn").hide();
-//   }
-// }
-
-
-
+//-------------------------------------------------
 //FUNCTIONS
 function refreshCarList() {
 
@@ -264,6 +284,9 @@ function refreshCarList() {
 }
 
 host = window.location.protocol + '//' + location.host
+
+//-------------------------------------------------
+//DISPLAY-CAR-LIST
 
 function displayCarList() {
   $.ajax({
@@ -364,7 +387,8 @@ function displayCarList() {
   });
 }
   
-
+//-------------------------------------------------
+//DELETE-CAR
 function deleteCar(carId) {
 
   $.ajax({
@@ -387,6 +411,8 @@ function deleteCar(carId) {
   }
 var currentCarId; 
 
+//-------------------------------------------------
+//EDIT-CAR
 function editCar(carId) {
   currentCarId = carId;
 
@@ -437,7 +463,8 @@ $("#editCarForm").submit(function (event) {
   })
 });
 
-
+//-----------------------------------------------
+//USER-EXISTS
 function userExists(UserId) {
   return $.ajax({
     url: host + '/users/' + UserId,
@@ -453,11 +480,12 @@ function userExists(UserId) {
 });
 }
 
-
+//??
 $(".add-car-btn").on('click', function() {
   $("#addMake, #addModel").val('');
 });
 
+//??
 $("#addCarForm").submit(function (event) {
   event.preventDefault();
 
@@ -474,7 +502,8 @@ $("#addCarForm").submit(function (event) {
       headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
       success: function (addedCar) {
           $("#addCarModal").modal('hide');
-          refreshCarList();
+         // refreshCarList();
+         
           showAlert("success", "Car Added!", "Good job!");
       },
       error: function (xhr, textStatus, errorThrown) {
@@ -483,7 +512,8 @@ $("#addCarForm").submit(function (event) {
   });
 });
 
-
+//------------------------------------------------------
+//SHOW-SIGN-UP-PAGE
 function ShowSignUpPage() {
 
   var signUpViewTemplate = $("#view-sign-up").html();
@@ -494,7 +524,8 @@ function ShowSignUpPage() {
       event.preventDefault();
 
       var formData = {
-          name: $("#name").val(),
+          firstName: $("#firstName").val(),
+          lastName: $("#lastName").val(),
           email: $("#email").val(),
           password: $("#password").val()
       };
@@ -503,10 +534,11 @@ function ShowSignUpPage() {
           url: host + '/sign-up',
           type: 'POST',
           contentType: 'application/json',
-          data: JSON.stringify({name: formData.name,email: formData.email, password: formData.password}),
+          data: JSON.stringify({firstName: formData.firstName, lastName: formData.lastName, email : formData.email, password: formData.password}),
           success: function (response) {
 
               ShowHomePage();
+              
           }, 
           error: function (error) {
               console.error(error);
@@ -515,6 +547,25 @@ function ShowSignUpPage() {
   });
 }
 
+//___________________________________________________________
+
+//Functions do decide which dropdown is showed depending on if loggedin or not 
+function updateDropdown(isLoggedIn) {
+  const loggedInDropdown = document.getElementById('loggedInDropdown');
+  const loggedOutDropdown = document.getElementById('loggedOutDropdown');
+
+  if (isLoggedIn) {
+      loggedInDropdown.style.display = 'block';
+      loggedOutDropdown.style.display = 'none';
+  } else {
+      loggedInDropdown.style.display = 'none';
+      loggedOutDropdown.style.display = 'block';
+  }
+}
+
+
+//--------------------------------------------------------------
+//SHOW-LOGIN-PAGE 
 function ShowLoginPage() {
   var loginViewTemplate = $("#view-login").html();
 
@@ -538,12 +589,16 @@ function ShowLoginPage() {
           console.log(response);
           sessionStorage.setItem('auth', JSON.stringify(response));
 
+             // Update isLoggedIn variable to true after successful login
+          isLoggedIn = true;
+
           console.log(signedIn);
           signedIn = sessionStorage.getItem('auth') !== null;
           console.log(signedIn);
           guserId = JSON.parse(sessionStorage.getItem('auth')).user.id;
 
           ShowHomePage();
+          updateDropdown(isLoggedIn);
           showAlert("success", "Du är nu inloggad", "Välkommen att kika runt!");
         },
         error: function (error) {
@@ -554,6 +609,8 @@ function ShowLoginPage() {
     });
 }
 
+//-----------------------------------------------------------
+//SHOW-LOGOUT-PAGE
 function ShowLogoutPage() {
   var logoutViewTemplate = $("#view-logout").html();
 
@@ -564,24 +621,42 @@ function ShowLogoutPage() {
 
     sessionStorage.removeItem('auth');
 
+    isLoggedIn = false;
+
     signedIn = sessionStorage.getItem('auth') !== null;
     ShowHomePage();
+    updateDropdown(isLoggedIn);
     
   });
 
-}
+} 
 
+
+//------------------------------------------
 //CLICK-EVENTS
 
 $(document).ready(function () {
-  // Show home page on initial load
   ShowHomePage();
 
   signedIn = sessionStorage.getItem('auth') !== null;
   console.log(signedIn);
+  
+  //check if logged in
+  isLoggedIn = sessionStorage.getItem('auth') !== null;
 
-  $(".nav-link.login, .nav-link.sign-up").toggleClass('d-none', signedIn);
+  var isLoggedIn = false; // Set this to true if the user is logged in
 
+  updateDropdown(isLoggedIn);
+
+
+   $(".navbar-brand.logo").click(function() {
+     isLoggedIn = true;
+     updateDropdown(isLoggedIn); // Update profile dropdown menu after logging out
+   });
+
+
+
+   //------------------------------------------
   // Navigation click event handlers
 
   //NAVBAR-LINKS
@@ -609,20 +684,6 @@ $(document).ready(function () {
     ShowAboutusPage();
 });
 
-  $(".nav-link.register").click(function () {
-    //if (!signedIn) {
-    //  ShowRegisterPage();
-   // }
-   ShowRegisterPage();
-  });
-
-  $(".nav-link.login").click(function () {
-   // if (!signedIn) {
-   //   ShowLoginPage();
-   // }
-   ShowLoginPage();
-  });
-
   $(".nav-link.logout").click(function () {
     ShowLogoutPage();
 });
@@ -635,6 +696,23 @@ $(".nav-link.shoppingcart").click(function () {
   ShowShoppingcartPage();
 });
 
+
+//Dropdown-logged out
+$(".nav-item.dropdown .dropdown-menu .sign-up").click(function () {
+  //if (!signedIn) {
+  //  ShowRegisterPage();
+ // }
+ ShowSignUpPage();
+});
+
+$(".nav-item.dropdown .dropdown-menu .login").click(function () {
+ // if (!signedIn) {
+ //   ShowLoginPage();
+ // }
+ ShowLoginPage();
+});
+
+//Dropdown-logged in
 $(".nav-item.dropdown .dropdown-menu .orders").click(function () {
   ShowOrdersPage();
 });
