@@ -413,33 +413,59 @@
     <script id="view-sell" type="text/html"></div>
       <h1>Säljformulär</h1>
       <form id="sellForm" enctype="multipart/form-data" class="nice-form">
-          <div class="form-group">
-              <label for="productName">Produktnamn:</label>
-              <input type="text" id="product-name" name="productName" class="form-control" required>
-          </div>
-          <div class="form-group">
-              <label for="productDescription">Produktbeskrivning:</label>
-              <textarea id="product-description" name="productDescription" class="form-control" rows="4" required></textarea>
-          </div>
-          <div class="form-group">
-              <label for="productPrice">Prisförslag:</label>
-              <input type="number" id="product-price" name="productPrice" min="0" step="0.01" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label for="productQuantity">Kvantitet:</label>
-            <input type="number" id="product-quantity" name="productQuantity" min="0" step="0.01" class="form-control" required>
+        <div class="form-group">
+            <label for="productName">Produktnamn:</label>
+            <input type="text" id="product-name" name="productName" class="form-control" required>
         </div>
-          <div class="form-group">
-              <label for="productImage">Product Image:</label>
-              <input type="file" id="product-image" name="productImage" accept="image/*" class="form-control-file">
-          </div>
-          <div class="form-group">
-            <label for="productOtherNotes">Övriga noteringar:</label>
-            <textarea id="productOtherNotes" name="productOtherNotes" class="form-control" rows="4"></textarea>
+        <div class="form-group">
+            <label for="productDescription">Produktbeskrivning:</label>
+            <textarea id="product-description" name="productDescription" class="form-control" rows="4" required></textarea>
         </div>
-          <div class="form-group">
-              <button type="submit" class="btn btn-primary" onclick="addProduct()">Skicka</button>
-          </div>
+        <div class="form-group">
+            <label for="productPrice">Prisförslag:</label>
+            <input type="number" id="product-price" name="productPrice" min="0" step="0.01" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="productQuantity">Kvantitet:</label>
+          <input type="number" id="product-quantity" name="productQuantity" min="0" step="0.01" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="productImage">Bild:</label>
+            <input type="file" id="product-image" name="productImage" accept="image/*" class="form-control-file">
+        </div>
+        <div class="form-group">
+          <label for="category">Kategori:</label>
+          <select id="product-category" name="category" class="form-control"></select>
+        </div>
+        <div class="form-group">
+          <label for="year">År:</label>
+          <input type="number" id="product-year" name="year" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="section">Sektion:</label>
+            <input type="text" id="product-section" name="section" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="event">Event:</label>
+            <input type="text" id="product-event" name="event" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="event_organizer">Arrangör:</label>
+            <input type="text" id="event_organizer" name="event_organizer" class="form-control">
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary" onclick="addProduct()">Skicka</button>
+        </div>
+        <script>
+            fetch('/categories')
+                .then(response => response.json())
+                .then(categories => {
+                  var select = document.getElementById('product-category');
+                  categories.forEach(category => {
+                      select.innerHTML += `<option value="${category.id}">${category.name}</option>`;
+                  });
+                });
+        </script>
       </form>
     </div>
   </script>
