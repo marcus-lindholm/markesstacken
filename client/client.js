@@ -13,6 +13,16 @@ function ShowHomePage() {
   $(".container").html($("#view-home").html());
 }
 
+//LOGIN-PAGE
+function ShowLoginPage() {
+  $(".container").html($("#view-login").html());
+}
+
+//REGISTER-PAGE
+function ShowRegisterPage() {
+  $(".container").html($("#view-register").html());
+}
+
 //ABOUTUS-PAGE
 function ShowAboutusPage() {
   $(".container").html($("#view-aboutus").html());
@@ -497,16 +507,18 @@ $(document).ready(function () {
     ShowAboutusPage();
 });
 
-  $(".nav-link.sign-up").click(function () {
-    if (!signedIn) {
-      ShowSignUpPage();
-    }
+  $(".nav-link.register").click(function () {
+    //if (!signedIn) {
+    //  ShowRegisterPage();
+   // }
+   ShowRegisterPage();
   });
 
   $(".nav-link.login").click(function () {
-    if (!signedIn) {
-      ShowLoginPage();
-    }
+   // if (!signedIn) {
+   //   ShowLoginPage();
+   // }
+   ShowLoginPage();
   });
 
   $(".nav-link.logout").click(function () {
