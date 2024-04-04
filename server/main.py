@@ -63,6 +63,7 @@ class Subcategory(db.Model):
     name = db.Column(db.String, nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
     category = db.relationship('Category', backref='subcategories', lazy=True)
+    
 
     def __repr__(self):
         return f'<Subcategory {self.id}: {self.name}: {self.category}>'
@@ -90,16 +91,22 @@ class Product(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=True)
-    img = db.Column(db.LargeBinary, nullable=True) #eget image library (imgID)
+    #img = db.Column(db.LargeBinary, nullable=True) #eget image library (imgID)
     subcategory_id = db.Column(db.Integer, db.ForeignKey('subcategory.id'), nullable=True)
     subcategory = db.relationship('Subcategory', backref='products', lazy=True, foreign_keys=[subcategory_id])
-
+    year = db.Column(db.Integer, nullable=True)
+    section = db.Column(db.String, nullable=True)
+    event = db.Column(db.String, nullable=True)
+    event_organizer = db.Column(db.String, nullable=True)
+    
+    
+    
     def __repr__(self):
         return f'<Product {self.id}: {self.name}: {self.price}>'
     
     def serialize(self):
         return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity,
-            description=self.description, img=self.img, subcategory=self.subcategory.serialize() if self.subcategory else None)
+            description=self.description, subcategory=self.subcategory.serialize() if self.subcategory else None)
         
 class CartItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)    
@@ -173,8 +180,8 @@ with app.app_context():
     subcat2 = Subcategory(name='Festivallen', category=category1)
     db.session.add(subcat1)
     db.session.add(subcat2)
-    product1 = Product(name='UK 2022', price=30, quantity=100, description='Märke från UK 2022.', subcategory=subcat1)
-    product2 = Product(name='Festivallen 1995', price=50, quantity=10, description='Märke från Festivallen 1995.', subcategory=subcat2)
+    product1 = Product(name='UK 2022', price=30, quantity=100, description='Märke från UK 2022.', subcategory=subcat1, year = 2022, section = 'I-Sektionen', event = 'UK', event_organizer = 'CM')
+    product2 = Product(name='Festivallen 1995', price=50, quantity=10, description='Märke från Festivallen 1995.', subcategory=subcat2, year = 2020, section = 'Läk-Sektionen', event = 'FESTIVALLEN', event_organizer = 'MEDSEX')
     db.session.add(product1)
     db.session.add(product2)
     shoppingcart1 = ShoppingCart()
@@ -324,9 +331,9 @@ def products():
         product_list = [product.serialize() for product in products]
         return jsonify(product_list)
 
-    elif request.method == 'POST' and get_jwt_identity().is_admin:
+    elif request.method == 'POST': #and get_jwt_identity().is_admin:
         data = request.get_json()
-        new_product = Product(name=data['name'], price=data['price'], quantity=data['quantity'], description=data['description'], img=data['img'])
+        new_product = Product(name=data['name'], price=data['price'], quantity=data['quantity'], description=data['description'])
         db.session.add(new_product)
         db.session.commit()
         return jsonify(new_product.serialize()), 201
@@ -481,6 +488,18 @@ def login():
         return jsonify(response)
     else:
         return jsonify({"error": "Invalid email or password"}), 401  # 401 Unauthorized
+    
+#Köpsidan
+@app.route('/Buy', methods=['GET'], endpoint = 'Buy')
+def Buy():
+    if request.method == 'GET':
+        # Query all products from the database
+        products = Product.query.all()
+        # Serialize products into a JSON format
+        products_json = [product.serialize() for product in products]
+        # Return products as JSON response
+        return jsonify(products=products_json)
+
 
 
 # @app.route('/cars/<int:car_id>', methods=['PUT', 'GET', 'DELETE'], endpoint='get_car_by_id')
