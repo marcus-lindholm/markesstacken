@@ -32,15 +32,13 @@ function ShowAboutusPage() {
 function ShowFavoritesPage() {
   $(".container").html($("#view-favorites").html());
 }
-
-//PURCHASE-PAGE
 // Function to show the purchase page
 function ShowPurchasePage() {
   $(".container").html($("#view-purchase").html());
   
   // Make AJAX request to fetch products
   $.ajax({
-      url: host + "/Buy",
+      url: host + "/Buy", // Assuming Buy route is relative
       type: "GET",
       success: function(response) {
           // Loop through each product and generate HTML dynamically
@@ -79,9 +77,12 @@ function ShowPurchasePage() {
                       </div>
                   </div>
               </div>`;
+
               // Append product HTML to the container
-              $(".container .row").append(productHTML);
+              $("#product-container").append(productHTML);
           });
+
+          populateFilterDropdowns(response);
       },
       error: function(error) {
           console.error("Error fetching products:", error);
@@ -89,6 +90,55 @@ function ShowPurchasePage() {
   });
 }
 
+function populateFilterDropdowns(response) {
+  var years = [];
+  var sections = [];
+  var organizers = [];
+  var events = [];
+
+  // Extract unique values for each filter
+  response.products.forEach(function(product) {
+    if (product.year !== null && !years.includes(product.year)) {
+        years.push(product.year);
+    }
+    if (product.section !== null && !sections.includes(product.section)) {
+        sections.push(product.section);
+    }
+    if (product.event_organizer !== null && !organizers.includes(product.event_organizer)) {
+        organizers.push(product.event_organizer);
+    }
+    if (product.event !== null && !events.includes(product.event)) {
+        events.push(product.event);
+    }
+  });
+
+  // Sort the lists alphabetically
+  years.sort();
+  sections.sort();
+  organizers.sort();
+  events.sort();
+
+  // Populate filter dropdowns
+  populateDropdown("filterYear", years);
+  populateDropdown("filterSection", sections);
+  populateDropdown("filterOrganizers", organizers);
+  populateDropdown("filterEvent", events);
+}
+
+// Function to populate a dropdown
+function populateDropdown(id, options) {
+  var dropdown = $("#" + id);
+  dropdown.empty();
+  dropdown.append($('<option>', { value: "", text : "All" }));
+  options.forEach(function(option) {
+      dropdown.append($('<option>', { value: option, text : option }));
+  });
+}
+
+// Call the function to show the purchase page
+$(document).ready(function() {
+  ShowPurchasePage();
+});
 
 //SELL-PAGE
 function ShowSellPage() {
