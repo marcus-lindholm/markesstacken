@@ -99,6 +99,38 @@ function ShowContactPage() {
   $(".container").html($("#view-contact").html());
 }
 
+function addProduct(){
+  console.log("adding product");
+  const name = document.getElementById("product-name").value;
+  console.log(name);
+  const description = document.getElementById("product-description").value;
+  const price = document.getElementById("product-price").value;
+  const quantity = document.getElementById("product-quantity").value;
+  //const img = document.getElementById("product-img").value;
+
+  console.log(name, description, price, quantity);
+
+  $.ajax({
+    url: '/products',
+    type: 'POST',
+    //headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    contentType: 'application/json',
+    data: JSON.stringify({
+      name: name,
+      description: description, 
+      price: price,
+      quantity: quantity}),
+    success: function (response) {
+        console.log(response);
+        showAlert("success", "Product Added!", "Nice!");
+    },
+    error: function (error) {
+        console.error(error);
+    }
+  });
+
+}
+
 //SHOPPINGCART-PAGE
 function ShowShoppingcartPage() {
   $(".container").html($("#view-shoppingcart").html());

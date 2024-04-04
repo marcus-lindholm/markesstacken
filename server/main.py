@@ -91,7 +91,7 @@ class Product(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=True)
-    img = db.Column(db.LargeBinary, nullable=True) #eget image library (imgID)
+    #img = db.Column(db.LargeBinary, nullable=True) #eget image library (imgID)
     subcategory_id = db.Column(db.Integer, db.ForeignKey('subcategory.id'), nullable=True)
     subcategory = db.relationship('Subcategory', backref='products', lazy=True, foreign_keys=[subcategory_id])
     year = db.Column(db.Integer, nullable=True)
@@ -106,10 +106,8 @@ class Product(db.Model):
     
     def serialize(self):
         return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity,
-            description=self.description, img=self.img, subcategory=self.subcategory.serialize() if self.subcategory else None)
-    
-
-
+            description=self.description, subcategory=self.subcategory.serialize() if self.subcategory else None)
+        
 class CartItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)    
     quantity = db.Column(db.Integer, nullable=False) #quantity of each product
@@ -333,9 +331,9 @@ def products():
         product_list = [product.serialize() for product in products]
         return jsonify(product_list)
 
-    elif request.method == 'POST' and get_jwt_identity().is_admin:
+    elif request.method == 'POST': #and get_jwt_identity().is_admin:
         data = request.get_json()
-        new_product = Product(name=data['name'], price=data['price'], quantity=data['quantity'], description=data['description'], img=data['img'])
+        new_product = Product(name=data['name'], price=data['price'], quantity=data['quantity'], description=data['description'])
         db.session.add(new_product)
         db.session.commit()
         return jsonify(new_product.serialize()), 201
