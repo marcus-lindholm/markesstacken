@@ -91,7 +91,6 @@ class Product(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=True)
-    #img = db.Column(db.LargeBinary, nullable=True) #eget image library (imgID)
     subcategory_id = db.Column(db.Integer, db.ForeignKey('subcategory.id'), nullable=True)
     subcategory = db.relationship('Subcategory', backref='products', lazy=True, foreign_keys=[subcategory_id])
     year = db.Column(db.Integer, nullable=True)
@@ -105,7 +104,7 @@ class Product(db.Model):
         return f'<Product {self.id}: {self.name}: {self.price}>'
     
     def serialize(self):
-            return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity, description=self.description, img=self.img, year=self.year, section=self.section, event=self.event, event_organizer=self.event_organizer, subcategory=self.subcategory.serialize() if self.subcategory else None)
+            return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity, description=self.description, year=self.year, section=self.section, event=self.event, event_organizer=self.event_organizer, subcategory=self.subcategory.serialize() if self.subcategory else None)
     
 
 
@@ -361,8 +360,6 @@ def product_by_id(product_id):
             product.quantity = data['quantity']
         if 'description' in data:
             product.description = data['description']
-        if 'img' in data:
-            product.img = data['img']
         if 'subcategory_id' in data:
             product.subcategory_id = data['subcategory_id']
         db.session.commit()
@@ -494,19 +491,6 @@ def login():
     else:
         return jsonify({"error": "Invalid email or password"}), 401  # 401 Unauthorized
     
-#Köpsidan
-@app.route('/Buy', methods=['GET'], endpoint = 'Buy')
-def Buy():
-    if request.method == 'GET':
-        # Query all products from the database
-        products = Product.query.all()
-
-        # Serialize products into a JSON format
-        products_json = [product.serialize() for product in products]
-        # Return products as JSON response
-        return jsonify(products=products_json)
-
-
 
 # @app.route('/cars/<int:car_id>', methods=['PUT', 'GET', 'DELETE'], endpoint='get_car_by_id')
 # @jwt_required()
@@ -692,5 +676,5 @@ def client():
 
 
 if __name__ == "__main__":
-    app.run(port=5001) # På MacOS, byt till 5001 eller dylikt
+    app.run(port=5002) # På MacOS, byt till 5001 eller dylikt
 
