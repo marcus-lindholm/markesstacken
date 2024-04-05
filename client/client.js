@@ -146,10 +146,18 @@ function ShowContactPage() {
 function addProduct(){
   console.log("adding product");
   const name = document.getElementById("product-name").value;
-  console.log(name);
   const description = document.getElementById("product-description").value;
   const price = document.getElementById("product-price").value;
   const quantity = document.getElementById("product-quantity").value;
+  const categoryid = document.getElementById("product-category").value;
+  const yearElement = document.getElementById("product-year");
+  const year = yearElement && yearElement.value ? yearElement.value : null;
+  const sectionElement = document.getElementById("product-section");
+  const section = sectionElement && sectionElement.value ? sectionElement.value : null;
+  const eventElement = document.getElementById("product-event");
+  const event = eventElement && eventElement.value ? eventElement.value : null;
+  const organizerElement = document.getElementById("event_organizer");
+  const organizer = organizerElement && organizerElement.value ? organizerElement.value : null;
   //const img = document.getElementById("product-img").value;
 
   console.log(name, description, price, quantity);
@@ -163,7 +171,13 @@ function addProduct(){
       name: name,
       description: description, 
       price: price,
-      quantity: quantity}),
+      quantity: quantity,
+      category_id: categoryid,
+      year: year,
+      section: section,
+      event: event,
+      organizer: organizer
+    }),
     success: function (response) {
         console.log(response);
         showAlert("success", "Product Added!", "Nice!");

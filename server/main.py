@@ -44,46 +44,33 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-class Car(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    make = db.Column(db.String, nullable=False)
-    model = db.Column(db.String, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = True)
-
-    user = db.relationship('User', backref='user_cars', lazy=True)
-
-    def __repr__(self):
-        return f'<Car {self.id}: {self.make} {self.model}>'
-
-    def serialize(self):
-        return dict(id=self.id, make=self.make, model=self.model, user_id=self.user_id)
-
-class Subcategory(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
-    category = db.relationship('Category', backref='subcategories', lazy=True)
+# class Subcategory(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.String, nullable=False)
+#     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
+#     category = db.relationship('Category', backref='subcategories', lazy=True)
     
 
-    def __repr__(self):
-        return f'<Subcategory {self.id}: {self.name}: {self.category}>'
+#     def __repr__(self):
+#         return f'<Subcategory {self.id}: {self.name}: {self.category}>'
     
-    def serialize(self):
-        return dict(
-            id=self.id, 
-            name=self.name, 
-            category=self.category.serialize() if self.category else None
-        )
+#     def serialize(self):
+#         return dict(
+#             id=self.id, 
+#             name=self.name, 
+#             category=self.category.serialize() if self.category else None
+#         )
 
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
-
+    
     def __repr__(self):
         return f'<Category {self.id}: {self.name}>'
 
     def serialize(self):
-        return dict(id=self.id, name=self.name)
+        return dict(id=self.id,
+                    name=self.name)
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -91,14 +78,13 @@ class Product(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=True)
-    subcategory_id = db.Column(db.Integer, db.ForeignKey('subcategory.id'), nullable=True)
-    subcategory = db.relationship('Subcategory', backref='products', lazy=True, foreign_keys=[subcategory_id])
+    #img = db.Column(db.LargeBinary, nullable=True) #eget image library (imgID)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
+    category = db.relationship('Category', backref='products', lazy=True)
     year = db.Column(db.Integer, nullable=True)
     section = db.Column(db.String, nullable=True)
     event = db.Column(db.String, nullable=True)
-    event_organizer = db.Column(db.String, nullable=True)
-    
-    
+    organizer = db.Column(db.String, nullable=True)
     
     def __repr__(self):
         return f'<Product {self.id}: {self.name}: {self.price}>'
@@ -176,16 +162,12 @@ with app.app_context():
     category2 = Category(name='Övrigt')
     db.session.add(category1)
     db.session.add(category2)
-    subcat1 = Subcategory(name='UK', category=category1)
-    subcat2 = Subcategory(name='Festivallen', category=category1)
-    db.session.add(subcat1)
-    db.session.add(subcat2)
-
-    #DUMMY PRODUCTS
-    product1 = Product(name='UK 2022', price=30, quantity=100, description='Märke från UK 2022.', subcategory=subcat1, year = 2022, section = 'I-Sektionen', event = 'UK', event_organizer = 'CM')
-    product2 = Product(name='Festivallen 1995', price=50, quantity=10, description='Märke från Festivallen 1995.', subcategory=subcat2, year = 2020, section = 'Läk-Sektionen', event = 'FESTIVALLEN', event_organizer = 'MEDSEX')
-    
-    
+    # subcat1 = Subcategory(name='UK', category=category1)
+    # subcat2 = Subcategory(name='Festivallen', category=category1)
+    # db.session.add(subcat1)
+    # db.session.add(subcat2)
+    product1 = Product(name='UK 2022', price=30, quantity=100, description='Märke från UK 2022.', category=category1, year = 2022, section = 'I-Sektionen', event = 'UK', organizer = 'CM')
+    product2 = Product(name='Festivallen 1995', price=50, quantity=10, description='Märke från Festivallen 1995.', category=category2, year = 2020, section = 'Läk-Sektionen', event = 'FESTIVALLEN', organizer = 'MEDSEX')
     db.session.add(product1)
     db.session.add(product2)
     shoppingcart1 = ShoppingCart()
@@ -337,7 +319,7 @@ def products():
 
     elif request.method == 'POST': #and get_jwt_identity().is_admin:
         data = request.get_json()
-        new_product = Product(name=data['name'], price=data['price'], quantity=data['quantity'], description=data['description'])
+        new_product = Product(name=data['name'], price=data['price'], quantity=data['quantity'], description=data['description'], category_id=data['category_id'], year = data['year'], section = data['section'], event = data['event'], organizer = data['organizer'])
         db.session.add(new_product)
         db.session.commit()
         return jsonify(new_product.serialize()), 201
@@ -360,8 +342,10 @@ def product_by_id(product_id):
             product.quantity = data['quantity']
         if 'description' in data:
             product.description = data['description']
-        if 'subcategory_id' in data:
-            product.subcategory_id = data['subcategory_id']
+        if 'img' in data:
+            product.img = data['img']
+        # if 'subcategory_id' in data:
+        #     product.subcategory_id = data['subcategory_id']
         db.session.commit()
         return jsonify(product.serialize()), 200
 
@@ -370,42 +354,42 @@ def product_by_id(product_id):
         db.session.commit()
         return jsonify("Success!"), 200 
 
-@app.route('/subcategories', methods=['GET', 'POST'], endpoint='subcategories')
-#@jwt_required()
-def subcategories():
-    if request.method == 'GET':
-        subcategories = Subcategory.query.all()
-        subcategory_list = [subcategory.serialize() for subcategory in subcategories]
-        return jsonify(subcategory_list)
+# @app.route('/subcategories', methods=['GET', 'POST'], endpoint='subcategories')
+# #@jwt_required()
+# def subcategories():
+#     if request.method == 'GET':
+#         subcategories = Subcategory.query.all()
+#         subcategory_list = [subcategory.serialize() for subcategory in subcategories]
+#         return jsonify(subcategory_list)
 
-    elif request.method == 'POST' and get_jwt_identity().is_admin:
-        data = request.get_json()
-        new_subcategory = Subcategory(name=data['name'], category_id=data['category_id'])
-        db.session.add(new_subcategory)
-        db.session.commit()
-        return jsonify(new_subcategory.serialize()), 201
+#     elif request.method == 'POST' and get_jwt_identity().is_admin:
+#         data = request.get_json()
+#         new_subcategory = Subcategory(name=data['name'], category_id=data['category_id'])
+#         db.session.add(new_subcategory)
+#         db.session.commit()
+#         return jsonify(new_subcategory.serialize()), 201
 
-@app.route('/subcategories/<int:subcategory_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='subcategory_by_id')
-#@jwt_required()
-def subcategory_by_id(subcategory_id):
-    subcategory = Subcategory.query.get_or_404(subcategory_id)
+# @app.route('/subcategories/<int:subcategory_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='subcategory_by_id')
+# #@jwt_required()
+# def subcategory_by_id(subcategory_id):
+#     subcategory = Subcategory.query.get_or_404(subcategory_id)
 
-    if request.method == 'GET':
-        return jsonify(subcategory.serialize())
+#     if request.method == 'GET':
+#         return jsonify(subcategory.serialize())
 
-    elif request.method == 'PUT' and get_jwt_identity().is_admin:
-        data = request.get_json()
-        if 'name' in data:
-            subcategory.name = data['name']
-        if 'category_id' in data:
-            subcategory.category_id = data['category_id']
-        db.session.commit()
-        return jsonify(subcategory.serialize()), 200
+#     elif request.method == 'PUT' and get_jwt_identity().is_admin:
+#         data = request.get_json()
+#         if 'name' in data:
+#             subcategory.name = data['name']
+#         if 'category_id' in data:
+#             subcategory.category_id = data['category_id']
+#         db.session.commit()
+#         return jsonify(subcategory.serialize()), 200
 
-    elif request.method == 'DELETE' and get_jwt_identity().is_admin:
-        db.session.delete(subcategory)
-        db.session.commit()
-        return jsonify("Success!"), 200
+#     elif request.method == 'DELETE' and get_jwt_identity().is_admin:
+#         db.session.delete(subcategory)
+#         db.session.commit()
+#         return jsonify("Success!"), 200
 
 @app.route('/categories', methods=['GET', 'POST'], endpoint='categories')
 #@jwt_required()
