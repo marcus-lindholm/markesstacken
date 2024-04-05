@@ -502,11 +502,12 @@ function ShowSignUpPage() {
           data: JSON.stringify({firstName: formData.firstName, lastName: formData.lastName, email : formData.email, password: formData.password}),
           success: function (response) {
 
-              ShowHomePage();
+              ShowLoginPage();
               
           }, 
           error: function (error) {
-              console.error(error);
+            showAlert("danger", "Registrering misslyckades", "Mailadressen används redan.");
+             console.error(error);
           }
       });
   });
@@ -515,13 +516,32 @@ function ShowSignUpPage() {
 //___________________________________________________________
 
 //Functions do decide which dropdown is showed depending on if loggedin or not 
-function updateDropdown(isLoggedIn) {
+function checkLoggedIn() {
+  auth = JSON.parse(sessionStorage.getItem('auth'));
+  var signedIn = auth !== null;
+  
   const loggedInDropdown = document.getElementById('loggedInDropdown');
   const loggedOutDropdown = document.getElementById('loggedOutDropdown');
 
-  if (isLoggedIn) {
-      loggedInDropdown.style.display = 'block';
-      loggedOutDropdown.style.display = 'none';
+  if (signedIn == true) {
+    loggedInDropdown.style.display = 'block';
+    loggedOutDropdown.style.display = 'none';
+    
+    $.ajax({
+      url: '/get-identity',
+      type: 'GET',
+      headers: {
+          'Content-Type': 'application/json',
+          "Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).access_token
+      },
+      success: function(user) {
+          if (user.user.is_admin === false) {
+              console.log("User is not admin", user.user.is_admin);
+             
+          } else {
+            
+          }
+      },});
   } else {
       loggedInDropdown.style.display = 'none';
       loggedOutDropdown.style.display = 'block';
@@ -554,16 +574,13 @@ function ShowLoginPage() {
           console.log(response);
           sessionStorage.setItem('auth', JSON.stringify(response));
 
-             // Update isLoggedIn variable to true after successful login
-          isLoggedIn = true;
-
           console.log(signedIn);
           signedIn = sessionStorage.getItem('auth') !== null;
           console.log(signedIn);
           guserId = JSON.parse(sessionStorage.getItem('auth')).user.id;
 
           ShowHomePage();
-          updateDropdown(isLoggedIn);
+          checkLoggedIn();
           showAlert("success", "Du är nu inloggad", "Välkommen att kika runt!");
         },
         error: function (error) {
@@ -586,11 +603,9 @@ function ShowLogoutPage() {
 
     sessionStorage.removeItem('auth');
 
-    isLoggedIn = false;
-
     signedIn = sessionStorage.getItem('auth') !== null;
     ShowHomePage();
-    updateDropdown(isLoggedIn);
+    checkLoggedIn();
     
   });
 
@@ -601,26 +616,12 @@ function ShowLogoutPage() {
 //CLICK-EVENTS
 
 $(document).ready(function () {
+  checkLoggedIn();
   ShowHomePage();
 
   signedIn = sessionStorage.getItem('auth') !== null;
   console.log(signedIn);
   
-  //check if logged in
-  isLoggedIn = sessionStorage.getItem('auth') !== null;
-
-  var isLoggedIn = false; // Set this to true if the user is logged in
-
-  updateDropdown(isLoggedIn);
-
-
-   $(".navbar-brand.logo").click(function() {
-     isLoggedIn = true;
-     updateDropdown(isLoggedIn); // Update profile dropdown menu after logging out
-   });
-
-
-
    //------------------------------------------
   // Navigation click event handlers
 
