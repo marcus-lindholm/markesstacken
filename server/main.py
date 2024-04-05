@@ -436,6 +436,11 @@ def sign_up():
     lastName = data['lastName']
     password = data['password']
 
+    # Make it so that the email has to be unique for every user signing up
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        return jsonify({"error": "Email address already in use"}), 400  # 400 Bad Request
+
     # Create a new user
     new_user = User(email=email, firstName=firstName, lastName=lastName)
     new_user.set_password(password)
