@@ -548,7 +548,6 @@ function checkLoggedIn() {
   }
 }
 
-
 //--------------------------------------------------------------
 //SHOW-LOGIN-PAGE 
 function ShowLoginPage() {
@@ -574,6 +573,8 @@ function ShowLoginPage() {
           console.log(response);
           sessionStorage.setItem('auth', JSON.stringify(response));
 
+          
+
           console.log(signedIn);
           signedIn = sessionStorage.getItem('auth') !== null;
           console.log(signedIn);
@@ -590,6 +591,7 @@ function ShowLoginPage() {
       });
     });
 }
+
 
 //-----------------------------------------------------------
 //SHOW-LOGOUT-PAGE
