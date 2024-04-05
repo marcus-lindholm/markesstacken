@@ -474,8 +474,7 @@
     </div>
 
     </script>
-
-    <!--VIEW-PURCHASE PAGE-->
+<!--VIEW-PURCHASE PAGE-->
 <script id="view-purchase" type="text/html">
   <h1>View-Purchase</h1>
 
@@ -487,23 +486,17 @@
  
           <!-- Year filter -->
           <div class="form-group">
-              <label for="filterYear">Year:</label>
-              <select class="form-control" id="filterYear">
-                  <option value="">All</option>
-                  <option value="2022">2022</option>
-                  <option value="2023">2023</option>
-                  <!-- Add more years as needed -->
-              </select>
-          </div>
- 
+            <label for="filterYear">Year:</label>
+            <select class="form-control" id="filterYear">
+                <option value="">All</option>
+            </select>
+        </div>
+
           <!-- Section filter -->
           <div class="form-group">
               <label for="filterSection">Section:</label>
               <select class="form-control" id="filterSection">
                   <option value="">All</option>
-                  <option value="Section 1">Section 1</option>
-                  <option value="Section 2">Section 2</option>
-                  <!-- Add more sections as needed -->
               </select>
           </div>
  
@@ -512,9 +505,6 @@
               <label for="filterOrganizers">Event Organizers:</label>
               <select class="form-control" id="filterOrganizers">
                   <option value="">All</option>
-                  <option value="Organizer 1">Organizer 1</option>
-                  <option value="Organizer 2">Organizer 2</option>
-                  <!-- Add more organizers as needed -->
               </select>
           </div>
  
@@ -523,14 +513,16 @@
               <label for="filterEvent">Event:</label>
               <select class="form-control" id="filterEvent">
                   <option value="">All</option>
-                  <option value="Event 1">Event 1</option>
-                  <option value="Event 2">Event 2</option>
-                  <!-- Add more events as needed -->
               </select>
           </div>
       </div>
-  </div>
+    </div>
 
+    <div class="col-md-9">
+      <div class="container-fluid">
+        <div class="row" id="product-container">
+          <!-- Product cards will be dynamically populated here -->
+        </div>
       </div>
     </div>
   </div>

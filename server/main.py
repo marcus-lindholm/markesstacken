@@ -90,9 +90,10 @@ class Product(db.Model):
         return f'<Product {self.id}: {self.name}: {self.price}>'
     
     def serialize(self):
-        return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity,
-            description=self.description, category=self.category.serialize() if self.category else None)
-        
+            return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity, description=self.description, year=self.year, section=self.section, event=self.event, organizer=self.organizer)
+    
+
+
 class CartItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)    
     quantity = db.Column(db.Integer, nullable=False) #quantity of each product
@@ -161,10 +162,6 @@ with app.app_context():
     category2 = Category(name='Övrigt')
     db.session.add(category1)
     db.session.add(category2)
-    # subcat1 = Subcategory(name='UK', category=category1)
-    # subcat2 = Subcategory(name='Festivallen', category=category1)
-    # db.session.add(subcat1)
-    # db.session.add(subcat2)
     product1 = Product(name='UK 2022', price=30, quantity=100, description='Märke från UK 2022.', category=category1, year = 2022, section = 'I-Sektionen', event = 'UK', organizer = 'CM')
     product2 = Product(name='Festivallen 1995', price=50, quantity=10, description='Märke från Festivallen 1995.', category=category2, year = 2020, section = 'Läk-Sektionen', event = 'FESTIVALLEN', organizer = 'MEDSEX')
     db.session.add(product1)
@@ -479,16 +476,106 @@ def login():
     else:
         return jsonify({"error": "Invalid email or password"}), 401  # 401 Unauthorized
     
-#Köpsidan
-@app.route('/Buy', methods=['GET'], endpoint = 'Buy')
-def Buy():
-    if request.method == 'GET':
-        # Query all products from the database
-        products = Product.query.all()
-        # Serialize products into a JSON format
-        products_json = [product.serialize() for product in products]
-        # Return products as JSON response
-        return jsonify(products=products_json)
+
+# @app.route('/cars/<int:car_id>', methods=['PUT', 'GET', 'DELETE'], endpoint='get_car_by_id')
+# @jwt_required()
+# def get_car_by_id(car_id):
+#     current_user = get_jwt_identity()
+#     car = Car.query.get_or_404(car_id)
+ 
+#     if request.method == 'GET':
+#         car_data = car.serialize()
+
+#         if car.user:
+#             car_data['user'] = car.user.serialize()
+#         else:
+#             car_data['user'] = None
+
+#         car_data.pop('user_id', None)
+
+#         return jsonify(car_data)
+
+#     elif request.method == 'PUT':
+#         data = request.get_json()
+
+#         if 'make' in data:
+#             car.make = data['make']
+            
+#         if 'model' in data:
+#             car.model = data['model']
+
+#         if 'user_id' in data:
+#             user_id = data['user_id']
+#             user = None  # Initialize user variable
+
+#             if user_id:  # Check if user_id is provided
+#                 user = User.query.get(user_id)
+
+#                 if user is None:
+#                     abort(404)
+
+#             car.user_id = user.id if user else None
+
+#         db.session.commit()
+#         return jsonify(car.serialize()), 200
+
+
+#     elif request.method == 'DELETE':
+#         db.session.delete(car)
+#         db.session.commit()
+#         return jsonify("Success!"), 200
+
+# @app.route('/cars/<int:car_id>/booking', methods=['POST'], endpoint = 'book_car')
+# @jwt_required()
+# def book_car(car_id):
+
+#     car = Car.query.get_or_404(car_id)
+
+#     if request.method == 'POST':
+#         current_user = get_jwt_identity()
+#         data = request.get_json()
+
+#         if car.user_id:
+#             abort(400, "Car already booked")
+
+#         car.user_id = data['user_id']
+#         db.session.commit()
+
+#         return jsonify({"message": "Car booked successfully"}), 200
+
+# @app.route('/cars', methods=['GET', 'POST'], endpoint = 'cars')
+# @jwt_required()
+# def cars():
+
+#   if request.method == 'GET':
+#      # Handle GET request
+#     cars = Car.query.all()
+#     car_list = []
+
+#     for car in cars:
+#         car_data = car.serialize()
+
+#         if car.user:
+     
+#             car_data['user_id'] = car.user.serialize()
+#         else:
+
+#             car_data['user_id'] = None
+
+#         car_list.append(car_data)
+
+#     return jsonify(car_list)
+
+#   elif request.method == 'POST' :
+
+#     data = request.get_json()
+#     user_id = data.get('user_id', None)
+
+#     new_car = Car(make=data['make'], model=data['model'], user_id=user_id)
+#     db.session.add(new_car)
+#     db.session.commit()
+
+#     return jsonify(new_car.serialize()), 201 
 
 @app.route('/users', methods=['GET', 'POST'], endpoint = 'users')
 #@jwt_required()
@@ -574,5 +661,5 @@ def client():
 
 
 if __name__ == "__main__":
-    app.run(port=5001) # På MacOS, byt till 5001 eller dylikt
+    app.run(port=5002) # På MacOS, byt till 5001 eller dylikt
 
