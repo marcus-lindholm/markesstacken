@@ -90,7 +90,7 @@ class Product(db.Model):
         return f'<Product {self.id}: {self.name}: {self.price}>'
     
     def serialize(self):
-            return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity, description=self.description, year=self.year, section=self.section, event=self.event, event_organizer=self.event_organizer, subcategory=self.subcategory.serialize() if self.subcategory else None)
+            return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity, description=self.description, year=self.year, section=self.section, event=self.event, organizer=self.organizer)
     
 
 
@@ -162,10 +162,6 @@ with app.app_context():
     category2 = Category(name='Övrigt')
     db.session.add(category1)
     db.session.add(category2)
-    # subcat1 = Subcategory(name='UK', category=category1)
-    # subcat2 = Subcategory(name='Festivallen', category=category1)
-    # db.session.add(subcat1)
-    # db.session.add(subcat2)
     product1 = Product(name='UK 2022', price=30, quantity=100, description='Märke från UK 2022.', category=category1, year = 2022, section = 'I-Sektionen', event = 'UK', organizer = 'CM')
     product2 = Product(name='Festivallen 1995', price=50, quantity=10, description='Märke från Festivallen 1995.', category=category2, year = 2020, section = 'Läk-Sektionen', event = 'FESTIVALLEN', organizer = 'MEDSEX')
     db.session.add(product1)
