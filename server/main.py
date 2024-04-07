@@ -1,5 +1,6 @@
  #!/usr/bin/env python3
 from datetime import datetime
+import time
 from flask import Flask
 from flask import jsonify
 from flask import abort
@@ -9,6 +10,8 @@ from flask_bcrypt import Bcrypt
 from flask_bcrypt import generate_password_hash
 from flask_bcrypt import check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from werkzeug.utils import secure_filename
+import os
 
 app = Flask(__name__, static_folder='../client', static_url_path='/')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -85,12 +88,13 @@ class Product(db.Model):
     section = db.Column(db.String, nullable=True)
     event = db.Column(db.String, nullable=True)
     organizer = db.Column(db.String, nullable=True)
+    img = db.Column(db.String, nullable=True)
     
     def __repr__(self):
         return f'<Product {self.id}: {self.name}: {self.price}>'
     
     def serialize(self):
-            return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity, description=self.description, year=self.year, section=self.section, event=self.event, organizer=self.organizer)
+            return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity, description=self.description, year=self.year, section=self.section, event=self.event, organizer=self.organizer, img=self.img, category=self.category.serialize() if self.category else None)
     
 
 
@@ -162,8 +166,8 @@ with app.app_context():
     category2 = Category(name='Övrigt')
     db.session.add(category1)
     db.session.add(category2)
-    product1 = Product(name='UK 2022', price=30, quantity=100, description='Märke från UK 2022.', category=category1, year = 2022, section = 'I-Sektionen', event = 'UK', organizer = 'CM')
-    product2 = Product(name='Festivallen 1995', price=50, quantity=10, description='Märke från Festivallen 1995.', category=category2, year = 2020, section = 'Läk-Sektionen', event = 'FESTIVALLEN', organizer = 'MEDSEX')
+    product1 = Product(name='UK 2022', price=30, quantity=100, description='Märke från UK 2022.', category=category1, year = 2022, section = 'I-Sektionen', event = 'UK', organizer = 'CM', img = 'cm.jpeg')
+    product2 = Product(name='Festivallen 1995', price=50, quantity=10, description='Märke från Festivallen 1995.', category=category2, year = 2020, section = 'Läk-Sektionen', event = 'FESTIVALLEN', organizer = 'MEDSEX', img = 'pub.jpeg')
     db.session.add(product1)
     db.session.add(product2)
     shoppingcart1 = ShoppingCart()
@@ -314,11 +318,24 @@ def products():
         return jsonify(product_list)
 
     elif request.method == 'POST': #and get_jwt_identity().is_admin:
-        data = request.get_json()
-        new_product = Product(name=data['name'], price=data['price'], quantity=data['quantity'], description=data['description'], category_id=data['category_id'], year = data['year'], section = data['section'], event = data['event'], organizer = data['organizer'])
-        db.session.add(new_product)
-        db.session.commit()
-        return jsonify(new_product.serialize()), 201
+        data = request.form
+        file = request.files.get('img')
+    if file:
+        print('File uploaded')
+        filename = secure_filename(file.filename)
+        timestamp = str(time.time()).replace('.', '_')  # get current timestamp and replace '.' with '_'
+        filename = f"{timestamp}_{filename}"
+        dir_path = os.path.join('../client/product_images')
+        os.makedirs(dir_path, exist_ok=True)
+        file_path = os.path.join(dir_path, filename)
+        file.save(file_path)
+    else:
+        print('No image uploaded')
+
+    new_product = Product(name=data['name'], price=data['price'], quantity=data['quantity'], description=data['description'], category_id=data['category_id'], year = data['year'], section = data['section'], event = data['event'], organizer = data['organizer'], img = filename)
+    db.session.add(new_product)
+    db.session.commit()
+    return jsonify(new_product.serialize()), 201
 
 @app.route('/products/<int:product_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='product_by_id')
 #@jwt_required()
@@ -345,10 +362,14 @@ def product_by_id(product_id):
         db.session.commit()
         return jsonify(product.serialize()), 200
 
-    elif request.method == 'DELETE' and get_jwt_identity().is_admin:
+    elif request.method == 'DELETE': #and get_jwt_identity().is_admin:
+        if product.img:
+            image_path = os.path.join('../client/product_images', product.img)
+            if os.path.exists(image_path):
+                os.remove(image_path)
         db.session.delete(product)
         db.session.commit()
-        return jsonify("Success!"), 200 
+    return jsonify("Success!"), 200
 
 # @app.route('/subcategories', methods=['GET', 'POST'], endpoint='subcategories')
 # #@jwt_required()
@@ -661,5 +682,5 @@ def client():
 
 
 if __name__ == "__main__":
-    app.run(port=5001) # På MacOS, byt till 5001 eller dylikt
+    app.run(port=5001, debug=True) # På MacOS, byt till 5001 eller dylikt
 

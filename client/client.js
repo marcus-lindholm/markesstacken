@@ -29,7 +29,6 @@ function ShowFavoritesPage() {
 function ShowPurchasePage() {
   $(".container").html($("#view-purchase").html());
   
-  // Make AJAX request to fetch products
   $.ajax({
       url: host + "/products", 
       type: "GET",
@@ -40,7 +39,7 @@ function ShowPurchasePage() {
             var productHTML = `
             <div class="col-md-4">
                 <div class="card">
-                  <img src="Images/logo.png" class="card-img-top" alt="Product Image">
+                  <img src="/product_images/${product.img}" class="card-img-top centered-product-image" alt="Product Image">
                     <div class="card-body">
                         <h5 class="card-title">${product.name}</h5>
                         <p class="card-text">${product.description}</p>
@@ -158,26 +157,31 @@ function addProduct(){
   const event = eventElement && eventElement.value ? eventElement.value : null;
   const organizerElement = document.getElementById("event_organizer");
   const organizer = organizerElement && organizerElement.value ? organizerElement.value : null;
-  //const img = document.getElementById("product-img").value;
+  const img = document.getElementById("product-image").files[0];
 
-  console.log(name, description, price, quantity);
+  console.log(name, description, price, quantity, img);
+
+  const formData = new FormData();
+  formData.append('name', name);
+  formData.append('description', description);
+  formData.append('price', price);
+  formData.append('quantity', quantity);
+  formData.append('category_id', categoryid);
+  formData.append('year', year);
+  formData.append('section', section);
+  formData.append('event', event);
+  formData.append('organizer', organizer);
+  if (img) {
+    formData.append('img', img);
+  }
 
   $.ajax({
     url: '/products',
     type: 'POST',
     //headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
-    contentType: 'application/json',
-    data: JSON.stringify({
-      name: name,
-      description: description, 
-      price: price,
-      quantity: quantity,
-      category_id: categoryid,
-      year: year,
-      section: section,
-      event: event,
-      organizer: organizer
-    }),
+    processData: false,  // tell jQuery not to process the data
+    contentType: false,  // tell jQuery not to set contentType
+    data: formData,
     success: function (response) {
         console.log(response);
         showAlert("success", "Product Added!", "Nice!");
@@ -186,7 +190,6 @@ function addProduct(){
         console.error(error);
     }
   });
-
 }
 
 //SHOPPINGCART-PAGE
