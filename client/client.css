@@ -79,12 +79,6 @@ p {
     transform: scaleX(1); 
 }
 
-
-
-
-
-
-
 .navbar-nav .nav-link {
     margin-right: 10px; /* Adjust the margin value as needed */ 
 }
@@ -191,8 +185,6 @@ p {
     border-color: #0056b3;
 }
 
-
-
 .aboutus-container {
     display: grid;
     grid-template-columns: 1fr 1fr; /* Two equal columns */
@@ -217,6 +209,7 @@ p {
     line-height: 1.6;
     text-align: justify;
 }
+
 .aboutus-image {
     text-align: center;
 }
@@ -239,4 +232,101 @@ input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0; /* Optional: Remove any additional margin */
+}
+
+
+
+/*FAQ collapse design*/
+.section_padding_130 {
+    padding-top: 130px;
+    padding-bottom: 130px;
+}
+.faq_area {
+    position: relative;
+    z-index: 1;
+    /*background-color: #83A88B;*/
+    background-color:  #f0f7f3; 
+    border: 50px solid rgb(255, 255, 255); 
+}
+
+.faq-accordian {
+    position: relative;
+    z-index: 1;
+}
+.faq-accordian .card {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 1.5rem;
+}
+.faq-accordian .card:last-child {
+    margin-bottom: 0;
+}
+.faq-accordian .card .card-header {
+    background-color: #ffffff;
+    padding: 0;
+    border-bottom-color: #ebebeb;
+}
+.faq-accordian .card .card-header h6 {
+    cursor: pointer;
+    padding: 1.75rem 2rem;
+    color: rgb(0, 0, 1);
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    -ms-grid-row-align: center;
+    align-items: center;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+}
+.faq-accordian .card .card-header h6 span {
+    font-size: 1.5rem;
+}
+.faq-accordian .card .card-header h6.collapsed {
+    color: #1c1c1c;
+}
+.faq-accordian .card .card-header h6.collapsed span {
+    -webkit-transform: rotate(-180deg);
+    transform: rotate(-180deg);
+}
+.faq-accordian .card .card-body {
+    padding: 1.75rem 2rem;
+}
+.faq-accordian .card .card-body p:last-child {
+    margin-bottom: 0;
+}
+
+@media only screen and (max-width: 575px) {
+    .support-button p {
+        font-size: 14px;
+    }
+}
+
+.support-button i {
+    color: #000000;
+    font-size: 1.25rem;
+}
+
+@media only screen and (max-width: 575px) {
+    .support-button i {
+        font-size: 1rem;
+    }
+}
+
+.support-button a {
+    text-transform: capitalize;
+    color: #2ecc71;
+}
+
+@media only screen and (max-width: 575px) {
+    .support-button a {
+        font-size: 13px;
+    }
+}
+
+.card .card-header:hover {
+    background-color: #f0f0f0; /* Change to desired hover background color */
+    cursor: pointer;
 }
