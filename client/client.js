@@ -35,7 +35,6 @@ function ShowPurchasePage() {
       success: function(response) {
           // Loop through each product and generate HTML dynamically
           response.forEach(function(product) {
-            console.log(product);
             var productHTML = `
             <div class="col-md-4">
                 <div class="card">
@@ -53,7 +52,7 @@ function ShowPurchasePage() {
                                         <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
                                     </svg>
                                 </button>
-                                <input type="number" id="quantity" class="form-control" value="1" min="1">
+                                <input type="number" id="quantity" class="form-control" value="1" min="1" max="${product.quantity}">
                                 <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepUp()" id="plus-button">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                                         <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
@@ -151,7 +150,7 @@ function ShowProductPage(productId) {
           <h2>${product.name}</h2>
           <h3>${product.price} kr</h3>
           <p>${product.description}</p>
-          <p>Antal i lager: ${product.quantity}</p>
+          <p>Antal i lager: ${product.quantity === 0 ? 'Ej i lager' : product.quantity}</p>
           ${product.year ? `<p>År: ${product.year}</p>` : ''}
           ${product.section ? `<p>Sektion: ${product.section}</p>` : ''}
           ${product.event ? `<p>Event: ${product.event}</p>` : ''}
@@ -165,7 +164,7 @@ function ShowProductPage(productId) {
                           <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
                       </svg>
                   </button>
-                  <input type="number" id="quantity" class="form-control" value="1" min="1">
+                  <input type="number" id="quantity" class="form-control" value="1" min="1" max="${product.quantity}">
                   <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepUp()" id="plus-button">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                           <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
@@ -174,11 +173,12 @@ function ShowProductPage(productId) {
                   </button>
               </div>
           </div>
-          <button class="btn btn-light">Add to Cart</button>
+          <button class="btn btn-light" ${product.quantity === 0 ? 'disabled' : ''}>Add to Cart</button>
         </div>
       </div>
       `;
       $(".container").html(productPageHTML);
+
     }
   });
 }
@@ -193,7 +193,6 @@ function ShowContactPage() {
 }
 
 function addProduct(){
-  console.log("adding product");
   const name = document.getElementById("product-name").value;
   const description = document.getElementById("product-description").value;
   const price = document.getElementById("product-price").value;
@@ -208,8 +207,6 @@ function addProduct(){
   const organizerElement = document.getElementById("event_organizer");
   const organizer = organizerElement && organizerElement.value ? organizerElement.value : null;
   const img = document.getElementById("product-image").files[0];
-
-  console.log(name, description, price, quantity, img);
 
   const formData = new FormData();
   formData.append('name', name);
@@ -233,7 +230,6 @@ function addProduct(){
     contentType: false,  // tell jQuery not to set contentType
     data: formData,
     success: function (response) {
-        console.log(response);
         showAlert("success", "Product Added!", "Nice!");
     },
     error: function (error) {
