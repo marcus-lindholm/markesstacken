@@ -227,6 +227,18 @@ function ShowSettingsPage(){
 }
 
 //-------------------------------------------------
+//ADMIN-ORDERS-PAGE
+function ShowAdminOrdersPage(){
+  $(".container").html($("#view-admin-orders").html());
+}
+
+//-------------------------------------------------
+//ADMIN-RETURNS-PAGE
+function ShowAdminReturnsPage(){
+  $(".container").html($("#view-admin-returns").html());
+}
+
+//-------------------------------------------------
 //LOGOUT-PAGE
 function ShowLogoutPage(){
   $(".container").html($("#view-logout").html());
@@ -580,6 +592,7 @@ function checkLoggedIn() {
 
     loggedInDropdown.style.display = 'block';
     loggedOutDropdown.style.display = 'none';
+    //adminDropdown.style.display = 'block'; 
 
     $.ajax({
       url: '/get-identity',
@@ -800,6 +813,23 @@ $(".nav-item.dropdown .dropdown-menu .settings").click(function () {
 });
 
 $(".nav-item.dropdown .dropdown-menu .logout").click(function () {
+  ShowLogoutPage();
+});
+
+//Dropdown Admin
+$(".nav-item.dropdown .dropdown-menu .adminOrders").click(function () {
+  ShowAdminOrdersPage();
+});
+
+$(".nav-item.dropdown .dropdown-menu .adminReturns").click(function () {
+  ShowAdminReturnsPage();
+});
+
+$(".nav-item.dropdown .dropdown-menu .settings").click(function () { //Behövs ej?
+  ShowSettingsPage();
+});
+
+$(".nav-item.dropdown .dropdown-menu .logout").click(function () { //Behövs ej? 
   ShowLogoutPage();
 });
 
