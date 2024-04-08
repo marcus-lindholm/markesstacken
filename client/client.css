@@ -116,30 +116,71 @@ p {
     padding-right: 20px; /* Adjust the value as needed */
   }
 
+/* VIEW PRODUCT PAGE */
 
+.product-page {
+    max-width: 100%;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+}
 
-  /*VIEW-PURCHASE*/
-  .card {
-    /*margin: 30px;*/
-  }
+.half-page {
+    width: 50%;
+    padding: 20px;
+}
 
-  .card-img-top {
+h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+img {
+    width: 300px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+/* VIEW-PURCHASE */
+.card {
+/*margin: 30px;*/
+}
+
+.card-img-top {
     max-width: 150px;
-  }
+}
 
-  .quantity {
+.quantity {
     width: 40px;
     text-align: center;
-  }
+}
 
 .centered-product-image {
     display: block;
     margin-left: auto;
     margin-right: auto;
 }
+.show-product {
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+  
+.show-product:hover {
+    opacity: 0.8;
+    cursor: pointer;
+}
 
-
-
+.quantity-input-group {
+    max-width: 150px;
+}
 
 /* CSS styles for the form */
 .nice-form {
