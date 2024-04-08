@@ -586,19 +586,22 @@ function checkLoggedIn() {
       type: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        "Authorization": "Bearer " + auth.access_token
+        "Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).access_token
+        //auth.access_token
       },
       success: function(user) {
+    
+        console.log("get-identity hej", guserId);
       
-        if (user.user.is_admin === true) {
-          adminDropdown.style.display = 'block'; 
-          console.log("admin true", user.user.is_admin);
-        } else {
+        if (user.user.is_admin === false) {
           adminDropdown.style.display = 'none'; 
-          console.log("admin false", user.user.is_admin);
+          console.log("admin ", user.user.is_admin);
+        } else {
+          adminDropdown.style.display = 'block'; 
+          console.log("admin ", user.user.is_admin);
         }
       },
-      error: function(xhr, status, error) {
+      error: function(error) {
         console.error("Error fetching identity:", error);
         adminDropdown.style.display = 'none'; 
       }
@@ -611,6 +614,10 @@ function checkLoggedIn() {
   }
 }
  
+
+
+
+
 
 // function checkLoggedIn() {
 //   auth = JSON.parse(sessionStorage.getItem('auth'));
@@ -669,10 +676,11 @@ function ShowLoginPage() {
           console.log(response);
           sessionStorage.setItem('auth', JSON.stringify(response));
 
-          console.log(signedIn);
-          signedIn = sessionStorage.getItem('auth') !== null;
-          console.log(signedIn);
+          //console.log(signedIn);
+          //signedIn = sessionStorage.getItem('auth') !== null;
+          //console.log(signedIn);
           guserId = JSON.parse(sessionStorage.getItem('auth')).user.id;
+          console.log("guserId", guserId);
 
           ShowHomePage();
           checkLoggedIn();
@@ -699,7 +707,7 @@ function ShowLogoutPage() {
 
     sessionStorage.removeItem('auth');
 
-    signedIn = sessionStorage.getItem('auth') !== null;
+    //signedIn = sessionStorage.getItem('auth') !== null;
     ShowHomePage();
     checkLoggedIn();
     
@@ -715,8 +723,8 @@ $(document).ready(function () {
   checkLoggedIn();
   ShowHomePage();
 
-  signedIn = sessionStorage.getItem('auth') !== null;
-  console.log(signedIn);
+  //signedIn = sessionStorage.getItem('auth') !== null;
+  //console.log(signedIn);
   
    //------------------------------------------
   // Navigation click event handlers
