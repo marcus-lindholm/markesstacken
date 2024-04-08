@@ -1,5 +1,6 @@
-var signedIn = false;
+//var signedIn = false;
 var guserId;
+host = window.location.protocol + '//' + location.host
 
 //drop-down for profile 
 $(document).ready(function () {
@@ -9,8 +10,6 @@ $(document).ready(function () {
 //-------------------------------------------------
 //HOME-PAGE
 function ShowHomePage() {
-  $(".nav-link.login, .nav-link.sign-up").toggleClass('d-none', signedIn);
-  $(".nav-link.logout, .nav-link.cars").toggleClass('d-none', !signedIn);
   $(".container").html($("#view-home").html());
 }
 
@@ -124,7 +123,7 @@ function populateDropdown(id, options) {
   dropdown.empty();
   dropdown.append($('<option>', { value: "", text : "All" }));
   options.forEach(function(option) {
-      dropdown.append($('<option>', { value: option, text : option }));
+  dropdown.append($('<option>', { value: option, text : option }));
   });
 }
 
@@ -301,7 +300,6 @@ function refreshCarList() {
   showAlert("success", "Car List Updated!", "The car list has been successfully updated.");
 }
 
-host = window.location.protocol + '//' + location.host
 
 //-------------------------------------------------
 //DISPLAY-CAR-LIST
@@ -383,7 +381,7 @@ function displayCarList() {
             data: JSON.stringify({ user_id: 0}),
             headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
             success: function(response) {
-              showAlert("success", "Car Is Un Booked!", "Nice!");
+              showAlert("success", "Car Is UnBooked!", "Nice!");
               refreshCarList();
             },
             error: function() {
@@ -569,37 +567,82 @@ function ShowSignUpPage() {
 //___________________________________________________________
 
 //Functions do decide which dropdown is showed depending on if loggedin or not 
+
 function checkLoggedIn() {
   auth = JSON.parse(sessionStorage.getItem('auth'));
-  var signedIn = auth !== null;
-  
+  signedIn = auth !== null;
+
   const loggedInDropdown = document.getElementById('loggedInDropdown');
   const loggedOutDropdown = document.getElementById('loggedOutDropdown');
+  const adminDropdown = document.getElementById('adminDropdown');
 
   if (signedIn == true) {
+
     loggedInDropdown.style.display = 'block';
     loggedOutDropdown.style.display = 'none';
-    
+
     $.ajax({
       url: '/get-identity',
       type: 'GET',
       headers: {
-          'Content-Type': 'application/json',
-          "Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).access_token
+        'Content-Type': 'application/json',
+        "Authorization": "Bearer " + auth.access_token
       },
       success: function(user) {
-          if (user.user.is_admin === false) {
-              console.log("User is not admin", user.user.is_admin);
-             
-          } else {
-            
-          }
-      },});
+      
+        if (user.user.is_admin === true) {
+          adminDropdown.style.display = 'block'; 
+          console.log("admin true", user.user.is_admin);
+        } else {
+          adminDropdown.style.display = 'none'; 
+          console.log("admin false", user.user.is_admin);
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error("Error fetching identity:", error);
+        adminDropdown.style.display = 'none'; 
+      }
+    });
+
   } else {
-      loggedInDropdown.style.display = 'none';
-      loggedOutDropdown.style.display = 'block';
+    loggedInDropdown.style.display = 'none';
+    loggedOutDropdown.style.display = 'block';
+    adminDropdown.style.display = 'none'; 
   }
 }
+ 
+
+// function checkLoggedIn() {
+//   auth = JSON.parse(sessionStorage.getItem('auth'));
+//   var signedIn = auth !== null;
+  
+//   const loggedInDropdown = document.getElementById('loggedInDropdown');
+//   const loggedOutDropdown = document.getElementById('loggedOutDropdown');
+//   const adminDropdown = document.getElementById('adminDropdown');
+
+//   if (signedIn) {
+//     // User is logged in
+//     console.log("logged in");
+//     if (auth.user.is_admin) {
+//       // Admin is logged in
+//       adminDropdown.style.display = 'block'; 
+//       loggedInDropdown.style.display = 'none';
+//       loggedOutDropdown.style.display = 'none';
+//     } else {
+//       // Regular user is logged in
+//       loggedInDropdown.style.display = 'block';
+//       loggedOutDropdown.style.display = 'none';
+//       adminDropdown.style.display = 'none'; 
+//     }
+//   } else {
+//     // User is not logged in
+//     console.log("logged out");
+//     loggedInDropdown.style.display = 'none';
+//     loggedOutDropdown.style.display = 'block';
+//     adminDropdown.style.display = 'none'; 
+//   }
+// }
+
 
 //--------------------------------------------------------------
 //SHOW-LOGIN-PAGE 
@@ -625,8 +668,6 @@ function ShowLoginPage() {
         success: function (response) {
           console.log(response);
           sessionStorage.setItem('auth', JSON.stringify(response));
-
-          
 
           console.log(signedIn);
           signedIn = sessionStorage.getItem('auth') !== null;
