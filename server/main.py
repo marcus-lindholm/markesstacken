@@ -452,6 +452,7 @@ def category_by_id(category_id):
 
 @app.route('/sign-up', methods=['POST'])
 def sign_up():
+
     data = request.get_json()
 
     if 'email' not in data or 'firstName' not in data and 'lastName' not in data or 'password' not in data:
@@ -460,8 +461,9 @@ def sign_up():
     firstName = data['firstName']
     lastName = data['lastName']
     password = data['password']
+    
 
-    # Make it so that the email has to be unique for every user signing up
+    # Email has to be unique for every user signing up
     existing_user = User.query.filter_by(email=email).first()
     if existing_user:
         return jsonify({"error": "Email address already in use"}), 400  # 400 Bad Request
@@ -605,14 +607,13 @@ def login():
 
 #     return jsonify(new_car.serialize()), 201 
 
-@app.route('/get-identity', methods=['GET'])
+@app.route('/get-identity', methods=['GET'], endpoint = 'get_identity')
 @jwt_required()
 def get_identity():
-    print("test")
-    identity = get_jwt_identity()
-    print(identity)
     
-    user = User.query.filter_by(email=identity).first()
+    identity = get_jwt_identity()
+    user = User.query.filter_by(id=identity).first()
+    
     if user:
         return jsonify(user=user.serialize()), 200
     else:

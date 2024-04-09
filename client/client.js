@@ -578,7 +578,7 @@ function ShowSignUpPage() {
 
 //___________________________________________________________
 
-//Functions do decide which dropdown is showed depending on if loggedin or not 
+//Functions do decide which dropdown is showed depending on if logged in or not 
 
 function checkLoggedIn() {
   auth = JSON.parse(sessionStorage.getItem('auth'));
@@ -592,28 +592,36 @@ function checkLoggedIn() {
 
     loggedInDropdown.style.display = 'block';
     loggedOutDropdown.style.display = 'none';
-    //adminDropdown.style.display = 'block'; 
+    adminDropdown.style.display = 'none'; 
+
+    console.log("auth.access", auth.token);
 
     $.ajax({
       url: '/get-identity',
       type: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        "Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).access_token
-        //auth.access_token
+        "Authorization": "Bearer " + auth.token
+       
       },
+
       success: function(user) {
     
         console.log("get-identity hej", guserId);
       
         if (user.user.is_admin === false) {
-          adminDropdown.style.display = 'none'; 
-          console.log("admin ", user.user.is_admin);
+          loggedInDropdown.style.display = 'block';
+          loggedOutDropdown.style.display = 'none';
+          adminDropdown.style.display = 'none';
+          console.log("admin false", user.user.is_admin);
         } else {
+          loggedInDropdown.style.display = 'none';
+          loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'block'; 
-          console.log("admin ", user.user.is_admin);
+          console.log("admin true", user.user.is_admin);
         }
       },
+      
       error: function(error) {
         console.error("Error fetching identity:", error);
         adminDropdown.style.display = 'none'; 
@@ -627,41 +635,6 @@ function checkLoggedIn() {
   }
 }
  
-
-
-
-
-
-// function checkLoggedIn() {
-//   auth = JSON.parse(sessionStorage.getItem('auth'));
-//   var signedIn = auth !== null;
-  
-//   const loggedInDropdown = document.getElementById('loggedInDropdown');
-//   const loggedOutDropdown = document.getElementById('loggedOutDropdown');
-//   const adminDropdown = document.getElementById('adminDropdown');
-
-//   if (signedIn) {
-//     // User is logged in
-//     console.log("logged in");
-//     if (auth.user.is_admin) {
-//       // Admin is logged in
-//       adminDropdown.style.display = 'block'; 
-//       loggedInDropdown.style.display = 'none';
-//       loggedOutDropdown.style.display = 'none';
-//     } else {
-//       // Regular user is logged in
-//       loggedInDropdown.style.display = 'block';
-//       loggedOutDropdown.style.display = 'none';
-//       adminDropdown.style.display = 'none'; 
-//     }
-//   } else {
-//     // User is not logged in
-//     console.log("logged out");
-//     loggedInDropdown.style.display = 'none';
-//     loggedOutDropdown.style.display = 'block';
-//     adminDropdown.style.display = 'none'; 
-//   }
-// }
 
 
 //--------------------------------------------------------------
@@ -689,9 +662,6 @@ function ShowLoginPage() {
           console.log(response);
           sessionStorage.setItem('auth', JSON.stringify(response));
 
-          //console.log(signedIn);
-          //signedIn = sessionStorage.getItem('auth') !== null;
-          //console.log(signedIn);
           guserId = JSON.parse(sessionStorage.getItem('auth')).user.id;
           console.log("guserId", guserId);
 
@@ -720,7 +690,6 @@ function ShowLogoutPage() {
 
     sessionStorage.removeItem('auth');
 
-    //signedIn = sessionStorage.getItem('auth') !== null;
     ShowHomePage();
     checkLoggedIn();
     
@@ -735,9 +704,6 @@ function ShowLogoutPage() {
 $(document).ready(function () {
   checkLoggedIn();
   ShowHomePage();
-
-  //signedIn = sessionStorage.getItem('auth') !== null;
-  //console.log(signedIn);
   
    //------------------------------------------
   // Navigation click event handlers
