@@ -81,6 +81,15 @@ function ShowPurchasePage() {
             $("#product-container").append(productHTML);
         });
 
+        populateFilterDropdowns(response);
+        refreshProducts();
+    },
+    error: function(error) {
+        console.error("Error fetching products:", error);
+    }
+  });
+}
+
 function populateFilterDropdowns(response) {
   var years = [];
   var sections = [];
@@ -281,7 +290,7 @@ function ShowProductPage(productId) {
 
     }
   });
-
+}
 // Function to update the global filter lists based on checked/unchecked checkboxes
 function updateFilterList(containerId) {
   // Get the checked checkboxes and update the corresponding global filter list
@@ -861,10 +870,6 @@ $(document).on("click", "#checkout-button", function() {
   ShowCheckoutPage();
 });
 
-
 });
 
 
-// $(document).on("click", ".refresh-car-btn", function () {
-//   refreshCarList();
-// });
