@@ -169,7 +169,7 @@ with app.app_context():
     category2 = Category(name='Övrigt')
     db.session.add(category1)
     db.session.add(category2)
-    product1 = Product(name='UK 2022', price=30, quantity=100, description='Märke från UK 2022.', category=category1, year = 2022, section = 'I-Sektionen', event = 'UK', organizer = 'CM', img = 'cm.jpeg')
+    product1 = Product(name='UK 2022', price=30, quantity=100, description='Märke från UK 2022. Jättefinmärke 10/10, Arian rekomenderar starkt. Rund cirkel typ som hjul eller ett ägg om man tittar på det rakt uppifrån.', category=category1, year = 2022, section = 'I-Sektionen', event = 'UK', organizer = 'CM', img = 'cm.jpeg')
     product2 = Product(name='Festivallen 1995', price=50, quantity=10, description='Märke från Festivallen 1995.', category=category2, year = 1995, section = 'Läk-Sektionen', event = 'FESTIVALLEN', organizer = 'MEDSEX', img = 'pub.jpeg')
     product3 = Product(name='Drat i spat 2022', price=25, quantity=40, description='Märke från Drat i spat 2022.', category=category2, year = 2022, section = 'I-Sektionen', event = 'DRAT I SPAT', organizer = 'CM', img = 'pub.jpeg')
     product4 = Product(name='Lemans 2023', price=40, quantity=10, description='Märke från Lemans 1995.', category=category2, year = 2023, section = 'M-Sektionen', event = 'LEMANS', organizer = 'FM', img = 'pub.jpeg')
@@ -179,6 +179,12 @@ with app.app_context():
 
     db.session.add(product1)
     db.session.add(product2)
+    db.session.add(product3)
+    db.session.add(product4)
+    db.session.add(product5)
+    db.session.add(product6)
+    db.session.add(product7)
+
     shoppingcart1 = ShoppingCart()
     db.session.add(shoppingcart1)
     cartitem1 = CartItem(quantity=2, product=product1, shoppingcart_id=1)
@@ -711,5 +717,5 @@ def client():
 
 
 if __name__ == "__main__":
-    app.run(port=5001, debug=True) # På MacOS, byt till 5001 eller dylikt
+    app.run(port=5002, debug=True) # På MacOS, byt till 5001 eller dylikt
 
