@@ -1,4 +1,6 @@
 //var signedIn = false;
+host = window.location.protocol + '//' + location.host;
+
 var guserId;
 var yearCheckboxesfilter = [];
 var sectionCheckboxesfilter = [];
