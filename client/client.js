@@ -61,12 +61,15 @@ function ShowPurchasePage() {
                                 </button>
                             </div>
                         </div>
-                        <button class="btn btn-light">Add to Cart</button>
-                        <button class="btn btn-outline-dark">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
-                                <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
-                            </svg>
-                        </button>
+                        <button class="btn btn-light product-overview">Lägg i varukorg</button>
+                        <div class="product-overview">
+                          <button class="btn btn-dark" style="width: 105px;">Köp nu</button>
+                          <button class="btn btn-outline-dark">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                                  <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+                              </svg>
+                          </button>
+                        </div>
                     </div>
                 </div>
             </div>`;
@@ -133,7 +136,27 @@ $(document).ready(function() {
   ShowPurchasePage();
 });
 
-// Show the product page
+// Show the PRODUCT PAGE
+
+//Zoom image on hover
+$(document).on('mousemove', '.product-image', function(e) {
+  var imgWidth = $(this).width();
+  var imgHeight = $(this).height();
+  var mouseX = e.pageX - $(this).offset().left;
+  var mouseY = e.pageY - $(this).offset().top;
+  var percentX = ((mouseX / imgWidth) - 0.5) * 100;
+  var percentY = ((mouseY / imgHeight) - 0.5) * 100;
+  var maxMovement = 20;
+  percentX = Math.max(Math.min(percentX, maxMovement), -maxMovement);
+  percentY = Math.max(Math.min(percentY, maxMovement), -maxMovement);
+
+  $(this).css('transform', 'scale(1.2) translate(' + percentX + '%, ' + percentY + '%)');
+});
+
+$(document).on('mouseout', '.product-image', function() {
+  $(this).css('transform', 'scale(1)');
+});
+
 function ShowProductPage(productId) {
   $(".container").html($("#view-product").html());
 
@@ -144,7 +167,9 @@ function ShowProductPage(productId) {
       var productPageHTML = `
       <div class="product-page">
         <div class="half-page">
-          <img src="/product_images/${product.img}" alt="${product.name}">
+          <div class="image-wrapper">
+            <img src="/product_images/${product.img}" class="product-image" alt="${product.name}">
+          </div>
         </div>
         <div class="half-page">
           <h2>${product.name}</h2>
@@ -173,7 +198,15 @@ function ShowProductPage(productId) {
                   </button>
               </div>
           </div>
-          <button class="btn btn-light" ${product.quantity === 0 ? 'disabled' : ''}>Add to Cart</button>
+          <div class="justify-content-between mb-3">
+            <button class="btn btn-light" style="width: 145px; margin: 5px 0;" ${product.quantity === 0 ? 'disabled' : ''}>Add to Cart</button>
+            <button class="btn btn-outline-dark">
+                <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                    <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+                </svg>
+            </button><br>
+            <button class="btn btn-dark" style="width: 145px;">Köp nu</button>
+          </div>
         </div>
       </div>
       `;
@@ -181,6 +214,9 @@ function ShowProductPage(productId) {
 
     }
   });
+
+  
+
 }
 
 //SELL-PAGE

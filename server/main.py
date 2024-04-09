@@ -89,12 +89,13 @@ class Product(db.Model):
     event = db.Column(db.String, nullable=True)
     organizer = db.Column(db.String, nullable=True)
     img = db.Column(db.String, nullable=True)
+    number_of_sales = db.Column(db.Integer, default=0)
     
     def __repr__(self):
         return f'<Product {self.id}: {self.name}: {self.price}>'
     
     def serialize(self):
-            return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity, description=self.description, year=self.year, section=self.section, event=self.event, organizer=self.organizer, img=self.img, category=self.category.serialize() if self.category else None)
+            return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity, description=self.description, year=self.year, section=self.section, event=self.event, organizer=self.organizer, img=self.img, number_of_sales=self.number_of_sales, category=self.category.serialize() if self.category else None)
     
 
 
@@ -167,7 +168,7 @@ with app.app_context():
     db.session.add(category1)
     db.session.add(category2)
     product1 = Product(name='UK 2022', price=30, quantity=100, description='Märke från UK 2022.', category=category1, year = 2022, section = 'I-Sektionen', event = 'UK', organizer = 'CM', img = 'cm.jpeg')
-    product2 = Product(name='Festivallen 1995', price=50, quantity=10, description='Märke från Festivallen 1995.', category=category2, year = 2020, section = 'Läk-Sektionen', event = 'FESTIVALLEN', organizer = 'MEDSEX', img = 'pub.jpeg')
+    product2 = Product(name='Festivallen 1995', price=50, quantity=10, description='Märke från Festivallen 1995.', category=category2, year = 2020, section = 'Läk-Sektionen', event = 'FESTIVALLEN', organizer = 'MEDSEX', img = 'pub.jpeg', number_of_sales=5)
     db.session.add(product1)
     db.session.add(product2)
     shoppingcart1 = ShoppingCart()
