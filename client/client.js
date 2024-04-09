@@ -1,9 +1,9 @@
 var signedIn = false;
 var guserId;
-var yearsfilter = [];
-var sectionsfilter = [];
-var organizersfilter = [];
-var eventsfilter = [];
+var yearCheckboxesfilter = [];
+var sectionCheckboxesfilter = [];
+var organizersCheckboxesfilter = [];
+var eventCheckboxesfilter = [];
 
 //drop-down for profile 
 $(document).ready(function () {
@@ -57,21 +57,33 @@ function populateFilterDropdowns(response) {
   response.forEach(function(product) {
     if (product.year !== null && !years.includes(product.year)) {
         years.push(product.year);
-        yearsfilter.push(product.year);
     }
     if (product.section !== null && !sections.includes(product.section)) {
         sections.push(product.section);
-        sectionsfilter.push(product.section);
     }
     if (product.organizer !== null && !organizers.includes(product.organizer)) {
         organizers.push(product.organizer);
-        organizersfilter.push(product.organizers);
     }
     if (product.event !== null && !events.includes(product.event)) {
         events.push(product.event);
-        eventsfilter.push(product.event);
     }
   });
+  response.forEach(function(product) {
+    if (product.year !== null && !yearCheckboxesfilter.includes(product.year)) {
+        yearCheckboxesfilter.push(product.year);
+    }
+    if (product.section !== null && !sectionCheckboxesfilter.includes(product.section)) {
+        sectionCheckboxesfilter.push(product.section);
+    }
+    if (product.organizer !== null && !organizersCheckboxesfilter.includes(product.organizer)) {
+        organizersCheckboxesfilter.push(product.organizer);
+    }
+    if (product.event !== null && !eventCheckboxesfilter.includes(product.event)) {
+        eventCheckboxesfilter.push(product.event);
+    }
+  });
+
+  console.log(yearCheckboxesfilter);
 
   // Sort the lists alphabetically
   years.sort();
@@ -109,58 +121,113 @@ function addAllCheckbox(containerId) {
   var container = $("#" + containerId);
   container.prepend(`
     <div class="form-check">
-      <input class="form-check-input all-checkbox" type="checkbox" value="All" id="${containerId}-All">
+      <input class="form-check-input all-checkbox" type="checkbox" value="All" id="${containerId}-All" checked> <!-- Add checked attribute here -->
       <label class="form-check-label" for="${containerId}-All">
         All
       </label>
     </div>
   `);
+  container.find(".form-check-input:not(.all-checkbox)").prop("checked", true);
 }
+
 
 // Function to handle checkbox selection
 $(document).on("change", ".form-check-input", function() {
   var checkbox = $(this);
   var containerId = checkbox.closest(".form-check").parent().attr("id");
 
-  // Check if "All" checkbox is clicked
   if (checkbox.hasClass("all-checkbox")) {
     var isChecked = checkbox.prop("checked");
     $("." + containerId + " .form-check-input").prop("checked", isChecked);
+    // Set all individual checkboxes to checked or unchecked based on the state of the "All" checkbox
+    $("#" + containerId + " .form-check-input:not(.all-checkbox)").prop("checked", isChecked);
   } else {
-    // Update "All" checkbox based on other checkboxes' state
-    var allCheckbox = $("#" + containerId + "-All");
-    var allChecked = $("." + containerId + " .form-check-input:checked").length === $("." + containerId + " .form-check-input").length;
-    allCheckbox.prop("checked", allChecked);
+    // If an individual checkbox is unchecked, uncheck the "All" checkbox
+    if (!checkbox.prop("checked")) {
+      $("#" + containerId + "-All").prop("checked", false);
+    } else {
+      var allOtherChecked = true; // Assume all other checkboxes are checked initially
+        $("#" + containerId + " .form-check-input:not(.all-checkbox)").each(function() {
+            if (!$(this).prop("checked")) {
+                // If any checkbox (except "All") is unchecked, set allOtherChecked to false
+                allOtherChecked = false;
+                return false; // Exit the loop early
+            }
+        });
+
+        // Set the state of the "All" checkbox based on allOtherChecked
+        $("#" + containerId + "-All").prop("checked", allOtherChecked);
+    }
   }
+
+    // Update the corresponding filter list based on checked/unchecked checkboxes
+    console.log(containerId);
+    updateFilterList(containerId);
+
+    // Refresh products based on the updated filters
+    refreshProducts();
+
 });
 
-// // Function to populate a dropdown
-// function populateDropdown(id, options) {
-//   var dropdown = $("#" + id);
-//   dropdown.empty();
-//   dropdown.append($('<option>', { value: "", text : "All" }));
-//   options.forEach(function(option) {
-//   dropdown.append($('<option>', { value: option, text : option }));
-//   });
-// }
+// Function to update the global filter lists based on checked/unchecked checkboxes
+function updateFilterList(containerId) {
+  // Get the checked checkboxes and update the corresponding global filter list
+  $("#" + containerId + " .form-check-input").each(function() {
+    var value = $(this).val();
+    // Check if the checkbox is checked
+    if ($(this).prop("checked")) {
+      // If checked and not already in the filter list, add to the corresponding global filter list
+
+      if (containerId === "yearCheckboxes") {
+        if (!window[containerId + 'filter'].includes(parseInt(value))) {
+          window[containerId + 'filter'].push(parseInt(value));
+        } 
+      } else {
+        if (!window[containerId + 'filter'].includes(value)) {
+          window[containerId + 'filter'].push(value); 
+        }
+      }
+    } else {
+      // If unchecked, remove from the corresponding global filter list if present
+      if (containerId === "yearCheckboxes") {
+        var index = window[containerId + 'filter'].indexOf(parseInt(value));
+      } else {
+        var index = window[containerId + 'filter'].indexOf(value);
+      }
+      if (index !== -1) {
+        window[containerId + 'filter'].splice(index, 1);
+      }
+    }
+  });
+}
+
+
 function refreshProducts() {
   // Make AJAX request to fetch products
   $.ajax({
     url: host + "/products",
     type: "GET",
-    data: {
-      years: yearsfilter,
-      sections: sectionsfilter,
-      organizers: organizersfilter,
-      events: eventsfilter
-    },
 
     success: function(response) {
+
+      var filteredProducts = response.filter(function(product) {
+        // Check if the product matches all selected filters
+        console.log(yearCheckboxesfilter);
+        console.log(product.year);
+        return (
+          (yearCheckboxesfilter.length === 0 || yearCheckboxesfilter.includes(product.year)) &&
+          (sectionCheckboxesfilter.length === 0 || sectionCheckboxesfilter.includes(product.section)) &&
+          (organizersCheckboxesfilter.length === 0 || organizersCheckboxesfilter.includes(product.organizer)) &&
+          (eventCheckboxesfilter.length === 0 || eventCheckboxesfilter.includes(product.event))
+        );
+      });
+
       // Clear the product container before appending new products
       $("#product-container").empty();
 
       // Loop through each product and generate HTML dynamically
-      response.forEach(function(product) {
+      filteredProducts.forEach(function(product) {
+      //response.forEach(function(product) {
         var productHTML = `
           <div class="col-md-4">
             <div class="card">
@@ -204,11 +271,6 @@ function refreshProducts() {
     }
   });
 }
-
-// Call the function to show the purchase page
-$(document).ready(function() {
-  ShowPurchasePage();
-});
 
 //SELL-PAGE
 function ShowSellPage() {
