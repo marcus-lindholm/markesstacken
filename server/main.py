@@ -718,5 +718,5 @@ def client():
 
 
 if __name__ == "__main__":
-    app.run(port=5002, debug=True) # På MacOS, byt till 5001 eller dylikt
+    app.run(port=5001, debug=True) # På MacOS, byt till 5001 eller dylikt
 
