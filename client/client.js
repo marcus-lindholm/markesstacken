@@ -1,5 +1,11 @@
-var signedIn = false;
+//var signedIn = false;
+host = window.location.protocol + '//' + location.host;
+
 var guserId;
+var yearCheckboxesfilter = [];
+var sectionCheckboxesfilter = [];
+var organizersCheckboxesfilter = [];
+var eventCheckboxesfilter = [];
 
 //drop-down for profile 
 $(document).ready(function () {
@@ -9,8 +15,6 @@ $(document).ready(function () {
 //-------------------------------------------------
 //HOME-PAGE
 function ShowHomePage() {
-  $(".nav-link.login, .nav-link.sign-up").toggleClass('d-none', signedIn);
-  $(".nav-link.logout, .nav-link.cars").toggleClass('d-none', !signedIn);
   $(".container").html($("#view-home").html());
 }
 
@@ -28,7 +32,7 @@ function ShowFavoritesPage() {
 // Function to show the purchase page
 function ShowPurchasePage() {
   $(".container").html($("#view-purchase").html());
-  
+  // Make AJAX request to fetch products
   $.ajax({
       url: host + "/products", 
       type: "GET",
@@ -77,15 +81,6 @@ function ShowPurchasePage() {
             $("#product-container").append(productHTML);
         });
 
-
-          populateFilterDropdowns(response);
-      },
-      error: function(error) {
-          console.error("Error fetching products:", error);
-      }
-  });
-}
-
 function populateFilterDropdowns(response) {
   var years = [];
   var sections = [];
@@ -100,13 +95,29 @@ function populateFilterDropdowns(response) {
     if (product.section !== null && !sections.includes(product.section)) {
         sections.push(product.section);
     }
-    if (product.event_organizer !== null && !organizers.includes(product.event_organizer)) {
-        organizers.push(product.event_organizer);
+    if (product.organizer !== null && !organizers.includes(product.organizer)) {
+        organizers.push(product.organizer);
     }
     if (product.event !== null && !events.includes(product.event)) {
         events.push(product.event);
     }
   });
+  response.forEach(function(product) {
+    if (product.year !== null && !yearCheckboxesfilter.includes(product.year)) {
+        yearCheckboxesfilter.push(product.year);
+    }
+    if (product.section !== null && !sectionCheckboxesfilter.includes(product.section)) {
+        sectionCheckboxesfilter.push(product.section);
+    }
+    if (product.organizer !== null && !organizersCheckboxesfilter.includes(product.organizer)) {
+        organizersCheckboxesfilter.push(product.organizer);
+    }
+    if (product.event !== null && !eventCheckboxesfilter.includes(product.event)) {
+        eventCheckboxesfilter.push(product.event);
+    }
+  });
+
+  console.log(yearCheckboxesfilter);
 
   // Sort the lists alphabetically
   years.sort();
@@ -115,25 +126,81 @@ function populateFilterDropdowns(response) {
   events.sort();
 
   // Populate filter dropdowns
-  populateDropdown("filterYear", years);
-  populateDropdown("filterSection", sections);
-  populateDropdown("filterOrganizers", organizers);
-  populateDropdown("filterEvent", events);
+  populateCheckboxes("yearCheckboxes", years, "year");
+  populateCheckboxes("sectionCheckboxes", sections, "section");
+  populateCheckboxes("organizersCheckboxes", organizers, "organizer");
+  populateCheckboxes("eventCheckboxes", events, "event");
+
+  addAllCheckbox("yearCheckboxes");
+  addAllCheckbox("sectionCheckboxes");
+  addAllCheckbox("organizersCheckboxes");
+  addAllCheckbox("eventCheckboxes");
 }
 
-// Function to populate a dropdown
-function populateDropdown(id, options) {
-  var dropdown = $("#" + id);
-  dropdown.empty();
-  dropdown.append($('<option>', { value: "", text : "All" }));
+function populateCheckboxes(containerId, options, name) {
+  var container = $("#" + containerId);
   options.forEach(function(option) {
-      dropdown.append($('<option>', { value: option, text : option }));
+    container.append(`
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="${option}" id="${name}-${option}">
+        <label class="form-check-label" for="${name}-${option}">
+          ${option}
+        </label>
+      </div>
+    `);
   });
 }
 
-// Call the function to show the purchase page
-$(document).ready(function() {
-  ShowPurchasePage();
+function addAllCheckbox(containerId) {
+  var container = $("#" + containerId);
+  container.prepend(`
+    <div class="form-check">
+      <input class="form-check-input all-checkbox" type="checkbox" value="All" id="${containerId}-All" checked> <!-- Add checked attribute here -->
+      <label class="form-check-label" for="${containerId}-All">
+        All
+      </label>
+    </div>
+  `);
+  container.find(".form-check-input:not(.all-checkbox)").prop("checked", true);
+}
+
+
+// Function to handle checkbox selection
+$(document).on("change", ".form-check-input", function() {
+  var checkbox = $(this);
+  var containerId = checkbox.closest(".form-check").parent().attr("id");
+
+  if (checkbox.hasClass("all-checkbox")) {
+    var isChecked = checkbox.prop("checked");
+    $("." + containerId + " .form-check-input").prop("checked", isChecked);
+    // Set all individual checkboxes to checked or unchecked based on the state of the "All" checkbox
+    $("#" + containerId + " .form-check-input:not(.all-checkbox)").prop("checked", isChecked);
+  } else {
+    // If an individual checkbox is unchecked, uncheck the "All" checkbox
+    if (!checkbox.prop("checked")) {
+      $("#" + containerId + "-All").prop("checked", false);
+    } else {
+      var allOtherChecked = true; // Assume all other checkboxes are checked initially
+        $("#" + containerId + " .form-check-input:not(.all-checkbox)").each(function() {
+            if (!$(this).prop("checked")) {
+                // If any checkbox (except "All") is unchecked, set allOtherChecked to false
+                allOtherChecked = false;
+                return false; // Exit the loop early
+            }
+        });
+
+        // Set the state of the "All" checkbox based on allOtherChecked
+        $("#" + containerId + "-All").prop("checked", allOtherChecked);
+    }
+  }
+
+    // Update the corresponding filter list based on checked/unchecked checkboxes
+    console.log(containerId);
+    updateFilterList(containerId);
+
+    // Refresh products based on the updated filters
+    refreshProducts();
+
 });
 
 // Show the PRODUCT PAGE
@@ -215,8 +282,107 @@ function ShowProductPage(productId) {
     }
   });
 
-  
+// Function to update the global filter lists based on checked/unchecked checkboxes
+function updateFilterList(containerId) {
+  // Get the checked checkboxes and update the corresponding global filter list
+  $("#" + containerId + " .form-check-input").each(function() {
+    var value = $(this).val();
+    // Check if the checkbox is checked
+    if ($(this).prop("checked")) {
+      // If checked and not already in the filter list, add to the corresponding global filter list
 
+      if (containerId === "yearCheckboxes") {
+        if (!window[containerId + 'filter'].includes(parseInt(value))) {
+          window[containerId + 'filter'].push(parseInt(value));
+        } 
+      } else {
+        if (!window[containerId + 'filter'].includes(value)) {
+          window[containerId + 'filter'].push(value); 
+        }
+      }
+    } else {
+      // If unchecked, remove from the corresponding global filter list if present
+      if (containerId === "yearCheckboxes") {
+        var index = window[containerId + 'filter'].indexOf(parseInt(value));
+      } else {
+        var index = window[containerId + 'filter'].indexOf(value);
+      }
+      if (index !== -1) {
+        window[containerId + 'filter'].splice(index, 1);
+      }
+    }
+  });
+}
+
+
+function refreshProducts() {
+  // Make AJAX request to fetch products
+  $.ajax({
+    url: host + "/products",
+    type: "GET",
+
+    success: function(response) {
+
+      var filteredProducts = response.filter(function(product) {
+        // Check if the product matches all selected filters
+        console.log(yearCheckboxesfilter);
+        console.log(product.year);
+        return (
+          (yearCheckboxesfilter.length === 0 || yearCheckboxesfilter.includes(product.year)) &&
+          (sectionCheckboxesfilter.length === 0 || sectionCheckboxesfilter.includes(product.section)) &&
+          (organizersCheckboxesfilter.length === 0 || organizersCheckboxesfilter.includes(product.organizer)) &&
+          (eventCheckboxesfilter.length === 0 || eventCheckboxesfilter.includes(product.event))
+        );
+      });
+
+      // Clear the product container before appending new products
+      $("#product-container").empty();
+
+      // Loop through each product and generate HTML dynamically
+      filteredProducts.forEach(function(product) {
+      //response.forEach(function(product) {
+        var productHTML = `
+          <div class="col-md-4">
+            <div class="card">
+              <img src="Images/logo.png" class="card-img-top" alt="Product Image">
+              <div class="card-body">
+                <h5 class="card-title">${product.name}</h5>
+                <p class="card-text">${product.description}</p>
+                <div class="d-flex align-items-center mb-3">
+                  <label for="quantity" class="me-2">Antal:</label>
+                  <div class="input-group">
+                    <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepDown()" id="minus-button">
+                      <i class="fas fa-minus"></i>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
+                        <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
+                      </svg>
+                    </button>
+                    <input type="number" id="quantity" class="form-control" value="1" min="1">
+                    <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepUp()" id="plus-button">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                      </svg>
+                      <i class="fas fa-plus"></i>
+                    </button>
+                  </div>
+                </div>
+                <button class="btn btn-light">Add to Cart</button>
+                <button class="btn btn-outline-dark">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                    <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>`;
+        // Append product HTML to the container
+        $("#product-container").append(productHTML);
+      });
+    },
+    error: function(error) {
+      console.error("Error fetching products:", error);
+    }
+  });
 }
 
 //SELL-PAGE
@@ -310,6 +476,18 @@ function ShowSettingsPage(){
 }
 
 //-------------------------------------------------
+//ADMIN-ORDERS-PAGE
+function ShowAdminOrdersPage(){
+  $(".container").html($("#view-admin-orders").html());
+}
+
+//-------------------------------------------------
+//ADMIN-RETURNS-PAGE
+function ShowAdminReturnsPage(){
+  $(".container").html($("#view-admin-returns").html());
+}
+
+//-------------------------------------------------
 //LOGOUT-PAGE
 function ShowLogoutPage(){
   $(".container").html($("#view-logout").html());
@@ -383,8 +561,6 @@ function refreshCarList() {
   showAlert("success", "Car List Updated!", "The car list has been successfully updated.");
 }
 
-host = window.location.protocol + '//' + location.host
-
 //------------------------------------------------------
 //SHOW-SIGN-UP-PAGE
 function ShowSignUpPage() {
@@ -423,38 +599,64 @@ function ShowSignUpPage() {
 
 //___________________________________________________________
 
-//Functions do decide which dropdown is showed depending on if loggedin or not 
+//Functions do decide which dropdown is showed depending on if logged in or not 
+
 function checkLoggedIn() {
   auth = JSON.parse(sessionStorage.getItem('auth'));
-  var signedIn = auth !== null;
-  
+  signedIn = auth !== null;
+
   const loggedInDropdown = document.getElementById('loggedInDropdown');
   const loggedOutDropdown = document.getElementById('loggedOutDropdown');
+  const adminDropdown = document.getElementById('adminDropdown');
 
   if (signedIn == true) {
+
     loggedInDropdown.style.display = 'block';
     loggedOutDropdown.style.display = 'none';
-    
+    adminDropdown.style.display = 'none'; 
+
+    console.log("auth.access", auth.token);
+
     $.ajax({
       url: '/get-identity',
       type: 'GET',
       headers: {
-          'Content-Type': 'application/json',
-          "Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).access_token
+        'Content-Type': 'application/json',
+        "Authorization": "Bearer " + auth.token
+       
       },
+
       success: function(user) {
-          if (user.user.is_admin === false) {
-              console.log("User is not admin", user.user.is_admin);
-             
-          } else {
-            
-          }
-      },});
+    
+        console.log("get-identity hej", guserId);
+      
+        if (user.user.is_admin === false) {
+          loggedInDropdown.style.display = 'block';
+          loggedOutDropdown.style.display = 'none';
+          adminDropdown.style.display = 'none';
+          console.log("admin false", user.user.is_admin);
+        } else {
+          loggedInDropdown.style.display = 'none';
+          loggedOutDropdown.style.display = 'none';
+          adminDropdown.style.display = 'block'; 
+          console.log("admin true", user.user.is_admin);
+        }
+      },
+      
+      error: function(error) {
+        console.error("Error fetching identity:", error);
+        adminDropdown.style.display = 'none'; 
+      }
+    });
+
   } else {
-      loggedInDropdown.style.display = 'none';
-      loggedOutDropdown.style.display = 'block';
+    loggedInDropdown.style.display = 'none';
+    loggedOutDropdown.style.display = 'block';
+    adminDropdown.style.display = 'none'; 
   }
 }
+ 
+
 
 //--------------------------------------------------------------
 //SHOW-LOGIN-PAGE 
@@ -481,12 +683,8 @@ function ShowLoginPage() {
           console.log(response);
           sessionStorage.setItem('auth', JSON.stringify(response));
 
-          
-
-          console.log(signedIn);
-          signedIn = sessionStorage.getItem('auth') !== null;
-          console.log(signedIn);
           guserId = JSON.parse(sessionStorage.getItem('auth')).user.id;
+          console.log("guserId", guserId);
 
           ShowHomePage();
           checkLoggedIn();
@@ -513,7 +711,6 @@ function ShowLogoutPage() {
 
     sessionStorage.removeItem('auth');
 
-    signedIn = sessionStorage.getItem('auth') !== null;
     ShowHomePage();
     checkLoggedIn();
     
@@ -528,9 +725,6 @@ function ShowLogoutPage() {
 $(document).ready(function () {
   checkLoggedIn();
   ShowHomePage();
-
-  signedIn = sessionStorage.getItem('auth') !== null;
-  console.log(signedIn);
   
    //------------------------------------------
   // Navigation click event handlers
@@ -615,6 +809,23 @@ $(".nav-item.dropdown .dropdown-menu .logout").click(function () {
   ShowLogoutPage();
 });
 
+//Dropdown Admin
+$(".nav-item.dropdown .dropdown-menu .adminOrders").click(function () {
+  ShowAdminOrdersPage();
+});
+
+$(".nav-item.dropdown .dropdown-menu .adminReturns").click(function () {
+  ShowAdminReturnsPage();
+});
+
+$(".nav-item.dropdown .dropdown-menu .settings").click(function () { //Behövs ej?
+  ShowSettingsPage();
+});
+
+$(".nav-item.dropdown .dropdown-menu .logout").click(function () { //Behövs ej? 
+  ShowLogoutPage();
+});
+
 //FOOTER-LINKS
 $(".footer-link.shippingReturns").click(function () {
   ShowQuestionsPage();
@@ -657,4 +868,3 @@ $(document).on("click", "#checkout-button", function() {
 // $(document).on("click", ".refresh-car-btn", function () {
 //   refreshCarList();
 // });
-
