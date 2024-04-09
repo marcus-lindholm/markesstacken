@@ -52,7 +52,7 @@ function ShowPurchasePage() {
                                         <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
                                     </svg>
                                 </button>
-                                <input type="number" id="quantity" class="form-control" value="1" min="1">
+                                <input type="number" id="quantity${product.id}" class="form-control" value="1" min="1">
                                 <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepUp()" id="plus-button">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                                         <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
@@ -61,7 +61,7 @@ function ShowPurchasePage() {
                                 </button>
                             </div>
                         </div>
-                        <button class="btn btn-light">Add to Cart</button>
+                        <button id="add-to-cart-btn${product.id}" class="btn btn-light" data-product-id="${product.id}" onclick="addToShoppingCart(${product.id}, document.getElementById('quantity${product.id}').value, '${product.name}')" >Add to Cart</button>
                         <button class="btn btn-outline-dark">
                             <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
                                 <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
@@ -185,6 +185,8 @@ function addProduct(){
     success: function (response) {
         console.log(response);
         showAlert("success", "Product Added!", "Nice!");
+        
+        
     },
     error: function (error) {
         console.error(error);
@@ -195,6 +197,39 @@ function addProduct(){
 //SHOPPINGCART-PAGE
 function ShowShoppingcartPage() {
   $(".container").html($("#view-shoppingcart").html());
+}
+
+function addToShoppingCart(productId, orderQuantity, productName) {
+  if (orderQuantity > 0) {
+    $.ajax({
+      url: host + "/shoppingcarts/1", //hårdkodad i testsyfte
+      type: "PUT",
+      contentType: "application/json",
+      data: JSON.stringify({
+        cartitems: [
+          { "product": productId, "quantity": orderQuantity },
+        ],
+      }),
+      success: function (response) {
+        displayMessage = "Product: " + productName + " x " + orderQuantity + ".";
+        showAlert("success", "Added to cart:", displayMessage);
+        response.forEach(function (product) { //Remove later
+          console.log(product.id);
+        });
+      },
+      error: function (xhr, status, error) {
+        displayMessage = "Product: " + productName + " x " + orderQuantity + " was not added correctly.";
+        showAlert("warning", displayMessage, "Please try again later.");
+        console.error("Error adding product to cart:", error); // Remove later
+      },
+    });
+  } else {
+    showAlert("warning", "The current quantity is not accepted.", "Try increasing the quantity!");
+  }
+}
+
+function showShoppingCartDropdown() {
+
 }
 
 //-------------------------------------------------

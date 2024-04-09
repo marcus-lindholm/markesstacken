@@ -260,12 +260,20 @@ def shoppingcart_by_id(shoppingcart_id):
     if request.method == 'GET':
         return jsonify(shoppingcart.serialize())
 
-    elif request.method == 'PUT' and get_jwt_identity().is_admin:
+    elif request.method == 'PUT': # and get_jwt_identity().is_admin: // Felsökning
+        # data = request.get_json()
+        # if 'cartitems' in data:
+        #     shoppingcart.cartitems = data['cartitems']
+        # db.session.commit()
+        # return jsonify(shoppingcart.serialize()), 200
         data = request.get_json()
         if 'cartitems' in data:
-            shoppingcart.cartitems = data['cartitems']
-        db.session.commit()
-        return jsonify(shoppingcart.serialize()), 200
+            for item in data['cartitems']:
+                product_id = item['product']
+                quantity = item['quantity']
+
+            db.session.commit()
+            return jsonify(shoppingcart.serialize()), 200
 
     elif request.method == 'DELETE' and get_jwt_identity().is_admin:
         db.session.delete(shoppingcart)
