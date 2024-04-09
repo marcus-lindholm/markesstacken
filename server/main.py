@@ -33,6 +33,7 @@ class User(db.Model):
     shoppingcart = db.relationship('ShoppingCart', backref='shopping_cart', lazy=True, uselist=False)
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=True)
     orders = db.relationship('Order', backref='order_id', lazy=True, uselist=True)
+    
 
     def __repr__(self):
         return f'<User {self.id}: {self.name} ({self.email})>'
@@ -46,6 +47,8 @@ class User(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
+    
 
 # class Subcategory(db.Model):
 #     id = db.Column(db.Integer, primary_key=True)
@@ -196,6 +199,10 @@ with app.app_context():
     order1 = Order(shoppingcart=shoppingcart1, payment=payment1)
     db.session.add(order1)
     user1.orders.append(order1)
+
+    admin_user = User(email = 'admin@markesstacken.se', firstName = 'Admin', lastName = 'Admin', is_admin = True, shoppingcart_id = None)
+    admin_user.set_password('admin')
+    db.session.add(admin_user)
 
     db.session.commit()
 
@@ -457,6 +464,7 @@ def category_by_id(category_id):
 
 @app.route('/sign-up', methods=['POST'])
 def sign_up():
+
     data = request.get_json()
 
     if 'email' not in data or 'firstName' not in data and 'lastName' not in data or 'password' not in data:
@@ -465,8 +473,9 @@ def sign_up():
     firstName = data['firstName']
     lastName = data['lastName']
     password = data['password']
+    
 
-    # Make it so that the email has to be unique for every user signing up
+    # Email has to be unique for every user signing up
     existing_user = User.query.filter_by(email=email).first()
     if existing_user:
         return jsonify({"error": "Email address already in use"}), 400  # 400 Bad Request
@@ -609,6 +618,20 @@ def login():
 #     db.session.commit()
 
 #     return jsonify(new_car.serialize()), 201 
+
+@app.route('/get-identity', methods=['GET'], endpoint = 'get_identity')
+@jwt_required()
+def get_identity():
+    
+    identity = get_jwt_identity()
+    user = User.query.filter_by(id=identity).first()
+    
+    if user:
+        return jsonify(user=user.serialize()), 200
+    else:
+        return jsonify(message="User not found"), 404
+
+
 
 @app.route('/users', methods=['GET', 'POST'], endpoint = 'users')
 #@jwt_required()

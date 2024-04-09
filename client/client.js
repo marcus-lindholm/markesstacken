@@ -1,4 +1,4 @@
-var signedIn = false;
+//var signedIn = false;
 var guserId;
 var yearCheckboxesfilter = [];
 var sectionCheckboxesfilter = [];
@@ -13,8 +13,6 @@ $(document).ready(function () {
 //-------------------------------------------------
 //HOME-PAGE
 function ShowHomePage() {
-  $(".nav-link.login, .nav-link.sign-up").toggleClass('d-none', signedIn);
-  $(".nav-link.logout, .nav-link.cars").toggleClass('d-none', !signedIn);
   $(".container").html($("#view-home").html());
 }
 
@@ -367,6 +365,18 @@ function ShowSettingsPage(){
 }
 
 //-------------------------------------------------
+//ADMIN-ORDERS-PAGE
+function ShowAdminOrdersPage(){
+  $(".container").html($("#view-admin-orders").html());
+}
+
+//-------------------------------------------------
+//ADMIN-RETURNS-PAGE
+function ShowAdminReturnsPage(){
+  $(".container").html($("#view-admin-returns").html());
+}
+
+//-------------------------------------------------
 //LOGOUT-PAGE
 function ShowLogoutPage(){
   $(".container").html($("#view-logout").html());
@@ -440,7 +450,6 @@ function refreshCarList() {
   showAlert("success", "Car List Updated!", "The car list has been successfully updated.");
 }
 
-host = window.location.protocol + '//' + location.host
 
 //-------------------------------------------------
 //DISPLAY-CAR-LIST
@@ -522,7 +531,7 @@ function displayCarList() {
             data: JSON.stringify({ user_id: 0}),
             headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
             success: function(response) {
-              showAlert("success", "Car Is Un Booked!", "Nice!");
+              showAlert("success", "Car Is UnBooked!", "Nice!");
               refreshCarList();
             },
             error: function() {
@@ -707,38 +716,64 @@ function ShowSignUpPage() {
 
 //___________________________________________________________
 
-//Functions do decide which dropdown is showed depending on if loggedin or not 
+//Functions do decide which dropdown is showed depending on if logged in or not 
+
 function checkLoggedIn() {
   auth = JSON.parse(sessionStorage.getItem('auth'));
-  var signedIn = auth !== null;
-  
+  signedIn = auth !== null;
+
   const loggedInDropdown = document.getElementById('loggedInDropdown');
   const loggedOutDropdown = document.getElementById('loggedOutDropdown');
+  const adminDropdown = document.getElementById('adminDropdown');
 
   if (signedIn == true) {
+
     loggedInDropdown.style.display = 'block';
     loggedOutDropdown.style.display = 'none';
-    
+    adminDropdown.style.display = 'none'; 
+
+    console.log("auth.access", auth.token);
+
     $.ajax({
       url: '/get-identity',
       type: 'GET',
       headers: {
-          'Content-Type': 'application/json',
-          "Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).access_token
+        'Content-Type': 'application/json',
+        "Authorization": "Bearer " + auth.token
+       
       },
+
       success: function(user) {
-          if (user.user.is_admin === false) {
-              console.log("User is not admin", user.user.is_admin);
-             
-          } else {
-            
-          }
-      },});
+    
+        console.log("get-identity hej", guserId);
+      
+        if (user.user.is_admin === false) {
+          loggedInDropdown.style.display = 'block';
+          loggedOutDropdown.style.display = 'none';
+          adminDropdown.style.display = 'none';
+          console.log("admin false", user.user.is_admin);
+        } else {
+          loggedInDropdown.style.display = 'none';
+          loggedOutDropdown.style.display = 'none';
+          adminDropdown.style.display = 'block'; 
+          console.log("admin true", user.user.is_admin);
+        }
+      },
+      
+      error: function(error) {
+        console.error("Error fetching identity:", error);
+        adminDropdown.style.display = 'none'; 
+      }
+    });
+
   } else {
-      loggedInDropdown.style.display = 'none';
-      loggedOutDropdown.style.display = 'block';
+    loggedInDropdown.style.display = 'none';
+    loggedOutDropdown.style.display = 'block';
+    adminDropdown.style.display = 'none'; 
   }
 }
+ 
+
 
 //--------------------------------------------------------------
 //SHOW-LOGIN-PAGE 
@@ -765,12 +800,8 @@ function ShowLoginPage() {
           console.log(response);
           sessionStorage.setItem('auth', JSON.stringify(response));
 
-          
-
-          console.log(signedIn);
-          signedIn = sessionStorage.getItem('auth') !== null;
-          console.log(signedIn);
           guserId = JSON.parse(sessionStorage.getItem('auth')).user.id;
+          console.log("guserId", guserId);
 
           ShowHomePage();
           checkLoggedIn();
@@ -797,7 +828,6 @@ function ShowLogoutPage() {
 
     sessionStorage.removeItem('auth');
 
-    signedIn = sessionStorage.getItem('auth') !== null;
     ShowHomePage();
     checkLoggedIn();
     
@@ -812,9 +842,6 @@ function ShowLogoutPage() {
 $(document).ready(function () {
   checkLoggedIn();
   ShowHomePage();
-
-  signedIn = sessionStorage.getItem('auth') !== null;
-  console.log(signedIn);
   
    //------------------------------------------
   // Navigation click event handlers
@@ -890,6 +917,23 @@ $(".nav-item.dropdown .dropdown-menu .settings").click(function () {
 });
 
 $(".nav-item.dropdown .dropdown-menu .logout").click(function () {
+  ShowLogoutPage();
+});
+
+//Dropdown Admin
+$(".nav-item.dropdown .dropdown-menu .adminOrders").click(function () {
+  ShowAdminOrdersPage();
+});
+
+$(".nav-item.dropdown .dropdown-menu .adminReturns").click(function () {
+  ShowAdminReturnsPage();
+});
+
+$(".nav-item.dropdown .dropdown-menu .settings").click(function () { //Behövs ej?
+  ShowSettingsPage();
+});
+
+$(".nav-item.dropdown .dropdown-menu .logout").click(function () { //Behövs ej? 
   ShowLogoutPage();
 });
 
