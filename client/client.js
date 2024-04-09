@@ -45,7 +45,7 @@ function ShowPurchasePage() {
                   <img src="/product_images/${product.img}" class="card-img-top centered-product-image show-product" data-product-id="${product.id}" alt="Product Image">
                     <div class="card-body">
                         <h5 class="card-title show-product" data-product-id="${product.id}">${product.name}</h5>
-                        <p class="card-text">${product.description}</p>
+                        <p class="card-text">${product.description.length > 28 ? product.description.substring(0, 25) + '...' : product.description}</p>
                         <p class="card-text"> ${product.price} kr</p>
                         <div class="d-flex align-items-center mb-3">
                             <label for="quantity" class="me-2"></label>
@@ -65,7 +65,7 @@ function ShowPurchasePage() {
                                 </button>
                             </div>
                         </div>
-                        <button class="btn btn-light product-overview">Lägg i varukorg</button>
+                        <button class="btn btn-light" style="width: 145px; margin: 5px 0;" ${product.quantity === 0 ? 'disabled' : ''}>Lägg i varukorg</button>
                         <div class="product-overview">
                           <button class="btn btn-dark" style="width: 105px;">Köp nu</button>
                           <button class="btn btn-outline-dark">
@@ -247,7 +247,7 @@ function ShowProductPage(productId) {
         <div class="half-page">
           <h2>${product.name}</h2>
           <h3>${product.price} kr</h3>
-          <p>${product.description}</p>
+          <p class="card-text">${product.description.length > 28 ? product.description.substring(0, 25) + '...' : product.description}</p>
           <p>Antal i lager: ${product.quantity === 0 ? 'Ej i lager' : product.quantity}</p>
           ${product.year ? `<p>År: ${product.year}</p>` : ''}
           ${product.section ? `<p>Sektion: ${product.section}</p>` : ''}
@@ -353,7 +353,7 @@ function refreshProducts() {
                   <img src="/product_images/${product.img}" class="card-img-top centered-product-image show-product" data-product-id="${product.id}" alt="Product Image">
                     <div class="card-body">
                         <h5 class="card-title show-product" data-product-id="${product.id}">${product.name}</h5>
-                        <p class="card-text">${product.description}</p>
+                        <p class="card-text">${product.description.length > 28 ? product.description.substring(0, 25) + '...' : product.description}</p>
                         <p class="card-text"> ${product.price} kr</p>
                         <div class="d-flex align-items-center mb-3">
                             <label for="quantity" class="me-2"></label>
@@ -373,7 +373,7 @@ function refreshProducts() {
                                 </button>
                             </div>
                         </div>
-                        <button class="btn btn-light" style="width: 105px;" ${product.quantity === 0 ? 'disabled' : ''}>Lägg i varukorg</button>
+                        <button class="btn btn-light" style="width: 145px; margin: 5px 0;" ${product.quantity === 0 ? 'disabled' : ''}>Lägg i varukorg</button>
                         <div class="product-overview">
                           <button class="btn btn-dark" style="width: 105px;">Köp nu</button>
                           <button class="btn btn-outline-dark">
