@@ -130,7 +130,7 @@
                       <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
                   </svg>
               </a>
-              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">    <!--Koppla användarnamn med backend, if-sats?-->
+              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">  
                 <span class="dropdown-item disabled" href="#">Användarnamn</span> 
                   <a class="dropdown-item orders" href="#">Beställningar</a>
                   <a class="dropdown-item returns" href="#">Returer</a>
@@ -147,11 +147,27 @@
                               <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
                           </svg>
                       </a>
-                      <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">    <!--Koppla användarnamn med backend, if-sats?-->
+                      <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink"> 
                           <a class="dropdown-item login" href="#">Logga in</a>
                           <a class="dropdown-item sign-up" href="#">Registrera dig</a>
                       </div>
                   </li>
+
+            <!--Admin Logged In Dropdown Menu-->
+            <li class="nav-item dropdown" id="adminDropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                     <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
+                 </svg>
+             </a>
+             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">   
+               <span class="dropdown-item disabled" href="#">Admin</span> 
+                 <a class="dropdown-item adminOrders" href="#">Admin Beställningar</a>
+                 <a class="dropdown-item adminReturns" href="#">Admin Returer</a>
+                 <a class="dropdown-item settings" href="#">Inställningar</a>
+                 <a class="dropdown-item logout" href="#">Logga ut</a>
+             </div->
+           </li>
           
                          
           
@@ -471,7 +487,10 @@
     </div>
 
     </script>
-<!--VIEW-PURCHASE PAGE-->
+
+
+
+<!-- VIEW-PURCHASE PAGE -->
 <script id="view-purchase" type="text/html">
   <h1>View-Purchase</h1>
 
@@ -479,39 +498,39 @@
     <!-- Sidebar filter-->
     <div class="col-md-3">
       <div id="sidebar">
-          <h2>Filters</h2>
- 
-          <!-- Year filter -->
-          <div class="form-group">
-            <label for="filterYear">Year:</label>
-            <select class="form-control" id="filterYear">
-                <option value="">All</option>
-            </select>
+        <h2>Filters</h2>
+
+        <!-- Year filter -->
+        <div class="form-group">
+          <label>Year:</label>
+          <div id="yearCheckboxes">
+            <!-- Dynamically populated checkboxes -->
+          </div>
         </div>
 
-          <!-- Section filter -->
-          <div class="form-group">
-              <label for="filterSection">Section:</label>
-              <select class="form-control" id="filterSection">
-                  <option value="">All</option>
-              </select>
+        <!-- Section filter -->
+        <div class="form-group">
+          <label>Section:</label>
+          <div id="sectionCheckboxes">
+            <!-- Dynamically populated checkboxes -->
           </div>
- 
-          <!-- Event Organizers filter -->
-          <div class="form-group">
-              <label for="filterOrganizers">Event Organizers:</label>
-              <select class="form-control" id="filterOrganizers">
-                  <option value="">All</option>
-              </select>
+        </div>
+
+        <!-- Event Organizers filter -->
+        <div class="form-group">
+          <label>Event Organizers:</label>
+          <div id="organizersCheckboxes">
+            <!-- Dynamically populated checkboxes -->
           </div>
- 
-          <!-- Event filter -->
-          <div class="form-group">
-              <label for="filterEvent">Event:</label>
-              <select class="form-control" id="filterEvent">
-                  <option value="">All</option>
-              </select>
+        </div>
+
+        <!-- Event filter -->
+        <div class="form-group">
+          <label>Event:</label>
+          <div id="eventCheckboxes">
+            <!-- Dynamically populated checkboxes -->
           </div>
+        </div>
       </div>
     </div>
 
@@ -859,6 +878,16 @@
      <script id="view-profileinfo" type="text/html">
       <h1>View-profileinfo</h1>
     </script>
+
+    <!--VIEW-ADMIN-ORDERS--> 
+    <script id="view-admin-orders" type="text/html">
+      <h1>View-adminOrders</h1>
+    </script>
+
+      <!--VIEW-ADMIN-ORDERS--> 
+      <script id="view-admin-returns" type="text/html">
+        <h1>View-adminReturns</h1>
+      </script>
 
      <!--VIEW-SETTINGS-->
      <script id="view-settings" type="text/html">
