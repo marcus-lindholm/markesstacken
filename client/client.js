@@ -1,11 +1,13 @@
 //var signedIn = false;
 host = window.location.protocol + '//' + location.host;
 
-var guserId;
-var yearCheckboxesfilter = [];
-var sectionCheckboxesfilter = [];
-var organizersCheckboxesfilter = [];
-var eventCheckboxesfilter = [];
+let guserId;
+let yearCheckboxesfilter = [];
+let sectionCheckboxesfilter = [];
+let organizersCheckboxesfilter = [];
+let eventCheckboxesfilter = [];
+let shoppingcartID;
+
 
 //drop-down for profile 
 $(document).ready(function () {
@@ -30,6 +32,36 @@ function ShowFavoritesPage() {
   $(".container").html($("#view-favorites").html());
 }
 // Function to show the purchase page
+
+function addToShoppingCart(productId, orderQuantity, productName) {
+  if (orderQuantity > 0) {
+    console.log("Adding product to cart:", productId, orderQuantity); //Remove later
+    console.log("USER SC " + shoppingcartID);
+    $.ajax({
+      url: host + "/cartitems", //hårdkodad i testsyfte
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({
+        quantity: orderQuantity,
+        product_id: productId,
+        shoppingcart_id: shoppingcartID
+      }),
+      success: function (response) {
+        displayMessage = "Product: " + productName + " x " + orderQuantity + ".";
+        showAlert("success", "Added to cart:", displayMessage);
+      },
+      error: function (xhr, status, error) {
+        displayMessage = "Product: " + productName + " x " + orderQuantity + " was not added correctly.";
+        showAlert("warning", displayMessage, "Please try again later.");
+        console.error("Error adding product to cart:", error); // Remove later
+      },
+    });
+  } else {
+    showAlert("warning", "The current quantity is not accepted.", "Try increasing the quantity!");
+  }
+}
+
+
 function ShowPurchasePage() {
   $(".container").html($("#view-purchase").html());
 
@@ -88,7 +120,7 @@ function refreshProducts() {
                                         <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
                                     </svg>
                                 </button>
-                                <input type="number" id="quantity" class="form-control" value="1" min="1" max="${product.quantity}">
+                                <input type="number" id="quantity${product.id}" class="form-control" value="1" min="1" max="${product.quantity}">
                                 <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepUp()" id="plus-button">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                                         <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
@@ -97,7 +129,7 @@ function refreshProducts() {
                                 </button>
                             </div>
                         </div>
-                        <button class="btn btn-light" style="width: 145px; margin: 5px 0;" ${product.quantity === 0 ? 'disabled' : ''}>Lägg i varukorg</button>
+                        <button id="add-to-cart-btn${product.id}" data-product-id="${product.id}" onclick="addToShoppingCart(${product.id}, document.getElementById('quantity${product.id}').value, '${product.name}')" class="btn btn-light" style="width: 145px; margin: 5px 0;" ${product.quantity === 0 ? 'disabled' : ''}>Lägg i varukorg</button>
                         <div class="product-overview">
                           <button class="btn btn-dark" style="width: 105px;">Köp nu</button>
                           <button class="btn btn-outline-dark">
@@ -594,18 +626,18 @@ function checkLoggedIn() {
 
       success: function(user) {
     
-        console.log("get-identity hej", guserId);
+        console.log("user GETIDENTITY", user);
       
         if (user.user.is_admin === false) {
           loggedInDropdown.style.display = 'block';
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'none';
-          console.log("admin false", user.user.is_admin);
+          shoppingcartID = user.user.shoppingcart.id;
         } else {
           loggedInDropdown.style.display = 'none';
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'block'; 
-          console.log("admin true", user.user.is_admin);
+          shoppingcartID = user.user.shoppingcart.id;
         }
       },
       

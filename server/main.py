@@ -291,7 +291,7 @@ def shoppingcart_by_id(shoppingcart_id):
     if request.method == 'GET':
         return jsonify(shoppingcart.serialize())
 
-    elif request.method == 'PUT' and get_jwt_identity().is_admin:
+    elif request.method == 'PUT':
         data = request.get_json()
         if 'cartitems' in data:
             shoppingcart.cartitems = data['cartitems']
@@ -311,9 +311,9 @@ def cartitems():
         cartitem_list = [cartitem.serialize() for cartitem in cartitems]
         return jsonify(cartitem_list)
 
-    elif request.method == 'POST' and get_jwt_identity().is_admin:
+    elif request.method == 'POST':
         data = request.get_json()
-        new_cartitem = CartItem(quantity=data['quantity'], product_id=data['product_id'])
+        new_cartitem = CartItem(quantity=data['quantity'], product_id=data['product_id'], shoppingcart_id=data['shoppingcart_id'])
         db.session.add(new_cartitem)
         db.session.commit()
         return jsonify(new_cartitem.serialize()), 201
@@ -631,7 +631,7 @@ def login():
 
 #     return jsonify(new_car.serialize()), 201 
 
-@app.route('/get-identity', methods=['GET'], endpoint = 'get_identity')
+@app.route('/get-identity', methods=['GET'], endpoint = 'get-identity')
 @jwt_required()
 def get_identity():
     
@@ -700,7 +700,7 @@ def get_user_by_id(user_id):
         db.session.commit()
         return jsonify("Success!"), 200
 
-@app.route('/users/<int:user_id>/cars', methods=['GET'], endpoint = 'get_cars_by_user')
+""" @app.route('/users/<int:user_id>/cars', methods=['GET'], endpoint = 'get_cars_by_user')
 @jwt_required()
 def get_cars_by_user(user_id):
 
@@ -720,7 +720,7 @@ def get_cars_by_user(user_id):
         car_list.append(car_data)
         car_data.pop('user_id', None)
 
-    return jsonify(car_list)
+    return jsonify(car_list) """
 
 #labb2
 @app.route("/")
