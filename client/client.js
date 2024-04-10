@@ -7,6 +7,7 @@ let sectionCheckboxesfilter = [];
 let organizersCheckboxesfilter = [];
 let eventCheckboxesfilter = [];
 let shoppingcartID;
+let userID;
 
 
 //drop-down for profile 
@@ -33,6 +34,29 @@ function ShowFavoritesPage() {
 }
 // Function to show the purchase page
 
+function addToWishlist(productId, productName) {
+  console.log("Adding product to wishlist:", productId); // Remove later
+  $.ajax({
+    url: host + "/wishlist", 
+    type: "POST",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    data: JSON.stringify({
+      product_id: productId,
+    }),
+    success: function (response) {
+      displayMessage = "Product: " + productName + " was added to your wishlist.";
+      showAlert("success", "Added to wishlist:", displayMessage);
+    },
+    error: function (error) {
+      displayMessage = "Product: " + productName + " was not added to your wishlist.";
+      showAlert("warning", displayMessage, "Please try again later.");
+      console.error("Error adding product to wishlist:", error); // Remove later
+    },
+  });
+  
+}
+
 function addToShoppingCart(productId, orderQuantity, productName) {
   if (orderQuantity > 0) {
     console.log("Adding product to cart:", productId, orderQuantity); //Remove later
@@ -41,6 +65,7 @@ function addToShoppingCart(productId, orderQuantity, productName) {
       url: host + "/cartitems", //hårdkodad i testsyfte
       type: "POST",
       contentType: "application/json",
+      headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
       data: JSON.stringify({
         quantity: orderQuantity,
         product_id: productId,
@@ -50,7 +75,7 @@ function addToShoppingCart(productId, orderQuantity, productName) {
         displayMessage = "Product: " + productName + " x " + orderQuantity + ".";
         showAlert("success", "Added to cart:", displayMessage);
       },
-      error: function (xhr, status, error) {
+      error: function (error) {
         displayMessage = "Product: " + productName + " x " + orderQuantity + " was not added correctly.";
         showAlert("warning", displayMessage, "Please try again later.");
         console.error("Error adding product to cart:", error); // Remove later
@@ -132,7 +157,7 @@ function refreshProducts() {
                         <button id="add-to-cart-btn${product.id}" data-product-id="${product.id}" onclick="addToShoppingCart(${product.id}, document.getElementById('quantity${product.id}').value, '${product.name}')" class="btn btn-light" style="width: 145px; margin: 5px 0;" ${product.quantity === 0 ? 'disabled' : ''}>Lägg i varukorg</button>
                         <div class="product-overview">
                           <button class="btn btn-dark" style="width: 105px;">Köp nu</button>
-                          <button class="btn btn-outline-dark">
+                          <button id="add-to-wishlist-btn${product.id} data-product-id="${product.id}" onclick="addToWishlist(${product.id}, '${product.name}')" class="btn btn-outline-dark" >
                               <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
                                   <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
                               </svg>
@@ -310,7 +335,7 @@ function ShowProductPage(productId) {
         <div class="half-page">
           <h2>${product.name}</h2>
           <h3>${product.price} kr</h3>
-          <p class="card-text">${product.description.length > 28 ? product.description.substring(0, 25) + '...' : product.description}</p>
+          <p class="card-text">${product.description}</p>
           <p>Antal i lager: ${product.quantity === 0 ? 'Ej i lager' : product.quantity}</p>
           ${product.year ? `<p>År: ${product.year}</p>` : ''}
           ${product.section ? `<p>Sektion: ${product.section}</p>` : ''}
@@ -325,7 +350,7 @@ function ShowProductPage(productId) {
                           <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
                       </svg>
                   </button>
-                  <input type="number" id="quantity" class="form-control" value="1" min="1" max="${product.quantity}">
+                  <input type="number" id="quantity${product.id}" class="form-control" value="1" min="1" max="${product.quantity}">
                   <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepUp()" id="plus-button">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                           <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
@@ -335,8 +360,8 @@ function ShowProductPage(productId) {
               </div>
           </div>
           <div class="justify-content-between mb-3">
-            <button class="btn btn-light" style="width: 145px; margin: 5px 0;" ${product.quantity === 0 ? 'disabled' : ''}>Lägg i varukorg</button>
-            <button class="btn btn-outline-dark">
+          <button id="add-to-cart-btn${product.id}" data-product-id="${product.id}" onclick="addToShoppingCart(${product.id}, document.getElementById('quantity${product.id}').value, '${product.name}')" class="btn btn-light" style="width: 145px; margin: 5px 0;" ${product.quantity === 0 ? 'disabled' : ''}>Lägg i varukorg</button>
+            <button id="add-to-wishlist-btn${product.id} data-product-id="${product.id}" onclick="addToWishlist(${product.id}, '${product.name}')" class="btn btn-outline-dark" >
                 <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
                     <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
                 </svg>
@@ -633,11 +658,13 @@ function checkLoggedIn() {
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'none';
           shoppingcartID = user.user.shoppingcart.id;
+          userID = user.user.id;
         } else {
           loggedInDropdown.style.display = 'none';
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'block'; 
           shoppingcartID = user.user.shoppingcart.id;
+          userID = user.user.id;
         }
       },
       

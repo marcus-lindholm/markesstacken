@@ -218,6 +218,23 @@ with app.app_context():
 
     db.session.commit()
 
+@app.route('/wishlist', methods=['GET', 'POST'], endpoint='wishlist')
+@jwt_required()
+def wishlist():
+    if request.method == 'GET':
+        user = User.query.get(get_jwt_identity())
+        wishlist = user.wishlist
+        wishlist_list = [product.serialize() for product in wishlist]
+        return jsonify(wishlist_list)
+
+    elif request.method == 'POST':
+        data = request.get_json()
+        user = User.query.get(get_jwt_identity())
+        product = db.session.get(Product, data['product_id'])
+        user.add_to_wishlist(product)
+        db.session.commit()
+        return jsonify("Success!"), 200
+
 @app.route('/payments', methods=['GET', 'POST'], endpoint='payments')
 #@jwt_required()
 def payments():
@@ -304,7 +321,7 @@ def shoppingcart_by_id(shoppingcart_id):
         return jsonify("Success!"), 200
 
 @app.route('/cartitems', methods=['GET', 'POST'], endpoint='cartitems')
-#@jwt_required()
+@jwt_required()
 def cartitems():
     if request.method == 'GET':
         cartitems = CartItem.query.all()
@@ -319,7 +336,7 @@ def cartitems():
         return jsonify(new_cartitem.serialize()), 201
 
 @app.route('/cartitems/<int:cartitem_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='cartitem_by_id')
-#@jwt_required()
+@jwt_required()
 def cartitem_by_id(cartitem_id):
     cartitem = CartItem.query.get_or_404(cartitem_id)
 
