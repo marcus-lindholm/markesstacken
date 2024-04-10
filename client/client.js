@@ -31,6 +31,54 @@ function ShowAboutusPage() {
 //FAVORITES-PAGE
 function ShowFavoritesPage() {
   $(".container").html($("#view-favorites").html());
+  $.ajax({
+    url: host + "/wishlist", 
+    type: "GET",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    success: function (items) {
+      let htmlString = items.map(product => {
+        return `
+          <div class="col-lg-4 col-md-6 mb-4" style="display: inline;">
+            <div class="card wishlist-item h-100">
+              <img class="card-img-top mx-auto d-block show-product" src="/product_images/${product.img}" alt="${product.name}" data-product-id="${product.id}"/>
+              <div class="card-body">
+                <h5 class="card-title show-product" data-product-id="${product.id}">${product.name}</h5>
+                <p class="card-text">${product.description}</p>
+                <p class="card-text"> ${product.price} kr</p>
+                <div class="d-flex mb-3 col-2">
+                    <label for="quantity" class="me-2"></label>
+                    <div class="input-group">
+                        <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepDown()" id="minus-button">
+                            <i class="fas fa-minus"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
+                                <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
+                            </svg>
+                        </button>
+                        <input type="number" id="quantity${product.id}" class="form-control" value="1" min="1" max="${product.quantity}">
+                        <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepUp()" id="plus-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                            </svg>
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <button id="add-to-cart-btn${product.id}" data-product-id="${product.id}" onclick="addToShoppingCart(${product.id}, document.getElementById('quantity${product.id}').value, '${product.name}')" class="btn btn-light" style="width: 145px; margin: 5px 0;" ${product.quantity === 0 ? 'disabled' : ''}>Lägg i varukorg</button>
+                <button id="remove-from-wishlist${product.id}" class="btn btn-secondary" data-product-id="${product.id}" onclick="removeFromWishlist(${product.id})">Ta bort från önskelista</button>              </div>
+            </div>
+          </div>
+      `;
+      }).join('');
+    
+      $(".container").html($("#view-favorites").html() + htmlString);
+    },
+    error: function (error) {
+      displayMessage = "Product: " + productName + " was not added to your wishlist.";
+      showAlert("warning", displayMessage, "Please try again later.");
+      console.error("Error adding product to wishlist:", error); // Remove later
+    },
+  });
 }
 // Function to show the purchase page
 
@@ -54,15 +102,35 @@ function addToWishlist(productId, productName) {
       console.error("Error adding product to wishlist:", error); // Remove later
     },
   });
-  
 }
+
+function removeFromWishlist(productId) {
+  console.log("Removing product from wishlist:", productId); // Remove later
+  $.ajax({
+    url: host + "/wishlist/" + productId, 
+    type: "DELETE",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    success: function (response) {
+      displayMessage = "Product was removed from your wishlist.";
+      showAlert("success", "Removed from wishlist:", displayMessage);
+      ShowFavoritesPage(); // Reload the favorites page
+    },
+    error: function (error) {
+      displayMessage = "Product was not removed from your wishlist.";
+      showAlert("warning", displayMessage, "Please try again later.");
+      console.error("Error removing product from wishlist:", error); // Remove later
+    }
+  });
+}
+
 
 function addToShoppingCart(productId, orderQuantity, productName) {
   if (orderQuantity > 0) {
     console.log("Adding product to cart:", productId, orderQuantity); //Remove later
-    console.log("USER SC " + shoppingcartID);
+    console.log("USER SC " + shoppingcartID);                         //Remove later
     $.ajax({
-      url: host + "/cartitems", //hårdkodad i testsyfte
+      url: host + "/cartitems",
       type: "POST",
       contentType: "application/json",
       headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
@@ -614,7 +682,7 @@ function ShowSignUpPage() {
           }, 
           error: function (error) {
             showAlert("danger", "Registrering misslyckades", "Mailadressen används redan.");
-             console.error(error);
+            console.error(error);
           }
       });
   });
@@ -651,7 +719,7 @@ function checkLoggedIn() {
 
       success: function(user) {
     
-        console.log("user GETIDENTITY", user);
+        console.log("user GETIDENTITY", user); // Remove later
       
         if (user.user.is_admin === false) {
           loggedInDropdown.style.display = 'block';
@@ -668,9 +736,13 @@ function checkLoggedIn() {
         }
       },
       
-      error: function(error) {
-        console.error("Error fetching identity:", error);
-        adminDropdown.style.display = 'none'; 
+      error: function(jqXHR, error) {
+        if (jqXHR.status === 401) {
+          logout();
+        } else {
+          console.error("Error fetching identity:", error);
+          adminDropdown.style.display = 'none';
+        } 
       }
     });
 
@@ -679,6 +751,11 @@ function checkLoggedIn() {
     loggedOutDropdown.style.display = 'block';
     adminDropdown.style.display = 'none'; 
   }
+}
+function logout() {
+  // Clear the auth token from session storage
+  sessionStorage.removeItem('auth');
+  location.reload();
 }
  
 

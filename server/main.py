@@ -43,7 +43,7 @@ class User(db.Model):
     
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
-        self.shoppingcart = ShoppingCart()  # Create a ShoppingCart instance for every new User
+        self.shoppingcart = ShoppingCart()
 
     def check_if_in_wishlist(self, product):
         if product in self.wishlist:
@@ -88,7 +88,6 @@ class Product(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=True)
-    #img = db.Column(db.LargeBinary, nullable=True) #eget image library (imgID)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
     category = db.relationship('Category', backref='products', lazy=True)
     year = db.Column(db.Integer, nullable=True)
@@ -102,7 +101,7 @@ class Product(db.Model):
         return f'<Product {self.id}: {self.name}: {self.price}>'
     
     def serialize(self):
-            return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity, description=self.description, year=self.year, section=self.section, event=self.event, organizer=self.organizer, img=self.img, number_of_sales=self.number_of_sales, category=self.category.serialize() if self.category else None)
+        return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity, description=self.description, year=self.year, section=self.section, event=self.event, organizer=self.organizer, img=self.img, number_of_sales=self.number_of_sales, category=self.category.serialize() if self.category else None)
     
 
 
@@ -234,6 +233,15 @@ def wishlist():
         user.add_to_wishlist(product)
         db.session.commit()
         return jsonify("Success!"), 200
+    
+@app.route('/wishlist/<int:product_id>', methods=['DELETE'], endpoint='remove_from_wishlist')
+@jwt_required()
+def wishlist_by_id(product_id):
+    user = User.query.get(get_jwt_identity())
+    product = db.session.get(Product, product_id)
+    user.remove_from_wishlist(product)
+    db.session.commit()
+    return jsonify("Success!"), 200
 
 @app.route('/payments', methods=['GET', 'POST'], endpoint='payments')
 #@jwt_required()
