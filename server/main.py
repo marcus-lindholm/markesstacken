@@ -22,6 +22,11 @@ bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 db = SQLAlchemy(app)
 
+wishlist = db.Table('wishlist',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('product_id', db.Integer, db.ForeignKey('product.id'), primary_key=True)
+)
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, nullable=False)
@@ -29,43 +34,42 @@ class User(db.Model):
     lastName = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, default=False, nullable=True)
     password_hash = db.Column(db.String, nullable=False)
-    shoppingcart_id = db.Column(db.Integer, db.ForeignKey('shopping_cart.id'), nullable=True)
+    shoppingcart_id = db.Column(db.Integer, db.ForeignKey('shopping_cart.id'), nullable=False)
     shoppingcart = db.relationship('ShoppingCart', backref='shopping_cart', lazy=True, uselist=False)
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=True)
     orders = db.relationship('Order', backref='order_id', lazy=True, uselist=True)
+    wishlist = db.relationship('Product', secondary=wishlist, lazy='subquery',
+        backref=db.backref('users', lazy=True))
     
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+        self.shoppingcart = ShoppingCart()  # Create a ShoppingCart instance for every new User
+
+    def check_if_in_wishlist(self, product):
+        if product in self.wishlist:
+            return product in self.wishlist
+
+    def add_to_wishlist(self, product):
+        if not self.check_if_in_wishlist(product):
+            self.wishlist.append(product)
+    
+    def remove_from_wishlist(self, product):
+        self.wishlist.remove(product)
 
     def __repr__(self):
         return f'<User {self.id}: {self.name} ({self.email})>'
 
     def serialize(self):
         return dict(id=self.id, firstName=self.firstName, lastName=self.lastName, email=self.email, is_admin=self.is_admin, 
-                    orders=[order.serialize() for order in self.orders] if self.orders else None, shoppingcart=self.shoppingcart.serialize() if self.shoppingcart else None)
+                    orders=[order.serialize() for order in self.orders] if self.orders else None, shoppingcart=self.shoppingcart.serialize(), wishlist=[product.serialize() for product in self.wishlist] if self.wishlist else None)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password).decode('utf8')
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-    
-    
 
-# class Subcategory(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String, nullable=False)
-#     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
-#     category = db.relationship('Category', backref='subcategories', lazy=True)
-    
 
-#     def __repr__(self):
-#         return f'<Subcategory {self.id}: {self.name}: {self.category}>'
-    
-#     def serialize(self):
-#         return dict(
-#             id=self.id, 
-#             name=self.name, 
-#             category=self.category.serialize() if self.category else None
-#         )
 
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -92,12 +96,13 @@ class Product(db.Model):
     event = db.Column(db.String, nullable=True)
     organizer = db.Column(db.String, nullable=True)
     img = db.Column(db.String, nullable=True)
+    number_of_sales = db.Column(db.Integer, default=0)
     
     def __repr__(self):
         return f'<Product {self.id}: {self.name}: {self.price}>'
     
     def serialize(self):
-            return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity, description=self.description, year=self.year, section=self.section, event=self.event, organizer=self.organizer, img=self.img, category=self.category.serialize() if self.category else None)
+            return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity, description=self.description, year=self.year, section=self.section, event=self.event, organizer=self.organizer, img=self.img, number_of_sales=self.number_of_sales, category=self.category.serialize() if self.category else None)
     
 
 
@@ -185,20 +190,27 @@ with app.app_context():
     db.session.add(product6)
     db.session.add(product7)
 
-    shoppingcart1 = ShoppingCart()
-    db.session.add(shoppingcart1)
+    #shoppingcart1 = ShoppingCart()
+    #db.session.add(shoppingcart1)
     cartitem1 = CartItem(quantity=2, product=product1, shoppingcart_id=1)
     cartitem2 = CartItem(quantity=3, product=product2, shoppingcart_id=1)
     db.session.add(cartitem1)
     db.session.add(cartitem2)
-    user1 = User(email='johndoe@mail.com', firstName='John', lastName='Doe', is_admin=False, shoppingcart_id=1)
+    cartitem3 = CartItem(quantity=2, product=product1, shoppingcart_id=2)
+    db.session.add(cartitem3)
+    user1 = User(email='johndoe@mail.com', firstName='John', lastName='Doe', is_admin=False)
+    user2 = User(email='rgn@gmail', firstName='Ragnar', lastName='Lothbrok', is_admin=False)
     user1.set_password('password')
+    user2.set_password('password')
     db.session.add(user1)
+    db.session.add(user2)
     payment1 = Payment(paymentDate=datetime.now(), paymentAmount=100.0)
     db.session.add(payment1)
-    order1 = Order(shoppingcart=shoppingcart1, payment=payment1)
-    db.session.add(order1)
-    user1.orders.append(order1)
+    user1.add_to_wishlist(product2)
+    user1.add_to_wishlist(product2)
+    #order1 = Order(shoppingcart=shoppingcart1, payment=payment1)
+    #db.session.add(order1)
+    #user1.orders.append(order1)
 
     admin_user = User(email = 'admin@markesstacken.se', firstName = 'Admin', lastName = 'Admin', is_admin = True, shoppingcart_id = None)
     admin_user.set_password('admin')
@@ -717,5 +729,5 @@ def client():
 
 
 if __name__ == "__main__":
-    app.run(port=5002, debug=True) # På MacOS, byt till 5001 eller dylikt
+    app.run(port=5001, debug=True) # På MacOS, byt till 5001 eller dylikt
 
