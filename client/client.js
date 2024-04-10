@@ -7,6 +7,7 @@ var sectionCheckboxesfilter = [];
 var organizersCheckboxesfilter = [];
 var eventCheckboxesfilter = [];
 
+
 //drop-down for profile 
 $(document).ready(function () {
   $('.dropdown-toggle').dropdown();
@@ -200,6 +201,7 @@ function addAllCheckbox(containerId) {
   `);
   container.find(".form-check-input:not(.all-checkbox)").prop("checked", true);
 }
+
 
 
 // Function to handle checkbox selection
@@ -420,6 +422,18 @@ function ShowShoppingcartPage() {
 //CHECKOUT-PAGE
 function ShowCheckoutPage() {
  $(".container").html($("#view-checkout").html());
+}
+
+//-------------------------------------------------
+//ORDER-CONFIRMATION-PAGE
+function ShowOrderConfirmationPage() {
+  $(".container").html($("#view-order-confirmation").html());
+  
+    var currentDateElement = document.getElementById("currentDate");
+    var currentDate = new Date().toLocaleDateString(); 
+  
+    currentDateElement.textContent = currentDate;
+
 }
 
 //-------------------------------------------------
