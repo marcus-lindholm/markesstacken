@@ -29,11 +29,14 @@ class User(db.Model):
     lastName = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, default=False, nullable=True)
     password_hash = db.Column(db.String, nullable=False)
-    shoppingcart_id = db.Column(db.Integer, db.ForeignKey('shopping_cart.id'), nullable=True)
+    shoppingcart_id = db.Column(db.Integer, db.ForeignKey('shopping_cart.id'), nullable=False)
     shoppingcart = db.relationship('ShoppingCart', backref='shopping_cart', lazy=True, uselist=False)
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=True)
     orders = db.relationship('Order', backref='order_id', lazy=True, uselist=True)
     
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+        self.shoppingcart = ShoppingCart()  # Create a ShoppingCart instance for every new User
 
     def __repr__(self):
         return f'<User {self.id}: {self.name} ({self.email})>'
@@ -186,20 +189,23 @@ with app.app_context():
     db.session.add(product6)
     db.session.add(product7)
 
-    shoppingcart1 = ShoppingCart()
-    db.session.add(shoppingcart1)
+    #shoppingcart1 = ShoppingCart()
+    #db.session.add(shoppingcart1)
     cartitem1 = CartItem(quantity=2, product=product1, shoppingcart_id=1)
     cartitem2 = CartItem(quantity=3, product=product2, shoppingcart_id=1)
     db.session.add(cartitem1)
     db.session.add(cartitem2)
-    user1 = User(email='johndoe@mail.com', firstName='John', lastName='Doe', is_admin=False, shoppingcart_id=1)
+    user1 = User(email='johndoe@mail.com', firstName='John', lastName='Doe', is_admin=False)
+    user2 = User(email='rgn@gmail', firstName='Ragnar', lastName='Lothbrok', is_admin=False)
     user1.set_password('password')
+    user2.set_password('password')
     db.session.add(user1)
+    db.session.add(user2)
     payment1 = Payment(paymentDate=datetime.now(), paymentAmount=100.0)
     db.session.add(payment1)
-    order1 = Order(shoppingcart=shoppingcart1, payment=payment1)
-    db.session.add(order1)
-    user1.orders.append(order1)
+    #order1 = Order(shoppingcart=shoppingcart1, payment=payment1)
+    #db.session.add(order1)
+    #user1.orders.append(order1)
 
     admin_user = User(email = 'admin@markesstacken.se', firstName = 'Admin', lastName = 'Admin', is_admin = True, shoppingcart_id = None)
     admin_user.set_password('admin')
