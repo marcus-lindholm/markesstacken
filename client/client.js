@@ -893,8 +893,7 @@ $(document).ready(function () {
 });
 
 $(".nav-link.favorites").click(function () {
-  //ShowFavoritesPage();
-  ShowOrderConfirmationPage();
+  ShowFavoritesPage();
 });
 
 $(".nav-link.shoppingcart").click(function () {
