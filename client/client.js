@@ -618,12 +618,14 @@ function checkLoggedIn() {
   const loggedInDropdown = document.getElementById('loggedInDropdown');
   const loggedOutDropdown = document.getElementById('loggedOutDropdown');
   const adminDropdown = document.getElementById('adminDropdown');
+  const sellButton = document.getElementById('sellButton');
 
   if (signedIn == true) {
 
     loggedInDropdown.style.display = 'block';
     loggedOutDropdown.style.display = 'none';
     adminDropdown.style.display = 'none'; 
+    sellButton.style.display='block';
 
     console.log("auth.access", auth.token);
 
@@ -644,11 +646,13 @@ function checkLoggedIn() {
           loggedInDropdown.style.display = 'block';
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'none';
+          sellButton.style.display='block';
           console.log("admin false", user.user.is_admin);
         } else {
           loggedInDropdown.style.display = 'none';
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'block'; 
+          sellButton.style.display='none';
           console.log("admin true", user.user.is_admin);
         }
       },
@@ -663,6 +667,7 @@ function checkLoggedIn() {
     loggedInDropdown.style.display = 'none';
     loggedOutDropdown.style.display = 'block';
     adminDropdown.style.display = 'none'; 
+    sellButton.style.display='none';
   }
 }
  
