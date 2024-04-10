@@ -380,6 +380,7 @@ function ShowShoppingcartPage() {
 }
 
 function addToShoppingCart(productId, orderQuantity, productName) {
+  console.log("hej");
   if (orderQuantity > 0) {
     $.ajax({
       url: host + "/shoppingcarts/1", //hårdkodad i testsyfte
