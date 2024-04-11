@@ -279,6 +279,7 @@ function populateFilterDropdowns(response) {
         events.push(product.event);
     }
   });
+
   response.forEach(function(product) {
     if (product.year !== null && !yearCheckboxesfilter.includes(product.year)) {
         yearCheckboxesfilter.push(product.year);
@@ -338,6 +339,7 @@ function addAllCheckbox(containerId) {
   `);
   container.find(".form-check-input:not(.all-checkbox)").prop("checked", true);
 }
+
 
 
 // Function to handle checkbox selection
@@ -453,10 +455,36 @@ function ShowProductPage(productId) {
       </div>
       `;
       $(".container").html(productPageHTML);
-
     }
   });
 }
+
+function search() {
+  var input = document.getElementById('searchBar').value;
+  console.log(input); 
+populateSearch(input);
+}
+
+function populateSearch(searchInput) {
+      // Select all items within the product container
+      var items = document.getElementById('product-container').getElementsByClassName('col-md-4');
+
+      for (var i = 0; i < items.length; i++) {
+          // Get the product name within the current item
+          var productName = items[i].getElementsByClassName('card-title')[0].textContent.toLowerCase();
+
+          if (productName.includes(searchInput)) {
+            // Show the item by setting its display property to "block"
+            items[i].style.display = 'block';
+           
+        } else {
+            // Hide the item if it doesn't match the search input
+            items[i].style.display = 'none';
+  
+        }
+      }  
+}
+
 // Function to update the global filter lists based on checked/unchecked checkboxes
 function updateFilterList(containerId) {
   // Get the checked checkboxes and update the corresponding global filter list
@@ -489,6 +517,11 @@ function updateFilterList(containerId) {
   });
 }
 
+//
+//
+//
+//
+//
 //SELL-PAGE
 function ShowSellPage() {
   $(".container").html($("#view-sell").html());
@@ -673,6 +706,18 @@ function ShowCheckoutPage() {
 }
 
 //-------------------------------------------------
+//ORDER-CONFIRMATION-PAGE
+function ShowOrderConfirmationPage() {
+  $(".container").html($("#view-order-confirmation").html());
+  
+    var currentDateElement = document.getElementById("currentDate");
+    var currentDate = new Date().toLocaleDateString(); 
+  
+    currentDateElement.textContent = currentDate;
+
+}
+
+//-------------------------------------------------
 //ORDERS-PAGE
 function ShowOrdersPage() {
   $(".container").html($("#view-orders").html());
@@ -813,16 +858,18 @@ function ShowSignUpPage() {
 function checkLoggedIn() {
   auth = JSON.parse(sessionStorage.getItem('auth'));
   signedIn = auth !== null;
-
+  loggedIn = signedIn;
   const loggedInDropdown = document.getElementById('loggedInDropdown');
   const loggedOutDropdown = document.getElementById('loggedOutDropdown');
   const adminDropdown = document.getElementById('adminDropdown');
+  const sellButton = document.getElementById('sellButton');
 
   if (signedIn == true) {
 
     loggedInDropdown.style.display = 'block';
     loggedOutDropdown.style.display = 'none';
     adminDropdown.style.display = 'none'; 
+    sellButton.style.display='block';
 
     console.log("auth.access", auth.token);
 
@@ -843,14 +890,15 @@ function checkLoggedIn() {
           loggedInDropdown.style.display = 'block';
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'none';
-          shoppingcartID = user.user.shoppingcart.id;
-          userID = user.user.id;
+          sellButton.style.display='block';
+          
+          console.log("admin false", user.user.is_admin);
         } else {
           loggedInDropdown.style.display = 'none';
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'block'; 
-          shoppingcartID = user.user.shoppingcart.id;
-          userID = user.user.id;
+          sellButton.style.display='none';
+          console.log("admin true", user.user.is_admin);
         }
       },
       
@@ -868,6 +916,7 @@ function checkLoggedIn() {
     loggedInDropdown.style.display = 'none';
     loggedOutDropdown.style.display = 'block';
     adminDropdown.style.display = 'none'; 
+    sellButton.style.display='none';
   }
 }
 function logout() {
@@ -943,143 +992,242 @@ function ShowLogoutPage() {
 //CLICK-EVENTS
 
 $(document).ready(function () {
+  
   checkLoggedIn();
   ShowHomePage();
   
    //------------------------------------------
   // Navigation click event handlers
 
-  //NAVBAR-LINKS
-  $(".nav-link.home").click(function () {
-      ShowHomePage();
-  });
+  function loadView(viewId, productId) {
+      switch (viewId) {
+        case "view-home":
+          ShowHomePage();
+          break;
+        case "view-aboutus":
+          ShowAboutusPage();
+          break; 
+        case "view-contact":
+          ShowContactPage();
+          break;
+        case "view-purchase":
+          ShowPurchasePage();
+          break;
+        case "view-sell":
+          ShowSellPage();
+          break;
+        case "view-logout":
+          ShowLogoutPage();
+          break;
+        case "view-favorites":
+          ShowFavoritesPage();
+          break;
+        case "view-shoppingcart":
+          ShowShoppingcartPage();
+          break;
+        case "view-sign-up":
+          ShowSignUpPage();
+          break;
+        case "view-login":
+          ShowLoginPage();
+          break;
+        case "view-orderspage":
+          ShowOrdersPage();
+          break;
+        case "view-returns":
+          ShowReturnsPage();
+          break;
+        case "view-profileInfo":
+          ShowProfileInfoPage();
+          break;
+        case "view-settings":
+          ShowSettingsPage();
+          break;
+        case "view-logout":
+          ShowLogoutPage();
+          break;
+        case "view-adminOrders":
+          ShowAdminOrdersPage();
+          break;
+        case "view-adminReturns":
+          ShowAdminReturnsPage();
+          break;
+        case "view-questions":
+          ShowQuestionsPage();
+          break; 
+        case "view-checkout":
+          ShowCheckoutPage();
+          break; 
+        case "view-product":
+          ShowProductPage(productId);
+          break;
+        default:
+          console.error("Unknown view:", viewId);
+    }
+  }
 
-  $(".nav-link.contact").click(function () {
-      ShowContactPage();
-  });
 
+ 
+  //This function stores the navigationClicks i.e. the different views the user has "visited" and enables for the user to go back and 
+  //forward in the browser-history using the arrows
+
+let previousViewId = null;
+let previousProductId = null;
+
+function handleNavigationClick(viewId, productId = null) {  
+  if (previousViewId !== viewId || previousProductId !== productId) {
+    loadView(viewId, productId);
+    previousViewId = viewId;
+    previousProductId = productId;
+    history.pushState({ viewId: viewId, productId: productId }, "", "");
+    console.log("State object:", history.state);
+    console.log(productId);
+  }
+}
+
+
+
+$(document).on("click", "#checkout-button", function() {
+    handleNavigationClick("view-checkout");
+ });
+
+// Click event handler for product links
+$(document).on('click', '.show-product', function() {
+  var productId = $(this).data('product-id');
+  handleNavigationClick("view-product", productId);
+});
+
+
+
+  //NAVBAR LINKS CLICK
   $(".navbar-brand.logo").click(function () {
-    ShowHomePage();
-  });
-
-  $(".nav-link.purchase").click(function () {
-    ShowPurchasePage();
-  });
-
-  $(".nav-link.sell").click(function () {
-    ShowSellPage();
+    handleNavigationClick("view-home");
   });
 
   $(".nav-link.aboutus").click(function () {
-    ShowAboutusPage();
+    handleNavigationClick("view-aboutus");
   });
 
+  $(".nav-link.contact").click(function () {
+    handleNavigationClick("view-contact");
+  });
+
+  $(".nav-link.purchase").click(function () {
+    handleNavigationClick("view-purchase");
+  });
+
+  $(".nav-link.sell").click(function () {
+    handleNavigationClick("view-sell");
+  });
+  
   $(".nav-link.logout").click(function () {
-    ShowLogoutPage();
+    handleNavigationClick("view-logout");
   });
-
+  
   $(".nav-link.favorites").click(function () {
-    ShowFavoritesPage();
+    if (loggedIn) {
+      ShowFavoritesPage();
+    } else {
+      showAlert("danger", "Du behöver logga in för att spara favoriter", "");
+      setTimeout(function() {
+        ShowLoginPage();
+      }, 5000);
+      
+          }
+    
   });
-
+  
   $(".nav-link.shoppingcart").click(function () {
-    ShowShoppingcartPage();
+    handleNavigationClick("view-shoppingcart");
   });
 
-//Product page
-$(document).on('click', '.show-product', function() {
-  var productId = $(this).data('product-id');
-  ShowProductPage(productId);
-});
-
-
-//Dropdown-logged out
-$(".nav-item.dropdown .dropdown-menu .sign-up").click(function () {
-  //if (!signedIn) {
-  //  ShowRegisterPage();
- // }
- ShowSignUpPage();
+  $(".nav-item.dropdown .dropdown-menu .sign-up").click(function () {
+    handleNavigationClick("view-sign-up");
 });
 
 $(".nav-item.dropdown .dropdown-menu .login").click(function () {
- // if (!signedIn) {
- //   ShowLoginPage();
- // }
- ShowLoginPage();
+    handleNavigationClick("view-login");
 });
 
 //Dropdown-logged in
 $(".nav-item.dropdown .dropdown-menu .orders").click(function () {
-  ShowOrdersPage();
+    handleNavigationClick("view-orders");
 });
 
 $(".nav-item.dropdown .dropdown-menu .returns").click(function () {
-  ShowReturnsPage();
+    handleNavigationClick("view-returns");
 });
 
 $(".nav-item.dropdown .dropdown-menu .profileinfo").click(function () {
-  ShowProfileinfoPage();
+    handleNavigationClick("view-profileinfo");
 });
 
 $(".nav-item.dropdown .dropdown-menu .settings").click(function () {
-  ShowSettingsPage();
+    handleNavigationClick("view-settings");
 });
 
 $(".nav-item.dropdown .dropdown-menu .logout").click(function () {
-  ShowLogoutPage();
+    handleNavigationClick("view-logout");
 });
 
 //Dropdown Admin
 $(".nav-item.dropdown .dropdown-menu .adminOrders").click(function () {
-  ShowAdminOrdersPage();
+    handleNavigationClick("view-adminOrders");
 });
 
 $(".nav-item.dropdown .dropdown-menu .adminReturns").click(function () {
-  ShowAdminReturnsPage();
+    handleNavigationClick("view-adminReturns");
 });
 
-$(".nav-item.dropdown .dropdown-menu .settings").click(function () { //Behövs ej?
-  ShowSettingsPage();
-});
-
-$(".nav-item.dropdown .dropdown-menu .logout").click(function () { //Behövs ej? 
-  ShowLogoutPage();
-});
-
-//FOOTER-LINKS
+//Footer
 $(".footer-link.shippingReturns").click(function () {
-  ShowQuestionsPage();
-  ShowQuestionsShippingAndReturnsPage();
+  handleNavigationClick("view-questions");
 });
 
 $(".footer-link.questions").click(function () {
-  ShowQuestionsPage();
+  handleNavigationClick("view-questions");
 });
 
 $(".footer-link.buying").click(function () {
-  ShowQuestionsPage();
-  ShowQuestionsBuyingPage();
+  handleNavigationClick("view-questions");
 });
 
 $(".footer-link.selling").click(function () {
-  ShowQuestionsPage();
-  ShowQuestionsSellingPage();
+  handleNavigationClick("view-questions");
 });
 
 $(".footer-link.payment").click(function () {
-  ShowQuestionsPage();
-  ShowQuestionsPaymentPage();
+  handleNavigationClick("view-questions");
 });
 
 $(".footer-link.collecting").click(function () {
-  ShowQuestionsPage();
-  ShowQuestionsCollectingPage();
+  handleNavigationClick("view-questions");
 });
 
-//SHOPPING-CART and CHECKOUT
-$(document).on("click", "#checkout-button", function() {
-  ShowCheckoutPage();
+
+//The function that listens to if the user presses the back-arrow or going forward-arrow. 
+  window.addEventListener("popstate", function (event) {
+    if (event.state) {
+      const { productId, viewId } = event.state;
+      loadView(viewId, productId);
+    
+    }
+   
+  });
+
+//PURCHASE
+$(document).on("click", ".btn.btn-outline-dark", function() {
+ if (signedIn) {
+  ShowFavoritesPage()
+ } else {
+  showAlert("danger", "Du behöver logga in för att spara favoriter", "");
+  setTimeout(function() {
+    ShowLoginPage();
+  }, 5000);
+  
+ }
 });
+
 
 });
 
