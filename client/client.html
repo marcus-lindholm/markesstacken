@@ -13,66 +13,6 @@
 
 </head>
 <body>
-  <!-- <div class="modal fade" id="editCarModal" tabindex="-1" role="dialog" aria-labelledby="editCarModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editCarModalLabel">Edit Car</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="editCarForm">
-                    <div class="form-group">
-                        <label for="editMake">Make</label>
-                        <input type="text" class="form-control" id="editMake" placeholder="Enter make">
-                    </div>
-                    <div class="form-group">
-                        <label for="editModel">Model</label>
-                        <input type="text" class="form-control" id="editModel" placeholder="Enter model">
-                    </div>
-                    <div class="form-group">
-                      <label for="editUser">User_id</label>
-                      <input type="text" class="form-control" id="editUser" placeholder="Enter user_id">
-                    </div>
-
-
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </form>
-            </div>
-        </div>
-    </div>
-  </div>
-
-  <div class="modal fade" id="addCarModal" tabindex="-1" role="dialog" aria-labelledby="addCarModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addCarModalLabel">Add Car</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form id="addCarForm">
-            <div class="form-group">
-              <label for="addMake">Make</label>
-              <input type="text" class="form-control" id="addMake" placeholder="Enter make">
-            </div>
-            <div class="form-group">
-              <label for="addModel">Model</label>
-              <input type="text" class="form-control" id="addModel" placeholder="Enter model">
-            </div>
-  
-            <button type="submit" class="btn btn-primary">Add Car</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div> -->
-  
-
  <!--NAVBAR-SECTION-->
     <nav class="navbar navbar-expand-lg navbar-light">
         
@@ -580,10 +520,26 @@
     </script>
 
 
-    <!--VIEW-PURCHASE-DONE-->
-    <script id="view-purchase-done" type="text/html">
-      <h1>View-Purchase-Done</h1>
+      <!--VIEW-ORDER-CONFIRMATION-->
+      <script id="view-order-confirmation" type="text/html">    
+        <div class="confirmation-container">
+          <div class="confirmation-header">
+              <h2>Tack för din order! </h2>
+              <h5>En orderbekräftelse har nu skickats till din mail. </h5> 
+          </div>
+          <div class="confirmation-details">
+              <p><strong>Ordernummer:</strong> 00000</p>
+              <p><strong>Namn:</strong> John Doe</p>
+              <p><strong>Datum:</strong> <span id="currentDate"></span></p>
+              <p><strong>Email:</strong> johndoe@example.com</p>
+             
+          </div>
+      
+          <p>Vi skickar ett mail när ordern går att hämta ut.</p>
+          
+      </div>
     </script>
+    
 
      <!--VIEW-FAVORITES-->
      <script id="view-favorites" type="text/html">

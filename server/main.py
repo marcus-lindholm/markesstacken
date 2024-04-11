@@ -22,6 +22,11 @@ bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 db = SQLAlchemy(app)
 
+wishlist = db.Table('wishlist',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('product_id', db.Integer, db.ForeignKey('product.id'), primary_key=True)
+)
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, nullable=False)
@@ -29,43 +34,42 @@ class User(db.Model):
     lastName = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, default=False, nullable=True)
     password_hash = db.Column(db.String, nullable=False)
-    shoppingcart_id = db.Column(db.Integer, db.ForeignKey('shopping_cart.id'), nullable=True)
+    shoppingcart_id = db.Column(db.Integer, db.ForeignKey('shopping_cart.id'), nullable=False)
     shoppingcart = db.relationship('ShoppingCart', backref='shopping_cart', lazy=True, uselist=False)
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=True)
     orders = db.relationship('Order', backref='order_id', lazy=True, uselist=True)
+    wishlist = db.relationship('Product', secondary=wishlist, lazy='subquery',
+        backref=db.backref('users', lazy=True))
     
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+        self.shoppingcart = ShoppingCart()  # Create a ShoppingCart instance for every new User
+
+    def check_if_in_wishlist(self, product):
+        if product in self.wishlist:
+            return product in self.wishlist
+
+    def add_to_wishlist(self, product):
+        if not self.check_if_in_wishlist(product):
+            self.wishlist.append(product)
+    
+    def remove_from_wishlist(self, product):
+        self.wishlist.remove(product)
 
     def __repr__(self):
         return f'<User {self.id}: {self.name} ({self.email})>'
 
     def serialize(self):
         return dict(id=self.id, firstName=self.firstName, lastName=self.lastName, email=self.email, is_admin=self.is_admin, 
-                    orders=[order.serialize() for order in self.orders] if self.orders else None, shoppingcart=self.shoppingcart.serialize() if self.shoppingcart else None)
+                    orders=[order.serialize() for order in self.orders] if self.orders else None, shoppingcart=self.shoppingcart.serialize(), wishlist=[product.serialize() for product in self.wishlist] if self.wishlist else None)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password).decode('utf8')
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-    
-    
 
-# class Subcategory(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String, nullable=False)
-#     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
-#     category = db.relationship('Category', backref='subcategories', lazy=True)
-    
 
-#     def __repr__(self):
-#         return f'<Subcategory {self.id}: {self.name}: {self.category}>'
-    
-#     def serialize(self):
-#         return dict(
-#             id=self.id, 
-#             name=self.name, 
-#             category=self.category.serialize() if self.category else None
-#         )
 
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -170,13 +174,17 @@ with app.app_context():
     category2 = Category(name='Övrigt')
     db.session.add(category1)
     db.session.add(category2)
+    
     product1 = Product(name='UK 2022', price=30, quantity=100, description='Märke från UK 2022. Jättefinmärke 10/10, Arian rekomenderar starkt. Rund cirkel typ som hjul eller ett ägg om man tittar på det rakt uppifrån.', category=category1, year = 2022, section = 'I-Sektionen', event = 'UK', organizer = 'CM', img = 'cm.jpeg')
     product2 = Product(name='Festivallen 1995', price=50, quantity=10, description='Märke från Festivallen 1995.', category=category2, year = 1995, section = 'Läk-Sektionen', event = 'FESTIVALLEN', organizer = 'MEDSEX', img = 'pub.jpeg')
     product3 = Product(name='Drat i spat 2022', price=25, quantity=40, description='Märke från Drat i spat 2022.', category=category2, year = 2022, section = 'I-Sektionen', event = 'DRAT I SPAT', organizer = 'CM', img = 'pub.jpeg')
     product4 = Product(name='Lemans 2023', price=40, quantity=10, description='Märke från Lemans 1995.', category=category2, year = 2023, section = 'M-Sektionen', event = 'LEMANS', organizer = 'FM', img = 'pub.jpeg')
     product5 = Product(name='VSR 2021', price=49, quantity=34, description='Märke från VSR 1995.', category=category2, year = 2021, section = 'Y-Sektionen', event = 'VSR', organizer = 'Y-SEX', img = 'pub.jpeg')
     product6 = Product(name='PALLEN 2020', price=19, quantity=5, description='Märke från Pallen 1995.', category=category2, year = 2020, section = 'LING-Sektionen', event = 'PALLEN', organizer = 'VILING', img = 'pub.jpeg')
-    product7 = Product(name='I-Kravallen 2022', price=999, quantity=1, description='Märke från I-Kravallen 2022.', category=category2, year = 2022, section = 'I-Sektionen', event = 'I-KRAVALLEN', organizer = 'KLASSFÖRÄLDRARNA', img = 'pub.jpeg')
+    product7 = Product(name='I-Kravallen 2022', price=999, quantity=1, description='Märke från I-Kravallen 2022.', category=category2, year = 2022, section = 'I-Sektionen', event = 'I-KRAVALLEN', organizer = 'KLASSFÖRÄLDRARNA', img = 'I-Kravallen 2022.png')
+    product8 = Product(name='Pengar & Piller 2023', price=9, quantity=27, description='Märke från Pengar & Piller 2023.', category=category2, year = 2023, section = 'I-Sektionen', event = 'Pengar & Piller', organizer = 'KLASSFÖRÄLDRARNA', img = 'Pengar & Piller 2023.png')
+    product9 = Product(name='Nolle-P Reunion 2023', price=19, quantity=27, description='Märke från Nolle-P Reunion 2023.', category=category2, year = 2023, section = 'I-Sektionen', event = 'Nolle-P Reunion', organizer = 'KLASSFÖRÄLDRARNA', img = 'Nolle-P Reunion 2023.png')
+    product10 = Product(name='Munchen Hoben 2022', price=19, quantity=27, description='Märke från Munchen Hoben 2022.', category=category2, year = 2022,  section = 'LINKTEK', event = 'Munchen Hoben', organizer = 'LINKTEK', img = 'Munchen hoben 2022.png')
 
     db.session.add(product1)
     db.session.add(product2)
@@ -185,21 +193,31 @@ with app.app_context():
     db.session.add(product5)
     db.session.add(product6)
     db.session.add(product7)
+    db.session.add(product8)
+    db.session.add(product9)
+    db.session.add(product10)
 
-    shoppingcart1 = ShoppingCart()
-    db.session.add(shoppingcart1)
+    #shoppingcart1 = ShoppingCart()
+    #db.session.add(shoppingcart1)
     cartitem1 = CartItem(quantity=2, product=product1, shoppingcart_id=1)
     cartitem2 = CartItem(quantity=3, product=product2, shoppingcart_id=1)
     db.session.add(cartitem1)
     db.session.add(cartitem2)
-    user1 = User(email='johndoe@mail.com', firstName='John', lastName='Doe', is_admin=False, shoppingcart_id=1)
+    cartitem3 = CartItem(quantity=2, product=product1, shoppingcart_id=2)
+    db.session.add(cartitem3)
+    user1 = User(email='johndoe@mail.com', firstName='John', lastName='Doe', is_admin=False)
+    user2 = User(email='rgn@gmail', firstName='Ragnar', lastName='Lothbrok', is_admin=False)
     user1.set_password('password')
+    user2.set_password('password')
     db.session.add(user1)
+    db.session.add(user2)
     payment1 = Payment(paymentDate=datetime.now(), paymentAmount=100.0)
     db.session.add(payment1)
-    order1 = Order(shoppingcart=shoppingcart1, payment=payment1)
-    db.session.add(order1)
-    user1.orders.append(order1)
+    user1.add_to_wishlist(product2)
+    user1.add_to_wishlist(product2)
+    #order1 = Order(shoppingcart=shoppingcart1, payment=payment1)
+    #db.session.add(order1)
+    #user1.orders.append(order1)
 
     admin_user = User(email = 'admin@markesstacken.se', firstName = 'Admin', lastName = 'Admin', is_admin = True, shoppingcart_id = None)
     admin_user.set_password('admin')
