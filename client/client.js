@@ -143,6 +143,7 @@ function populateFilterDropdowns(response) {
         events.push(product.event);
     }
   });
+
   response.forEach(function(product) {
     if (product.year !== null && !yearCheckboxesfilter.includes(product.year)) {
         yearCheckboxesfilter.push(product.year);
@@ -318,10 +319,36 @@ function ShowProductPage(productId) {
       </div>
       `;
       $(".container").html(productPageHTML);
-
     }
   });
 }
+
+function search() {
+  var input = document.getElementById('searchBar').value;
+  console.log(input); 
+populateSearch(input);
+}
+
+function populateSearch(searchInput) {
+      // Select all items within the product container
+      var items = document.getElementById('product-container').getElementsByClassName('col-md-4');
+
+      for (var i = 0; i < items.length; i++) {
+          // Get the product name within the current item
+          var productName = items[i].getElementsByClassName('card-title')[0].textContent.toLowerCase();
+
+          if (productName.includes(searchInput)) {
+            // Show the item by setting its display property to "block"
+            items[i].style.display = 'block';
+           
+        } else {
+            // Hide the item if it doesn't match the search input
+            items[i].style.display = 'none';
+  
+        }
+      }  
+}
+
 // Function to update the global filter lists based on checked/unchecked checkboxes
 function updateFilterList(containerId) {
   // Get the checked checkboxes and update the corresponding global filter list
