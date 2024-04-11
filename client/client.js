@@ -64,7 +64,7 @@ function ShowFavoritesPage() {
                         </button>
                     </div>
                 </div>
-                <button id="add-to-cart-btn${product.id}" data-product-id="${product.id}" onclick="addToShoppingCart(${product.id}, document.getElementById('quantity${product.id}').value, '${product.name}')" class="btn btn-light" style="width: 145px; margin: 5px 0;" ${product.quantity === 0 ? 'disabled' : ''}>Lägg i varukorg</button>
+                <button id="add-to-cart-btn${product.id}" data-product-id="${product.id}" onclick="addToShoppingCart(${product.id}, removeFromWishlist(${product.id}), document.getElementById('quantity${product.id}').value, '${product.name}')" class="btn btn-light" style="width: 145px; margin: 5px 0;" ${product.quantity === 0 ? 'disabled' : ''}>Lägg i varukorg</button>
                 <button id="remove-from-wishlist${product.id}" class="btn btn-secondary" data-product-id="${product.id}" onclick="removeFromWishlist(${product.id})">Ta bort från önskelista</button>              </div>
             </div>
           </div>
@@ -83,7 +83,6 @@ function ShowFavoritesPage() {
 // Function to show the purchase page
 
 function addToWishlist(productId, productName) {
-  console.log("Adding product to wishlist:", productId); // Remove later
   $.ajax({
     url: host + "/wishlist", 
     type: "POST",
@@ -93,33 +92,30 @@ function addToWishlist(productId, productName) {
       product_id: productId,
     }),
     success: function (response) {
-      displayMessage = "Product: " + productName + " was added to your wishlist.";
-      showAlert("success", "Added to wishlist:", displayMessage);
+      displayMessage = "Produkt: " + productName + ".";
+      showAlert("success", "Tillagd i önskelistan: ", displayMessage);
     },
     error: function (error) {
-      displayMessage = "Product: " + productName + " was not added to your wishlist.";
-      showAlert("warning", displayMessage, "Please try again later.");
-      console.error("Error adding product to wishlist:", error); // Remove later
+      displayMessage = "Produkt: " + productName + " blev inte tillagd i önskelistan.";
+      showAlert("warning", displayMessage, "Försök igen.");
     },
   });
 }
 
 function removeFromWishlist(productId) {
-  console.log("Removing product from wishlist:", productId); // Remove later
   $.ajax({
     url: host + "/wishlist/" + productId, 
     type: "DELETE",
     contentType: "application/json",
     headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
     success: function (response) {
-      displayMessage = "Product was removed from your wishlist.";
-      showAlert("success", "Removed from wishlist:", displayMessage);
+      displayMessage = "Produkten togs bort från önskelistan."; 
+      showAlert("success", displayMessage, "");
       ShowFavoritesPage(); // Reload the favorites page
     },
     error: function (error) {
-      displayMessage = "Product was not removed from your wishlist.";
-      showAlert("warning", displayMessage, "Please try again later.");
-      console.error("Error removing product from wishlist:", error); // Remove later
+      displayMessage = "Produkten gick inte att ta bort från önskelistan.";
+      showAlert("warning", displayMessage, "Försök igen.");
     }
   });
 }
@@ -127,8 +123,6 @@ function removeFromWishlist(productId) {
 
 function addToShoppingCart(productId, orderQuantity, productName) {
   if (orderQuantity > 0) {
-    console.log("Adding product to cart:", productId, orderQuantity); //Remove later
-    console.log("USER SC " + shoppingcartID);                         //Remove later
     $.ajax({
       url: host + "/cartitems",
       type: "POST",
@@ -140,20 +134,39 @@ function addToShoppingCart(productId, orderQuantity, productName) {
         shoppingcart_id: shoppingcartID
       }),
       success: function (response) {
-        displayMessage = "Product: " + productName + " x " + orderQuantity + ".";
-        showAlert("success", "Added to cart:", displayMessage);
+        displayMessage = "Produkt: " + productName + " x " + orderQuantity + ".";
+        showAlert("success", "Tillagd i varukorgen:", displayMessage);
       },
       error: function (error) {
-        displayMessage = "Product: " + productName + " x " + orderQuantity + " was not added correctly.";
-        showAlert("warning", displayMessage, "Please try again later.");
-        console.error("Error adding product to cart:", error); // Remove later
+        displayMessage = "Produkt: " + productName + " x " + orderQuantity + " blev inte tillagd i varukorgen.";
+        showAlert("warning", displayMessage, "Försök igen.");
+        if (error.status == 400) {
+          showAlert("warning", "Ej tillräckligt många i lager.", "Minska antalet!");
+        }
       },
     });
   } else {
-    showAlert("warning", "The current quantity is not accepted.", "Try increasing the quantity!");
+    showAlert("warning", "Den nuvarande kvantiteten är inte tillåten.", "Var snäll och minska antalet!");
   }
 }
 
+function removeFromShoppingCart(productId) {
+  $.ajax({
+    url: host + "/cartitems/" + productId, 
+    type: "DELETE",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    success: function (response) {
+      displayMessage = "Produkten togs bort från varukorgen.";
+      showAlert("success", displayMessage, "");
+      ShowShoppingcartPage(); // Reload the shoppingcart page
+    },
+    error: function (error) {
+      displayMessage = "Produkten gick inte att ta bort från varukorgen.";
+      showAlert("warning", displayMessage, "Försök igen.");
+    }
+  });
+}
 
 function ShowPurchasePage() {
   $(".container").html($("#view-purchase").html());
@@ -531,9 +544,126 @@ function addProduct(){
   });
 }
 
-//SHOPPINGCART-PAGE
 function ShowShoppingcartPage() {
   $(".container").html($("#view-shoppingcart").html());
+  $.ajax({
+    url: host + "/myShoppingCart", 
+    type: "GET",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    success: function (response) {
+      console.log(response.cartitems);
+      console.log(response.cartitems[0].product.id);
+      let totalPrice = 0;
+      let htmlString = '';
+      response.cartitems.forEach(item => {
+        totalPrice += item.product.price * item.quantity;
+        htmlString += `
+          <div class="col-lg-4 col-md-6 mb-4" style="display: inline;">
+            <div class="card shoppingcart-item h-100">
+              <img class="card-img-top mx-auto d-block show-product" src="/product_images/${item.product.img}" alt="${item.product.name}" data-product-id="${item.product.id}"/>
+              <div class="card-body">
+                <h5 class="card-title show-product" data-product-id="${item.product.id}">${item.product.name}</h5>
+                <p class="card-text">${item.product.description}</p>
+                <p class="card-text"> ${item.product.price} kr</p>
+                <div class="d-flex mb-3 col-2">
+                    <label for="quantity" class="me-2"></label>
+                    <div class="input-group">
+                        <button class="btn btn-sm btn-outline-dark" data-product-id="${item.product.id}" onclick="this.parentNode.querySelector('input[type=number]').stepDown(), decreaseQuantity(${item.product.id}, ${item.quantity})" id="minus-button${item.product.id}">
+                            <i class="fas fa-minus"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
+                                <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
+                            </svg>
+                        </button>
+                        <input type="number" id="quantity${item.product.id}" class="form-control" value="${item.quantity}" min="1" max="${item.product.quantity}">
+                        <button class="btn btn-sm btn-outline-dark" data-product-id="${item.product.id}" onclick="this.parentNode.querySelector('input[type=number]').stepUp(), increaseQuantity(${item.product.id}, ${item.product.quantity}, ${item.quantity})" id="plus-button${item.product.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                            </svg>
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>`;
+      });
+      htmlString += `totalprice: ${totalPrice}`;
+      $(".container").append(htmlString);
+    }
+  });
+}
+
+function increaseQuantity(productId, maxQuantity, productQuantity) {
+  console.log("maxQ: " + maxQuantity + " prodQ: " + productQuantity);
+  if (maxQuantity > productQuantity) {
+     $.ajax({
+    url: host + "/myShoppingCart", 
+    type: "GET",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    success: function (response) {
+      response.cartitems.forEach(item => {
+        if (item.product.id === productId) {
+          $.ajax({
+            url: host + "/cartitems/" + item.id, 
+            type: "PUT",
+            contentType: "application/json",
+            headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+            data: JSON.stringify({
+              quantity: item.quantity + 1
+            }),
+            success: function (response) {
+              console.log(response);
+            }
+          });
+        }
+          ShowShoppingcartPage();
+      });
+    }
+  });
+  } else {
+    ShowShoppingcartPage();
+    displayMessage = "Ej tillräckligt många varor i lager.";
+    showAlert("warning", displayMessage, "");
+  }
+
+}
+
+function decreaseQuantity(productId, productQuantity) {
+  console.log("decreasing Q, prodID: " + productId);
+  if (productQuantity > 1) {
+    $.ajax({
+      url: host + "/myShoppingCart", 
+      type: "GET",
+      contentType: "application/json",
+      headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+      success: function (response) {
+        response.cartitems.forEach(item => {
+          if (item.product.id === productId) {
+            $.ajax({
+              url: host + "/cartitems/" + item.id, 
+              type: "PUT",
+              contentType: "application/json",
+              headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+              data: JSON.stringify({
+                quantity: item.quantity - 1
+              }),
+              success: function (response) {
+                console.log(response);
+              }
+            });
+          }
+          ShowShoppingcartPage();
+        });
+      }
+    });
+  } else {
+    removeFromShoppingCart(productId);
+    ShowShoppingcartPage();
+    displayMessage = productId + " togs bort från varukorgen."
+    showAlert("success", displayMessage, "");
+  } 
 }
 
 //-------------------------------------------------
@@ -638,18 +768,6 @@ function showAlert(type, heading, message) {
   setTimeout(function() {
     $(".alert").alert('close');
   }, 5000);
-}
-
-//-------------------------------------------------
-//FUNCTIONS
-function refreshCarList() {
-
-  $(".car-list").empty();
-
-  // Display each car in the updated list
-  displayCarList();
-
-  showAlert("success", "Car List Updated!", "The car list has been successfully updated.");
 }
 
 //------------------------------------------------------
