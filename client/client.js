@@ -627,7 +627,7 @@ function ShowShoppingcartPage() {
   });
 }
 
-function increaseQuantity(productId, maxQuantity, productQuantity) {
+function increaseQuantity(productId, maxQuantity, productQuantity) { //lägg till vänta så att hemsidan inte uppdateras för snabbt
   console.log("maxQ: " + maxQuantity + " prodQ: " + productQuantity);
   if (maxQuantity > productQuantity) {
      $.ajax({
@@ -651,8 +651,8 @@ function increaseQuantity(productId, maxQuantity, productQuantity) {
             }
           });
         }
-          ShowShoppingcartPage();
       });
+      ShowShoppingcartPage();
     }
   });
   } else {
@@ -663,7 +663,7 @@ function increaseQuantity(productId, maxQuantity, productQuantity) {
 
 }
 
-function decreaseQuantity(productId, productQuantity) {
+function decreaseQuantity(productId, productQuantity) { //lägg till vänta så att hemsidan inte uppdateras för snabbt
   console.log("decreasing Q, prodID: " + productId);
   if (productQuantity > 1) {
     $.ajax({
@@ -687,9 +687,9 @@ function decreaseQuantity(productId, productQuantity) {
               }
             });
           }
-          ShowShoppingcartPage();
         });
-      }
+        ShowShoppingcartPage();
+      } 
     });
   } else {
     removeFromShoppingCart(productId);
@@ -865,7 +865,6 @@ function checkLoggedIn() {
   const sellButton = document.getElementById('sellButton');
 
   if (signedIn == true) {
-
     loggedInDropdown.style.display = 'block';
     loggedOutDropdown.style.display = 'none';
     adminDropdown.style.display = 'none'; 
@@ -887,6 +886,8 @@ function checkLoggedIn() {
         console.log("user GETIDENTITY", user); // Remove later
       
         if (user.user.is_admin === false) {
+          shoppingcartID = user.user.shoppingcart.id;
+          userID = user.user.id;
           loggedInDropdown.style.display = 'block';
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'none';
@@ -894,6 +895,8 @@ function checkLoggedIn() {
           
           console.log("admin false", user.user.is_admin);
         } else {
+          shoppingcartID = user.user.shoppingcart.id;
+          userID = user.user.id;
           loggedInDropdown.style.display = 'none';
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'block'; 
