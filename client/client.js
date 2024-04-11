@@ -6,6 +6,7 @@ var yearCheckboxesfilter = [];
 var sectionCheckboxesfilter = [];
 var organizersCheckboxesfilter = [];
 var eventCheckboxesfilter = [];
+var loggedIn = false;
 
 
 
@@ -143,6 +144,7 @@ function populateFilterDropdowns(response) {
         events.push(product.event);
     }
   });
+
   response.forEach(function(product) {
     if (product.year !== null && !yearCheckboxesfilter.includes(product.year)) {
         yearCheckboxesfilter.push(product.year);
@@ -318,10 +320,36 @@ function ShowProductPage(productId) {
       </div>
       `;
       $(".container").html(productPageHTML);
-
     }
   });
 }
+
+function search() {
+  var input = document.getElementById('searchBar').value;
+  console.log(input); 
+populateSearch(input);
+}
+
+function populateSearch(searchInput) {
+      // Select all items within the product container
+      var items = document.getElementById('product-container').getElementsByClassName('col-md-4');
+
+      for (var i = 0; i < items.length; i++) {
+          // Get the product name within the current item
+          var productName = items[i].getElementsByClassName('card-title')[0].textContent.toLowerCase();
+
+          if (productName.includes(searchInput)) {
+            // Show the item by setting its display property to "block"
+            items[i].style.display = 'block';
+           
+        } else {
+            // Hide the item if it doesn't match the search input
+            items[i].style.display = 'none';
+  
+        }
+      }  
+}
+
 // Function to update the global filter lists based on checked/unchecked checkboxes
 function updateFilterList(containerId) {
   // Get the checked checkboxes and update the corresponding global filter list
@@ -590,16 +618,18 @@ function ShowSignUpPage() {
 function checkLoggedIn() {
   auth = JSON.parse(sessionStorage.getItem('auth'));
   signedIn = auth !== null;
-
+  loggedIn = signedIn;
   const loggedInDropdown = document.getElementById('loggedInDropdown');
   const loggedOutDropdown = document.getElementById('loggedOutDropdown');
   const adminDropdown = document.getElementById('adminDropdown');
+  const sellButton = document.getElementById('sellButton');
 
   if (signedIn == true) {
 
     loggedInDropdown.style.display = 'block';
     loggedOutDropdown.style.display = 'none';
     adminDropdown.style.display = 'none'; 
+    sellButton.style.display='block';
 
     console.log("auth.access", auth.token);
 
@@ -620,11 +650,14 @@ function checkLoggedIn() {
           loggedInDropdown.style.display = 'block';
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'none';
+          sellButton.style.display='block';
+          
           console.log("admin false", user.user.is_admin);
         } else {
           loggedInDropdown.style.display = 'none';
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'block'; 
+          sellButton.style.display='none';
           console.log("admin true", user.user.is_admin);
         }
       },
@@ -639,6 +672,7 @@ function checkLoggedIn() {
     loggedInDropdown.style.display = 'none';
     loggedOutDropdown.style.display = 'block';
     adminDropdown.style.display = 'none'; 
+    sellButton.style.display='none';
   }
 }
  
@@ -842,7 +876,16 @@ $(document).on('click', '.show-product', function() {
   });
   
   $(".nav-link.favorites").click(function () {
-    handleNavigationClick("view-favorites");
+    if (loggedIn) {
+      ShowFavoritesPage();
+    } else {
+      showAlert("danger", "Du behöver logga in för att spara favoriter", "");
+      setTimeout(function() {
+        ShowLoginPage();
+      }, 5000);
+      
+          }
+    
   });
   
   $(".nav-link.shoppingcart").click(function () {
@@ -922,6 +965,20 @@ $(".footer-link.collecting").click(function () {
     }
    
   });
+
+//PURCHASE
+$(document).on("click", ".btn.btn-outline-dark", function() {
+ if (signedIn) {
+  ShowFavoritesPage()
+ } else {
+  showAlert("danger", "Du behöver logga in för att spara favoriter", "");
+  setTimeout(function() {
+    ShowLoginPage();
+  }, 5000);
+  
+ }
+});
+
 
 });
 
