@@ -709,50 +709,109 @@ function ShowLogoutPage() {
 //CLICK-EVENTS
 
 $(document).ready(function () {
+  
   checkLoggedIn();
   ShowHomePage();
   
    //------------------------------------------
   // Navigation click event handlers
 
-  function loadView(viewId) {
-    switch (viewId) {
-      case "view-home":
-        ShowHomePage();
-        break;
-      case "view-aboutus":
-        ShowAboutusPage();
-        break; 
-      case "view-contact":
-        ShowContactPage();
-        break;
-      case "view-purchase":
-        ShowPurchasePage();
-        break;
-      case "view-sell":
-        ShowSellPage();
-        break;
-      case "view-logout":
-        ShowLogoutPage();
-        break;
-      case "view-favorites":
-        ShowFavoritesPage();
-        break;
-      case "view-shoppingcart":
-        ShowShoppingcartPage();
-        break;
-      default:
-        console.error("Unknown view:", viewName);
+  function loadView(viewId, productId) {
+      switch (viewId) {
+        case "view-home":
+          ShowHomePage();
+          break;
+        case "view-aboutus":
+          ShowAboutusPage();
+          break; 
+        case "view-contact":
+          ShowContactPage();
+          break;
+        case "view-purchase":
+          ShowPurchasePage();
+          break;
+        case "view-sell":
+          ShowSellPage();
+          break;
+        case "view-logout":
+          ShowLogoutPage();
+          break;
+        case "view-favorites":
+          ShowFavoritesPage();
+          break;
+        case "view-shoppingcart":
+          ShowShoppingcartPage();
+          break;
+        case "view-sign-up":
+          ShowSignUpPage();
+          break;
+        case "view-login":
+          ShowLoginPage();
+          break;
+        case "view-orderspage":
+          ShowOrdersPage();
+          break;
+        case "view-returns":
+          ShowReturnsPage();
+          break;
+        case "view-profileInfo":
+          ShowProfileInfoPage();
+          break;
+        case "view-settings":
+          ShowSettingsPage();
+          break;
+        case "view-logout":
+          ShowLogoutPage();
+          break;
+        case "view-adminOrders":
+          ShowAdminOrdersPage();
+          break;
+        case "view-adminReturns":
+          ShowAdminReturnsPage();
+          break;
+        case "view-questions":
+          ShowQuestionsPage();
+          break; 
+        case "view-checkout":
+          ShowCheckoutPage();
+          break; 
+        case "view-product":
+          ShowProductPage(productId);
+          break;
+        default:
+          console.error("Unknown view:", viewId);
     }
-
   }
+
+
+ 
   //This function stores the navigationClicks i.e. the different views the user has "visited" and enables for the user to go back and 
   //forward in the browser-history using the arrows
-  function handleNavigationClick(viewId) {
-   
-    loadView(viewId);
-    history.pushState({ viewId: viewId }, "", "");
+
+let previousViewId = null;
+let previousProductId = null;
+
+function handleNavigationClick(viewId, productId = null) {  
+  if (previousViewId !== viewId || previousProductId !== productId) {
+    loadView(viewId, productId);
+    previousViewId = viewId;
+    previousProductId = productId;
+    history.pushState({ viewId: viewId, productId: productId }, "", "");
   }
+}
+
+
+$(document).on("click", "#checkout-button", function() {
+    handleNavigationClick("view-checkout");
+ });
+
+// Click event handler for product links
+$(document).on('click', '.show-product', function() {
+  var productId = $(this).data('product-id');
+  handleNavigationClick("view-product", productId);
+});
+
+
 
   //NAVBAR LINKS CLICK
   $(".navbar-brand.logo").click(function () {
@@ -786,11 +845,75 @@ $(document).ready(function () {
   $(".nav-link.shoppingcart").click(function () {
     handleNavigationClick("view-shoppingcart");
   });
-  
 
+  $(".nav-item.dropdown .dropdown-menu .sign-up").click(function () {
+    handleNavigationClick("view-sign-up");
+});
+
+$(".nav-item.dropdown .dropdown-menu .login").click(function () {
+    handleNavigationClick("view-login");
+});
+
+//Dropdown-logged in
+$(".nav-item.dropdown .dropdown-menu .orders").click(function () {
+    handleNavigationClick("view-orders");
+});
+
+$(".nav-item.dropdown .dropdown-menu .returns").click(function () {
+    handleNavigationClick("view-returns");
+});
+
+$(".nav-item.dropdown .dropdown-menu .profileinfo").click(function () {
+    handleNavigationClick("view-profileinfo");
+});
+
+$(".nav-item.dropdown .dropdown-menu .settings").click(function () {
+    handleNavigationClick("view-settings");
+});
+
+$(".nav-item.dropdown .dropdown-menu .logout").click(function () {
+    handleNavigationClick("view-logout");
+});
+
+//Dropdown Admin
+$(".nav-item.dropdown .dropdown-menu .adminOrders").click(function () {
+    handleNavigationClick("view-adminOrders");
+});
+
+$(".nav-item.dropdown .dropdown-menu .adminReturns").click(function () {
+    handleNavigationClick("view-adminReturns");
+});
+
+//Footer
+$(".footer-link.shippingReturns").click(function () {
+  handleNavigationClick("view-questions");
+});
+
+$(".footer-link.questions").click(function () {
+  handleNavigationClick("view-questions");
+});
+
+$(".footer-link.buying").click(function () {
+  handleNavigationClick("view-questions");
+});
+
+$(".footer-link.selling").click(function () {
+  handleNavigationClick("view-questions");
+});
+
+$(".footer-link.payment").click(function () {
+  handleNavigationClick("view-questions");
+});
+
+$(".footer-link.collecting").click(function () {
+  handleNavigationClick("view-questions");
+});
+
+
+//The function that listens to if the user presses the back-arrow or going forward-arrow. 
   window.addEventListener("popstate", function (event) {
-    if (event.state && event.state.viewId) {
-      loadView(event.state.viewId);
+    if (event.state && event.state.viewId || event.state.productId) {
+      loadView(event.state.viewId, event.state.productId);
     }
   });
 
@@ -832,93 +955,93 @@ $(document).ready(function () {
   // });
 
 //Product page
-$(document).on('click', '.show-product', function() {
-  var productId = $(this).data('product-id');
-  ShowProductPage(productId);
- });
+// $(document).on('click', '.show-product', function() {
+//   var productId = $(this).data('product-id');
+//   ShowProductPage(productId);
+//  });
 
 
 //Dropdown-logged out
-$(".nav-item.dropdown .dropdown-menu .sign-up").click(function () {
- ShowSignUpPage();
-});
+// $(".nav-item.dropdown .dropdown-menu .sign-up").click(function () {
+//  ShowSignUpPage();
+// });
 
-$(".nav-item.dropdown .dropdown-menu .login").click(function () {
- ShowLoginPage();
-});
+// $(".nav-item.dropdown .dropdown-menu .login").click(function () {
+//  ShowLoginPage();
+// });
 
 //Dropdown-logged in
-$(".nav-item.dropdown .dropdown-menu .orders").click(function () {
-  ShowOrdersPage();
-});
+// $(".nav-item.dropdown .dropdown-menu .orders").click(function () {
+//   ShowOrdersPage();
+// });
 
-$(".nav-item.dropdown .dropdown-menu .returns").click(function () {
-  ShowReturnsPage();
-});
+// $(".nav-item.dropdown .dropdown-menu .returns").click(function () {
+//   ShowReturnsPage();
+// });
 
-$(".nav-item.dropdown .dropdown-menu .profileinfo").click(function () {
-  ShowProfileinfoPage();
-});
+// $(".nav-item.dropdown .dropdown-menu .profileinfo").click(function () {
+//   ShowProfileinfoPage();
+// });
 
-$(".nav-item.dropdown .dropdown-menu .settings").click(function () {
-  ShowSettingsPage();
-});
+// $(".nav-item.dropdown .dropdown-menu .settings").click(function () {
+//   ShowSettingsPage();
+// });
 
-$(".nav-item.dropdown .dropdown-menu .logout").click(function () {
-  ShowLogoutPage();
-});
+// $(".nav-item.dropdown .dropdown-menu .logout").click(function () {
+//   ShowLogoutPage();
+// });
 
 //Dropdown Admin
-$(".nav-item.dropdown .dropdown-menu .adminOrders").click(function () {
-  ShowAdminOrdersPage();
-});
+// $(".nav-item.dropdown .dropdown-menu .adminOrders").click(function () {
+//   ShowAdminOrdersPage();
+// });
 
-$(".nav-item.dropdown .dropdown-menu .adminReturns").click(function () {
-  ShowAdminReturnsPage();
-});
+// $(".nav-item.dropdown .dropdown-menu .adminReturns").click(function () {
+//   ShowAdminReturnsPage();
+// });
 
-$(".nav-item.dropdown .dropdown-menu .settings").click(function () { //Behövs ej?
-  ShowSettingsPage();
-});
+// $(".nav-item.dropdown .dropdown-menu .settings").click(function () { //Behövs ej?
+//   ShowSettingsPage();
+// });
 
-$(".nav-item.dropdown .dropdown-menu .logout").click(function () { //Behövs ej? 
-  ShowLogoutPage();
-});
+// $(".nav-item.dropdown .dropdown-menu .logout").click(function () { //Behövs ej? 
+//   ShowLogoutPage();
+// });
 
 //FOOTER-LINKS
-$(".footer-link.shippingReturns").click(function () {
-  ShowQuestionsPage();
-  ShowQuestionsShippingAndReturnsPage();
-});
+// $(".footer-link.shippingReturns").click(function () {
+//   ShowQuestionsPage();
+//   ShowQuestionsShippingAndReturnsPage();
+// });
 
-$(".footer-link.questions").click(function () {
-  ShowQuestionsPage();
-});
+// $(".footer-link.questions").click(function () {
+//   ShowQuestionsPage();
+// });
 
-$(".footer-link.buying").click(function () {
-  ShowQuestionsPage();
-  ShowQuestionsBuyingPage();
-});
+// $(".footer-link.buying").click(function () {
+//   ShowQuestionsPage();
+//   ShowQuestionsBuyingPage();
+// });
 
-$(".footer-link.selling").click(function () {
-  ShowQuestionsPage();
-  ShowQuestionsSellingPage();
-});
+// $(".footer-link.selling").click(function () {
+//   ShowQuestionsPage();
+//   ShowQuestionsSellingPage();
+// });
 
-$(".footer-link.payment").click(function () {
-  ShowQuestionsPage();
-  ShowQuestionsPaymentPage();
-});
+// $(".footer-link.payment").click(function () {
+//   ShowQuestionsPage();
+//   ShowQuestionsPaymentPage();
+// });
 
-$(".footer-link.collecting").click(function () {
-  ShowQuestionsPage();
-  ShowQuestionsCollectingPage();
-});
+// $(".footer-link.collecting").click(function () {
+//   ShowQuestionsPage();
+//   ShowQuestionsCollectingPage();
+// });
 
 //SHOPPING-CART to CHECKOUT
-$(document).on("click", "#checkout-button", function() {
-  ShowCheckoutPage();
-});
+// $(document).on("click", "#checkout-button", function() {
+//   ShowCheckoutPage();
+// });
 
 });
 
