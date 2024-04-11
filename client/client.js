@@ -6,6 +6,7 @@ var yearCheckboxesfilter = [];
 var sectionCheckboxesfilter = [];
 var organizersCheckboxesfilter = [];
 var eventCheckboxesfilter = [];
+var loggedIn = false;
 
 
 //drop-down for profile 
@@ -589,7 +590,7 @@ function ShowSignUpPage() {
 function checkLoggedIn() {
   auth = JSON.parse(sessionStorage.getItem('auth'));
   signedIn = auth !== null;
-
+  loggedIn = signedIn;
   const loggedInDropdown = document.getElementById('loggedInDropdown');
   const loggedOutDropdown = document.getElementById('loggedOutDropdown');
   const adminDropdown = document.getElementById('adminDropdown');
@@ -622,6 +623,7 @@ function checkLoggedIn() {
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'none';
           sellButton.style.display='block';
+          
           console.log("admin false", user.user.is_admin);
         } else {
           loggedInDropdown.style.display = 'none';
@@ -749,7 +751,16 @@ $(document).ready(function () {
   });
 
   $(".nav-link.favorites").click(function () {
-    ShowFavoritesPage();
+    if (loggedIn) {
+      ShowFavoritesPage();
+    } else {
+      showAlert("danger", "Du behöver logga in för att spara favoriter", "");
+      setTimeout(function() {
+        ShowLoginPage();
+      }, 5000);
+      
+          }
+    
   });
 
   $(".nav-link.shoppingcart").click(function () {
@@ -850,6 +861,20 @@ $(".footer-link.collecting").click(function () {
 $(document).on("click", "#checkout-button", function() {
   ShowCheckoutPage();
 });
+
+//PURCHASE
+$(document).on("click", ".btn.btn-outline-dark", function() {
+ if (signedIn) {
+  ShowFavoritesPage()
+ } else {
+  showAlert("danger", "Du behöver logga in för att spara favoriter", "");
+  setTimeout(function() {
+    ShowLoginPage();
+  }, 5000);
+  
+ }
+});
+
 
 });
 
