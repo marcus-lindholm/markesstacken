@@ -8,6 +8,7 @@ var organizersCheckboxesfilter = [];
 var eventCheckboxesfilter = [];
 
 
+
 //drop-down for profile 
 $(document).ready(function () {
   $('.dropdown-toggle').dropdown();
@@ -714,62 +715,135 @@ $(document).ready(function () {
    //------------------------------------------
   // Navigation click event handlers
 
-  //NAVBAR-LINKS
-  $(".nav-link.home").click(function () {
-      ShowHomePage();
-  });
+  function loadView(viewId) {
+    switch (viewId) {
+      case "view-home":
+        ShowHomePage();
+        break;
+      case "view-aboutus":
+        ShowAboutusPage();
+        break; 
+      case "view-contact":
+        ShowContactPage();
+        break;
+      case "view-purchase":
+        ShowPurchasePage();
+        break;
+      case "view-sell":
+        ShowSellPage();
+        break;
+      case "view-logout":
+        ShowLogoutPage();
+        break;
+      case "view-favorites":
+        ShowFavoritesPage();
+        break;
+      case "view-shoppingcart":
+        ShowShoppingcartPage();
+        break;
+      default:
+        console.error("Unknown view:", viewName);
+    }
 
-  $(".nav-link.contact").click(function () {
-      ShowContactPage();
-  });
+  }
+  //This function stores the navigationClicks i.e. the different views the user has "visited" and enables for the user to go back and 
+  //forward in the browser-history using the arrows
+  function handleNavigationClick(viewId) {
+   
+    loadView(viewId);
+    history.pushState({ viewId: viewId }, "", "");
+  }
 
+  //NAVBAR LINKS CLICK
   $(".navbar-brand.logo").click(function () {
-    ShowHomePage();
-  });
-
-  $(".nav-link.purchase").click(function () {
-    ShowPurchasePage();
-  });
-
-  $(".nav-link.sell").click(function () {
-    ShowSellPage();
+    handleNavigationClick("view-home");
   });
 
   $(".nav-link.aboutus").click(function () {
-    ShowAboutusPage();
+    handleNavigationClick("view-aboutus");
   });
 
+  $(".nav-link.contact").click(function () {
+    handleNavigationClick("view-contact");
+  });
+
+  $(".nav-link.purchase").click(function () {
+    handleNavigationClick("view-purchase");
+  });
+
+  $(".nav-link.sell").click(function () {
+    handleNavigationClick("view-sell");
+  });
+  
   $(".nav-link.logout").click(function () {
-    ShowLogoutPage();
+    handleNavigationClick("view-logout");
   });
-
+  
   $(".nav-link.favorites").click(function () {
-    ShowFavoritesPage();
+    handleNavigationClick("view-favorites");
+  });
+  
+  $(".nav-link.shoppingcart").click(function () {
+    handleNavigationClick("view-shoppingcart");
+  });
+  
+
+  window.addEventListener("popstate", function (event) {
+    if (event.state && event.state.viewId) {
+      loadView(event.state.viewId);
+    }
   });
 
-  $(".nav-link.shoppingcart").click(function () {
-    ShowShoppingcartPage();
-  });
+  //NAVBAR-LINKS
+  // $(".nav-link.home").click(function () {
+  //     ShowHomePage();
+  // });
+
+  // $(".nav-link.contact").click(function () {
+  //     ShowContactPage();
+  // });
+
+  // $(".navbar-brand.logo").click(function () {
+  //   ShowHomePage();
+  // });
+
+  // $(".nav-link.purchase").click(function () {
+  //   ShowPurchasePage();
+  // });
+
+  // $(".nav-link.sell").click(function () {
+  //   ShowSellPage();
+  // });
+
+  // $(".nav-link.aboutus").click(function () {
+  //   ShowAboutusPage();
+  // });
+
+  // $(".nav-link.logout").click(function () {
+  //   ShowLogoutPage();
+  // });
+
+  // $(".nav-link.favorites").click(function () {
+  //   ShowFavoritesPage();
+  // });
+
+  // $(".nav-link.shoppingcart").click(function () {
+  //   ShowShoppingcartPage();
+  // });
 
 //Product page
 $(document).on('click', '.show-product', function() {
   var productId = $(this).data('product-id');
   ShowProductPage(productId);
-});
+ });
 
 
 //Dropdown-logged out
 $(".nav-item.dropdown .dropdown-menu .sign-up").click(function () {
-  //if (!signedIn) {
-  //  ShowRegisterPage();
- // }
  ShowSignUpPage();
 });
 
 $(".nav-item.dropdown .dropdown-menu .login").click(function () {
- // if (!signedIn) {
- //   ShowLoginPage();
- // }
  ShowLoginPage();
 });
 
@@ -841,7 +915,7 @@ $(".footer-link.collecting").click(function () {
   ShowQuestionsCollectingPage();
 });
 
-//SHOPPING-CART and CHECKOUT
+//SHOPPING-CART to CHECKOUT
 $(document).on("click", "#checkout-button", function() {
   ShowCheckoutPage();
 });
