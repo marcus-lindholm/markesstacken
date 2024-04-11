@@ -185,6 +185,11 @@ with app.app_context():
     product8 = Product(name='Pengar & Piller 2023', price=9, quantity=27, description='Märke från Pengar & Piller 2023.', category=category2, year = 2023, section = 'I-Sektionen', event = 'Pengar & Piller', organizer = 'KLASSFÖRÄLDRARNA', img = 'Pengar & Piller 2023.png')
     product9 = Product(name='Nolle-P Reunion 2023', price=19, quantity=27, description='Märke från Nolle-P Reunion 2023.', category=category2, year = 2023, section = 'I-Sektionen', event = 'Nolle-P Reunion', organizer = 'KLASSFÖRÄLDRARNA', img = 'Nolle-P Reunion 2023.png')
     product10 = Product(name='Munchen Hoben 2022', price=19, quantity=27, description='Märke från Munchen Hoben 2022.', category=category2, year = 2022,  section = 'LINKTEK', event = 'Munchen Hoben', organizer = 'LINKTEK', img = 'Munchen hoben 2022.png')
+    product11 = Product(name='Agent Limited Edition Märke', price=100, quantity=1, description='Exklusivt märke av Agent.', category=category2, year = 2021,  section = 'Övrigt', event = 'Övrigt', organizer = 'AGENT', img = 'AgentMärke.png')
+    product12 = Product(name='Sydkorea Flagga', price=50, quantity=20, description='Korea.', category=category2, year = 2021,  section = 'Övrigt', event = 'Övrigt', organizer = 'Övrigt', img = 'Sydkorea.png')
+    product13 = Product(name='SourFisk Märke', price=1000, quantity=1, description='Skepp och Hoj, SourFisk', category=category2, year = 2021,  section = 'Övrigt', event = 'Övrigt', organizer = 'Övrigt', img = 'SourFiskMärke.png')
+    product14 = Product(name='B-Klass Gensists 2021', price=30, quantity=50, description='B-klass on Fire ', category=category2, year = 2021,  section = 'I-Sektionen', event = 'Generationssittning', organizer = 'Övrigt', img = 'BKlass.png')
+
 
     db.session.add(product1)
     db.session.add(product2)
@@ -196,6 +201,10 @@ with app.app_context():
     db.session.add(product8)
     db.session.add(product9)
     db.session.add(product10)
+    db.session.add(product11)
+    db.session.add(product12)
+    db.session.add(product13)
+    db.session.add(product14)
 
     #shoppingcart1 = ShoppingCart()
     #db.session.add(shoppingcart1)

@@ -253,6 +253,7 @@ p {
 
 .aboutus-container {
     display: grid;
+    border-radius: 5px;
     grid-template-columns: 1fr 1fr; /* Two equal columns */
     gap: 20px; /* Space between columns */
     max-width: 800px;
@@ -262,6 +263,7 @@ p {
 .aboutus-text {
     background-color: #ffffff;
     padding: 20px;
+    text-align: left;
     border-radius: 5px;
 }
 
@@ -273,7 +275,9 @@ p {
 .aboutus-text p {
     font-size: 18px;
     line-height: 1.6;
-    text-align: justify;
+    text-align: left;
+    overflow-wrap: break-word;
+    word-spacing: 0.25px;
 }
 
 .aboutus-image {
