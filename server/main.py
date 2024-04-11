@@ -43,7 +43,7 @@ class User(db.Model):
     
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
-        self.shoppingcart = ShoppingCart()  # Create a ShoppingCart instance for every new User
+        self.shoppingcart = ShoppingCart()
 
     def check_if_in_wishlist(self, product):
         if product in self.wishlist:
@@ -88,7 +88,6 @@ class Product(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=True)
-    #img = db.Column(db.LargeBinary, nullable=True) #eget image library (imgID)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
     category = db.relationship('Category', backref='products', lazy=True)
     year = db.Column(db.Integer, nullable=True)
@@ -102,7 +101,7 @@ class Product(db.Model):
         return f'<Product {self.id}: {self.name}: {self.price}>'
     
     def serialize(self):
-            return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity, description=self.description, year=self.year, section=self.section, event=self.event, organizer=self.organizer, img=self.img, number_of_sales=self.number_of_sales, category=self.category.serialize() if self.category else None)
+        return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity, description=self.description, year=self.year, section=self.section, event=self.event, organizer=self.organizer, img=self.img, number_of_sales=self.number_of_sales, category=self.category.serialize() if self.category else None)
     
 
 
@@ -234,6 +233,32 @@ with app.app_context():
 
     db.session.commit()
 
+@app.route('/wishlist', methods=['GET', 'POST'], endpoint='wishlist')
+@jwt_required()
+def wishlist():
+    if request.method == 'GET':
+        user = User.query.get(get_jwt_identity())
+        wishlist = user.wishlist
+        wishlist_list = [product.serialize() for product in wishlist]
+        return jsonify(wishlist_list)
+
+    elif request.method == 'POST':
+        data = request.get_json()
+        user = User.query.get(get_jwt_identity())
+        product = db.session.get(Product, data['product_id'])
+        user.add_to_wishlist(product)
+        db.session.commit()
+        return jsonify("Success!"), 200
+    
+@app.route('/wishlist/<int:product_id>', methods=['DELETE'], endpoint='remove_from_wishlist')
+@jwt_required()
+def wishlist_by_id(product_id):
+    user = User.query.get(get_jwt_identity())
+    product = db.session.get(Product, product_id)
+    user.remove_from_wishlist(product)
+    db.session.commit()
+    return jsonify("Success!"), 200
+
 @app.route('/payments', methods=['GET', 'POST'], endpoint='payments')
 #@jwt_required()
 def payments():
@@ -284,6 +309,12 @@ def order_by_id(order_id):
         db.session.commit()
         return jsonify("Success!"), 200
 
+@app.route('/myShoppingCart', methods=['GET'], endpoint='myShoppingCart')
+@jwt_required()
+def myShoppingCart():
+    user = User.query.get(get_jwt_identity())
+    return jsonify(user.shoppingcart.serialize())
+
 @app.route('/shoppingcarts', methods=['GET', 'POST'], endpoint='shoppingcarts')
 #@jwt_required()
 def shoppingcarts():
@@ -307,7 +338,7 @@ def shoppingcart_by_id(shoppingcart_id):
     if request.method == 'GET':
         return jsonify(shoppingcart.serialize())
 
-    elif request.method == 'PUT' and get_jwt_identity().is_admin:
+    elif request.method == 'PUT':
         data = request.get_json()
         if 'cartitems' in data:
             shoppingcart.cartitems = data['cartitems']
@@ -320,29 +351,40 @@ def shoppingcart_by_id(shoppingcart_id):
         return jsonify("Success!"), 200
 
 @app.route('/cartitems', methods=['GET', 'POST'], endpoint='cartitems')
-#@jwt_required()
+@jwt_required()
 def cartitems():
     if request.method == 'GET':
         cartitems = CartItem.query.all()
         cartitem_list = [cartitem.serialize() for cartitem in cartitems]
         return jsonify(cartitem_list)
 
-    elif request.method == 'POST' and get_jwt_identity().is_admin:
+    elif request.method == 'POST':
         data = request.get_json()
-        new_cartitem = CartItem(quantity=data['quantity'], product_id=data['product_id'])
+        user = User.query.get(get_jwt_identity())
+        for product in user.shoppingcart.cartitems:
+            if product.product_id == request.get_json()['product_id']:
+                if product.quantity + int(request.get_json()['quantity']) > product.product.quantity:
+                    return jsonify("Not enough in stock"), 400
+                product.quantity += int(request.get_json()['quantity'])
+                db.session.commit()
+                return jsonify("Product already in cart, increased quantity"), 200
+            else:
+                if int(request.get_json()['quantity']) > product.product.quantity:
+                    return jsonify("Not enough in stock"), 400
+                new_cartitem = CartItem(quantity=data['quantity'], product_id=data['product_id'], shoppingcart_id=data['shoppingcart_id'])
         db.session.add(new_cartitem)
         db.session.commit()
         return jsonify(new_cartitem.serialize()), 201
 
 @app.route('/cartitems/<int:cartitem_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='cartitem_by_id')
-#@jwt_required()
+@jwt_required()
 def cartitem_by_id(cartitem_id):
     cartitem = CartItem.query.get_or_404(cartitem_id)
 
     if request.method == 'GET':
         return jsonify(cartitem.serialize())
 
-    elif request.method == 'PUT' and get_jwt_identity().is_admin:
+    elif request.method == 'PUT':
         data = request.get_json()
         if 'quantity' in data:
             cartitem.quantity = data['quantity']
@@ -351,10 +393,15 @@ def cartitem_by_id(cartitem_id):
         db.session.commit()
         return jsonify(cartitem.serialize()), 200
 
-    elif request.method == 'DELETE' and get_jwt_identity().is_admin:
+    elif request.method == 'DELETE':
+        identity = get_jwt_identity()
+        user = User.query.filter_by(id=identity).first()
+        cartitem = next((item for item in user.shoppingcart.cartitems if item.id == cartitem_id), None)
+        if cartitem is None:
+            return jsonify("Cart item not found!"), 404
         db.session.delete(cartitem)
         db.session.commit()
-        return jsonify("Success!"), 200
+    return jsonify("Success!"), 200
 
 @app.route('/products', methods=['GET', 'POST'], endpoint='products')
 #@jwt_required()
@@ -647,7 +694,7 @@ def login():
 
 #     return jsonify(new_car.serialize()), 201 
 
-@app.route('/get-identity', methods=['GET'], endpoint = 'get_identity')
+@app.route('/get-identity', methods=['GET'], endpoint = 'get-identity')
 @jwt_required()
 def get_identity():
     
@@ -716,7 +763,7 @@ def get_user_by_id(user_id):
         db.session.commit()
         return jsonify("Success!"), 200
 
-@app.route('/users/<int:user_id>/cars', methods=['GET'], endpoint = 'get_cars_by_user')
+""" @app.route('/users/<int:user_id>/cars', methods=['GET'], endpoint = 'get_cars_by_user')
 @jwt_required()
 def get_cars_by_user(user_id):
 
@@ -736,7 +783,7 @@ def get_cars_by_user(user_id):
         car_list.append(car_data)
         car_data.pop('user_id', None)
 
-    return jsonify(car_list)
+    return jsonify(car_list) """
 
 #labb2
 @app.route("/")

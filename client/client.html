@@ -372,43 +372,43 @@
       <h1>Säljformulär</h1>
       <form id="sellForm" enctype="multipart/form-data" class="nice-form">
         <div class="form-group">
-            <label for="productName">Produktnamn:</label>
+            <label for="productName">Produktnamn *</label>
             <input type="text" id="product-name" name="productName" class="form-control" required>
         </div>
         <div class="form-group">
-            <label for="productDescription">Produktbeskrivning:</label>
+            <label for="productDescription">Produktbeskrivning *</label>
             <textarea id="product-description" name="productDescription" class="form-control" rows="4" required></textarea>
         </div>
         <div class="form-group">
-            <label for="productPrice">Prisförslag:</label>
+            <label for="productPrice">Pris *</label>
             <input type="number" id="product-price" name="productPrice" min="0" step="0.01" class="form-control" required>
         </div>
         <div class="form-group">
-          <label for="productQuantity">Kvantitet:</label>
+          <label for="productQuantity">Kvantitet *</label>
           <input type="number" id="product-quantity" name="productQuantity" min="0" step="0.01" class="form-control" required>
         </div>
         <div class="form-group">
-          <label for="product-image">Bild:</label>
-          <input type="file" id="product-image" name="product-image" accept="image/*" class="form-control-file">
+          <label for="product-image">Bild *</label>
+          <input type="file" id="product-image" name="product-image" accept="image/*" class="form-control-file" required>
         </div>
         <div class="form-group">
-          <label for="category">Kategori:</label>
+          <label for="category">Kategori</label>
           <select id="product-category" name="category" class="form-control"></select>
         </div>
         <div class="form-group">
-          <label for="year">År:</label>
+          <label for="year">År</label>
           <input type="number" id="product-year" name="year" class="form-control">
         </div>
         <div class="form-group">
-            <label for="section">Sektion:</label>
+            <label for="section">Sektion</label>
             <input type="text" id="product-section" name="section" class="form-control">
         </div>
         <div class="form-group">
-            <label for="event">Event:</label>
+            <label for="event">Event</label>
             <input type="text" id="product-event" name="event" class="form-control">
         </div>
         <div class="form-group">
-            <label for="event_organizer">Arrangör:</label>
+            <label for="event_organizer">Arrangör</label>
             <input type="text" id="event_organizer" name="event_organizer" class="form-control">
         </div>
         <div class="form-group">
@@ -536,13 +536,13 @@
 
      <!--VIEW-FAVORITES-->
      <script id="view-favorites" type="text/html">
-      <h1>View-Favorites</h1>
+      <h1>Min önskelista</h1>
     </script>
 
      <!--VIEW-SHOPPINGCART-->
      <script id="view-shoppingcart" type="text/html">
-    
-    <section class="h-100 gradient-custom">
+      <h1>Min varukorg</h1>
+    <!-- <section class="h-100 gradient-custom">
       <div class="container py-5">
         <div class="row d-flex justify-content-center my-4">
           <div class="col-md-8">
@@ -551,10 +551,10 @@
                 <h5 class="mb-0">Varukorg (antal varor)</h5>
               </div>
               <div class="card-body">
-                <!-- Single item -->
+                
                 <div class="row">
                   <div class="col-lg-3 col-md-12 mb-4 mb-lg-0">
-                    <!-- Image -->
+                    
                     <div class="bg-image hover-overlay hover-zoom ripple rounded" data-mdb-ripple-color="light">
                       <img src="https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Vertical/12a.webp"
                         class="w-100" alt="Blue Jeans Jacket" />
@@ -562,11 +562,11 @@
                         <div class="mask" style="background-color: rgba(251, 251, 251, 0.2)"></div>
                       </a>
                     </div>
-                    <!-- Image -->
+                    
                   </div>
     
                   <div class="col-lg-5 col-md-6 mb-4 mb-lg-0">
-                    <!-- Data -->
+                    
                     <p><strong>Blue denim shirt</strong></p>
                     <p>Color: blue</p>
                     <p>Size: M</p>
@@ -584,11 +584,11 @@
                       </svg>
                       <i class="fas fa-heart"></i>
                     </button>
-                    <!-- Data -->
+                    
                   </div>
     
                  
-                    <!-- Quantity -->
+                    
                     <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
                       <label for="quantity" class="me-2">Antal:</label>
                       <div class="input-group">
@@ -609,14 +609,14 @@
                   </div>
                   
     
-                    <!-- Price -->
+                    
                     <p class="text-start text-md-center">
                       <strong>$17.99</strong>
                     </p>
-                    <!-- Price -->
+                    
                   </div>
                 </div>
-                <!-- Single item -->
+                
     
                 <hr class="my-4" />
     
@@ -676,7 +676,7 @@
           </div>
         </div>
       </div>
-    </section>
+    </section> -->
   </script>
 
     <!--VIEW-CHECKOUT-->
