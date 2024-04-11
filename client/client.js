@@ -797,8 +797,11 @@ function handleNavigationClick(viewId, productId = null) {
     previousViewId = viewId;
     previousProductId = productId;
     history.pushState({ viewId: viewId, productId: productId }, "", "");
+    console.log("State object:", history.state);
+    console.log(productId);
   }
 }
+
 
 
 $(document).on("click", "#checkout-button", function() {
@@ -911,10 +914,20 @@ $(".footer-link.collecting").click(function () {
 
 
 //The function that listens to if the user presses the back-arrow or going forward-arrow. 
+  // window.addEventListener("popstate", function (event) {
+  //   if (event.state && event.state.viewId || event.state.productId) {
+  //     loadView(event.state.viewId, event.state.productId);
+  //   }
+  // });
+
+
   window.addEventListener("popstate", function (event) {
-    if (event.state && event.state.viewId || event.state.productId) {
-      loadView(event.state.viewId, event.state.productId);
+    if (event.state) {
+      const { productId, viewId } = event.state;
+      loadView(viewId, productId);
+    
     }
+   
   });
 
   //NAVBAR-LINKS
