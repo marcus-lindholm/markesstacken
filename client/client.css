@@ -397,3 +397,12 @@ input[type="number"]::-webkit-outer-spin-button {
     cursor: pointer;
 }
 
+#searchBar {
+    width: 200px; /* Adjust the width as needed */
+/*     position: absolute;
+ */    left: 75px; /* Adjust the distance from the left edge of the page */
+ margin-top: 15px;
+ margin-bottom: 15px;
+}
+
+

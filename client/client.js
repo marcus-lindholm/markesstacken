@@ -289,24 +289,31 @@ function ShowProductPage(productId) {
   });
 }
 
-/* const searchBar = document.getElementById("searchBar");
-const searchButton = document.getElementById("searchButton"); */
-
-// Add an event listener to the search button
-/* searchButton.addEventListener("click", () => {
-  // Get the search input value
-  const query = searchBar.value;
-
-  // Write the input as an alert
-  alert("You searched for: " + query);
-}); */
 function search() {
   var input = document.getElementById('searchBar').value;
-  console.log(input);
+  console.log(input); 
+populateSearch(input);
 }
 
+function populateSearch(searchInput) {
+      // Select all items within the product container
+      var items = document.getElementById('product-container').getElementsByClassName('col-md-4');
 
+      for (var i = 0; i < items.length; i++) {
+          // Get the product name within the current item
+          var productName = items[i].getElementsByClassName('card-title')[0].textContent.toLowerCase();
 
+          if (productName.includes(searchInput)) {
+            // Show the item by setting its display property to "block"
+            items[i].style.display = 'block';
+           
+        } else {
+            // Hide the item if it doesn't match the search input
+            items[i].style.display = 'none';
+  
+        }
+      }  
+}
 
 // Function to update the global filter lists based on checked/unchecked checkboxes
 function updateFilterList(containerId) {
