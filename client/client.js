@@ -1034,13 +1034,13 @@ $(document).ready(function () {
         case "view-login":
           ShowLoginPage();
           break;
-        case "view-orderspage":
+        case "view-orders":
           ShowOrdersPage();
           break;
         case "view-returns":
           ShowReturnsPage();
           break;
-        case "view-profileInfo":
+        case "view-profileinfo":
           ShowProfileInfoPage();
           break;
         case "view-settings":
