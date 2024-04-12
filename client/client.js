@@ -41,10 +41,9 @@ function ShowFavoritesPage() {
     success: function (items) {
       let htmlString = items.map(product => {
         return `
-          
-        <div class="col-lg-4 col-md-6 mb-4" style="display: inline;">
+          <div class="col-lg-4 col-md-6 mb-4" style="display: inline;">
             <div class="card wishlist-item h-100">
-            <img class="card-img-top mx-auto d-block show-product" src="/product_images/${product.img}" alt="${product.name}" data-product-id="${product.id}"/>
+              <img class="card-img-top mx-auto d-block show-product" src="/product_images/${product.img}" alt="${product.name}" data-product-id="${product.id}"/>
               <div class="card-body">
                 <h5 class="card-title show-product" data-product-id="${product.id}">${product.name}</h5>
                 <p class="card-text">${product.description}</p>
@@ -72,7 +71,8 @@ function ShowFavoritesPage() {
             </div>
           </div>
       `;
-      }).join('');    
+      }).join('');
+    
       $(".container").html($("#view-favorites").html() + htmlString);
     },
     error: function (error) {
@@ -579,136 +579,6 @@ function addProduct(){
 //SHOPPINGCART-PAGE
 function ShowShoppingcartPage() {
   $(".container").html($("#view-shoppingcart").html());
-  $.ajax({
-    url: host + "/myShoppingCart", 
-    type: "GET",
-    contentType: "application/json",
-    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
-    success: function (response) {
-      console.log(response.cartitems);
-      console.log(response.cartitems[0].product.id);
-      let totalPrice = 0;
-      let htmlString = '';
-      htmlString += `<div class="shoppingCartArea section_padding_130" id="shoppingCart">
-      <div class="container">
-      <h2 class="bold-heading">Varukorg</h2>`;
-      response.cartitems.forEach(item => {
-        totalPrice += item.product.price * item.quantity;
-        htmlString += `
-          <div class="col-lg-4 col-md-6 mb-4" style="display: inline;">
-            <div class="card shoppingcart-item h-100">
-              <img class="card-img-top mx-auto d-block show-product" src="/product_images/${item.product.img}" alt="${item.product.name}" data-product-id="${item.product.id}"/>
-              <div class="card-body">
-                <h5 class="card-title show-product" data-product-id="${item.product.id}">${item.product.name}</h5>
-                <p class="card-text">${item.product.description}</p>
-                <p class="card-text"> ${item.product.price} kr</p>
-                <div class="d-flex mb-3 col-2">
-                    <label for="quantity" class="me-2"></label>
-                    <div class="input-group">
-                        <button class="btn btn-sm btn-outline-dark" data-product-id="${item.product.id}" onclick="this.parentNode.querySelector('input[type=number]').stepDown(), decreaseQuantity(${item.product.id}, ${item.quantity})" id="minus-button${item.product.id}">
-                            <i class="fas fa-minus"></i>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
-                                <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
-                            </svg>
-                        </button>
-                        <input type="number" id="quantity${item.product.id}" class="form-control" value="${item.quantity}" min="1" max="${item.product.quantity}">
-                        <button class="btn btn-sm btn-outline-dark" data-product-id="${item.product.id}" onclick="this.parentNode.querySelector('input[type=number]').stepUp(), increaseQuantity(${item.product.id}, ${item.product.quantity}, ${item.quantity})" id="plus-button${item.product.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-                            </svg>
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
-              </div>
-            </div>
-        
-          </div>`;
-    });
-    
-    htmlString += `<div class="Totalprice">
-                      <h2> Totalkostnad: ${totalPrice} SEK</h2>
-                      </div>`;
-                      htmlString += `<button id="checkout-button" class ="btn btn-sm btn-outline-dark btn-block" style="height: 50px; font-size: 16px;">Gå till kassan</button>`;
-
-      htmlString += `</div>
-    </div>`; 
-      
-      $(".container").append(htmlString);
-    }
-  });
-}
-
-function increaseQuantity(productId, maxQuantity, productQuantity) { //lägg till vänta så att hemsidan inte uppdateras för snabbt
-  console.log("maxQ: " + maxQuantity + " prodQ: " + productQuantity);
-  if (maxQuantity > productQuantity) {
-     $.ajax({
-    url: host + "/myShoppingCart", 
-    type: "GET",
-    contentType: "application/json",
-    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
-    success: function (response) {
-      response.cartitems.forEach(item => {
-        if (item.product.id === productId) {
-          $.ajax({
-            url: host + "/cartitems/" + item.id, 
-            type: "PUT",
-            contentType: "application/json",
-            headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
-            data: JSON.stringify({
-              quantity: item.quantity + 1
-            }),
-            success: function (response) {
-              console.log(response);
-            }
-          });
-        }
-      });
-      ShowShoppingcartPage();
-    }
-  });
-  } else {
-    ShowShoppingcartPage();
-    displayMessage = "Ej tillräckligt många varor i lager.";
-    showAlert("warning", displayMessage, "");
-  }
-
-}
-
-function decreaseQuantity(productId, productQuantity) { //lägg till vänta så att hemsidan inte uppdateras för snabbt
-  console.log("decreasing Q, prodID: " + productId);
-  if (productQuantity > 1) {
-    $.ajax({
-      url: host + "/myShoppingCart", 
-      type: "GET",
-      contentType: "application/json",
-      headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
-      success: function (response) {
-        response.cartitems.forEach(item => {
-          if (item.product.id === productId) {
-            $.ajax({
-              url: host + "/cartitems/" + item.id, 
-              type: "PUT",
-              contentType: "application/json",
-              headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
-              data: JSON.stringify({
-                quantity: item.quantity - 1
-              }),
-              success: function (response) {
-                console.log(response);
-              }
-            });
-          }
-        });
-        ShowShoppingcartPage();
-      } 
-    });
-  } else {
-    removeFromShoppingCart(productId);
-    ShowShoppingcartPage();
-    displayMessage = productId + " togs bort från varukorgen."
-    showAlert("success", displayMessage, "");
-  } 
 }
 
 //-------------------------------------------------
@@ -1010,114 +880,12 @@ $(document).ready(function () {
   checkLoggedIn();
   ShowHomePage();
   
-  //------------------------------------------
+   //------------------------------------------
   // Navigation click event handlers
 
-  function loadView(viewId, productId) {
-      switch (viewId) {
-        case "view-home":
-          ShowHomePage();
-          break;
-        case "view-aboutus":
-          ShowAboutusPage();
-          break; 
-        case "view-contact":
-          ShowContactPage();
-          break;
-        case "view-purchase":
-          ShowPurchasePage();
-          break;
-        case "view-sell":
-          ShowSellPage();
-          break;
-        case "view-logout":
-          ShowLogoutPage();
-          break;
-        case "view-favorites":
-          ShowFavoritesPage();
-          break;
-        case "view-shoppingcart":
-          ShowShoppingcartPage();
-          break;
-        case "view-sign-up":
-          ShowSignUpPage();
-          break;
-        case "view-login":
-          ShowLoginPage();
-          break;
-        case "view-orders":
-          ShowOrdersPage();
-          break;
-        case "view-returns":
-          ShowReturnsPage();
-          break;
-        case "view-profileinfo":
-          ShowProfileInfoPage();
-          break;
-        case "view-settings":
-          ShowSettingsPage();
-          break;
-        case "view-logout":
-          ShowLogoutPage();
-          break;
-        case "view-adminOrders":
-          ShowAdminOrdersPage();
-          break;
-        case "view-adminReturns":
-          ShowAdminReturnsPage();
-          break;
-        case "view-questions":
-          ShowQuestionsPage();
-          break; 
-        case "view-checkout":
-          ShowCheckoutPage();
-          break; 
-        case "view-product":
-          ShowProductPage(productId);
-          break;
-        default:
-          console.error("Unknown view:", viewId);
-    }
-  }
-
-
- 
-  //This function stores the navigationClicks i.e. the different views the user has "visited" and enables for the user to go back and 
-  //forward in the browser-history using the arrows
-
-let previousViewId = null;
-let previousProductId = null;
-
-function handleNavigationClick(viewId, productId = null) {  
-  if (previousViewId !== viewId || previousProductId !== productId) {
-    loadView(viewId, productId);
-    previousViewId = viewId;
-    previousProductId = productId;
-    history.pushState({ viewId: viewId, productId: productId }, "", "");
-  }
-}
-
-
-
-$(document).on("click", "#checkout-button", function() {
-    handleNavigationClick("view-checkout");
- });
-
-// Click event handler for product links
-$(document).on('click', '.show-product', function() {
-  var productId = $(this).data('product-id');
-  handleNavigationClick("view-product", productId);
-});
-
-
-
-  //NAVBAR LINKS CLICK
-  $(".navbar-brand.logo").click(function () {
-    handleNavigationClick("view-home");
-  });
-
-  $(".nav-link.aboutus").click(function () {
-    handleNavigationClick("view-aboutus");
+  //NAVBAR-LINKS
+  $(".nav-link.home").click(function () {
+      ShowHomePage();
   });
 
   $(".nav-link.contact").click(function () {

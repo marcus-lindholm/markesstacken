@@ -430,7 +430,7 @@ input[type="number"]::-webkit-outer-spin-button {
   }  
 
   /*LOGIN, SIGNUP, LOGOUT DESIGN*/
-  .loginArea, .signupArea, .logoutArea, .shoppingCartArea{
+  .loginArea, .signupArea, .logoutArea{
     position: relative;
     z-index: 1;
     width: 80%; 
@@ -498,18 +498,3 @@ input[type="number"]::-webkit-outer-spin-button {
     background-color: #f0f0f0;
 }
 
-/*SHOPPINGCART*/
-.shoppingCartArea{
-    position: relative;
-    z-index: 1;
-    width: 100%; 
-    margin: 0 auto;
-    background-color: #f0f7f3; 
-    padding: 50px; 
-    border: 50px solid rgb(255, 255, 255); 
-}
-
-
-.bold-heading {
-    font-weight: bold;
-}
