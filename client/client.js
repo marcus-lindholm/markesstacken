@@ -8,6 +8,7 @@ let organizersCheckboxesfilter = [];
 let eventCheckboxesfilter = [];
 let shoppingcartID;
 let userID;
+let myWishList = [];
 
 
 //drop-down for profile 
@@ -64,7 +65,7 @@ function ShowFavoritesPage() {
                         </button>
                     </div>
                 </div>
-                <button id="add-to-cart-btn${product.id}" data-product-id="${product.id}" onclick="addToShoppingCart(${product.id}, removeFromWishlist(${product.id}), document.getElementById('quantity${product.id}').value, '${product.name}')" class="btn btn-light" style="width: 145px; margin: 5px 0;" ${product.quantity === 0 ? 'disabled' : ''}>Lägg i varukorg</button>
+                <button id="add-to-cart-btn${product.id}" data-product-id="${product.id}" onclick="addToShoppingCart(${product.id}, document.getElementById('quantity${product.id}').value, '${product.name}')" class="btn btn-light" style="width: 145px; margin: 5px 0;" ${product.quantity === 0 ? 'disabled' : ''}>Lägg i varukorg</button>
                 <button id="remove-from-wishlist${product.id}" class="btn btn-secondary" data-product-id="${product.id}" onclick="removeFromWishlist(${product.id})">Ta bort från önskelista</button>              </div>
             </div>
           </div>
@@ -103,6 +104,7 @@ function addToWishlist(productId, productName) {
 }
 
 function removeFromWishlist(productId) {
+  console.log("removing from wishlist");
   $.ajax({
     url: host + "/wishlist/" + productId, 
     type: "DELETE",
@@ -134,8 +136,14 @@ function addToShoppingCart(productId, orderQuantity, productName) {
         shoppingcart_id: shoppingcartID
       }),
       success: function (response) {
+        checkIfInWishlist(productId).then(isInWishlist => {
+          if(isInWishlist) {
+            removeFromWishlist(productId)
+          }
+        });
         displayMessage = "Produkt: " + productName + " x " + orderQuantity + ".";
         showAlert("success", "Tillagd i varukorgen:", displayMessage);
+
       },
       error: function (error) {
         displayMessage = "Produkt: " + productName + " x " + orderQuantity + " blev inte tillagd i varukorgen.";
@@ -146,8 +154,25 @@ function addToShoppingCart(productId, orderQuantity, productName) {
       },
     });
   } else {
-    showAlert("warning", "Den nuvarande kvantiteten är inte tillåten.", "Var snäll och minska antalet!");
+    showAlert("warning", "Den nuvarande kvantiteten är inte tillåten.", "Var snäll och öka antalet!");
   }
+}
+
+async function checkIfInWishlist(productId) {
+  let inWishlist = false;
+  await $.ajax({
+    url: host + "/wishlist",
+    type: "GET",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+  }).then(function (response) {
+    response.forEach(item => {
+      if (item.id === productId) {
+        inWishlist = true;
+      }
+    });
+  });
+  return inWishlist;
 }
 
 function removeFromShoppingCart(productId) {
@@ -159,7 +184,7 @@ function removeFromShoppingCart(productId) {
     success: function (response) {
       displayMessage = "Produkten togs bort från varukorgen.";
       showAlert("success", displayMessage, "");
-      ShowShoppingcartPage(); // Reload the shoppingcart page
+      ShowShoppingcartPage(); 
     },
     error: function (error) {
       displayMessage = "Produkten gick inte att ta bort från varukorgen.";
@@ -433,7 +458,7 @@ function ShowProductPage(productId) {
                           <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
                       </svg>
                   </button>
-                  <input type="number" id="quantity${product.id}" class="form-control" value="1" min="1" max="${product.quantity}">
+                  <input type="number" id="quantity${item.product.id}" class="form-control" value="${item.quantity}" min="1" max="${item.product.quantity}" readonly>
                   <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepUp()" id="plus-button">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                           <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
