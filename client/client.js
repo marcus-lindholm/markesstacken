@@ -1,11 +1,11 @@
 //var signedIn = false;
 host = window.location.protocol + '//' + location.host;
 
-let guserId;
-let yearCheckboxesfilter = [];
-let sectionCheckboxesfilter = [];
-let organizersCheckboxesfilter = [];
-let eventCheckboxesfilter = [];
+var guserId;
+var yearCheckboxesfilter = [];
+var sectionCheckboxesfilter = [];
+var organizersCheckboxesfilter = [];
+var eventCheckboxesfilter = [];
 let shoppingcartID;
 let userID;
 let myWishList = [];
