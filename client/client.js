@@ -1,12 +1,14 @@
 //var signedIn = false;
 host = window.location.protocol + '//' + location.host;
 
-var guserId;
-var yearCheckboxesfilter = [];
-var sectionCheckboxesfilter = [];
-var organizersCheckboxesfilter = [];
-var eventCheckboxesfilter = [];
-var loggedIn = false;
+let guserId;
+let yearCheckboxesfilter = [];
+let sectionCheckboxesfilter = [];
+let organizersCheckboxesfilter = [];
+let eventCheckboxesfilter = [];
+let shoppingcartID;
+let userID;
+let myWishList = [];
 
 
 //drop-down for profile 
@@ -30,8 +32,167 @@ function ShowAboutusPage() {
 //FAVORITES-PAGE
 function ShowFavoritesPage() {
   $(".container").html($("#view-favorites").html());
+  $.ajax({
+    url: host + "/wishlist", 
+    type: "GET",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    success: function (items) {
+      let htmlString = items.map(product => {
+        return `
+          <div class="col-lg-4 col-md-6 mb-4" style="display: inline;">
+            <div class="card wishlist-item h-100">
+              <img class="card-img-top mx-auto d-block show-product" src="/product_images/${product.img}" alt="${product.name}" data-product-id="${product.id}"/>
+              <div class="card-body">
+                <h5 class="card-title show-product" data-product-id="${product.id}">${product.name}</h5>
+                <p class="card-text">${product.description}</p>
+                <p class="card-text"> ${product.price} kr</p>
+                <div class="d-flex mb-3 col-2">
+                    <label for="quantity" class="me-2"></label>
+                    <div class="input-group">
+                        <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepDown()" id="minus-button">
+                            <i class="fas fa-minus"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
+                                <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
+                            </svg>
+                        </button>
+                        <input type="number" id="quantity${product.id}" class="form-control" value="1" min="1" max="${product.quantity}">
+                        <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepUp()" id="plus-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                            </svg>
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <button id="add-to-cart-btn${product.id}" data-product-id="${product.id}" onclick="addToShoppingCart(${product.id}, document.getElementById('quantity${product.id}').value, '${product.name}')" class="btn btn-light" style="width: 145px; margin: 5px 0;" ${product.quantity === 0 ? 'disabled' : ''}>Lägg i varukorg</button>
+                <button id="remove-from-wishlist${product.id}" class="btn btn-secondary" data-product-id="${product.id}" onclick="removeFromWishlist(${product.id})">Ta bort från önskelista</button>              </div>
+            </div>
+          </div>
+      `;
+      }).join('');
+    
+      $(".container").html($("#view-favorites").html() + htmlString);
+    },
+    error: function (error) {
+      displayMessage = "Product: " + productName + " was not added to your wishlist.";
+      showAlert("warning", displayMessage, "Please try again later.");
+      console.error("Error adding product to wishlist:", error); // Remove later
+    },
+  });
 }
 // Function to show the purchase page
+
+function addToWishlist(productId, productName) {
+  $.ajax({
+    url: host + "/wishlist", 
+    type: "POST",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    data: JSON.stringify({
+      product_id: productId,
+    }),
+    success: function (response) {
+      displayMessage = "Produkt: " + productName + ".";
+      showAlert("success", "Tillagd i önskelistan: ", displayMessage);
+    },
+    error: function (error) {
+      displayMessage = "Produkt: " + productName + " blev inte tillagd i önskelistan.";
+      showAlert("warning", displayMessage, "Försök igen.");
+    },
+  });
+}
+
+function removeFromWishlist(productId) {
+  console.log("removing from wishlist");
+  $.ajax({
+    url: host + "/wishlist/" + productId, 
+    type: "DELETE",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    success: function (response) {
+      displayMessage = "Produkten togs bort från önskelistan."; 
+      showAlert("success", displayMessage, "");
+      ShowFavoritesPage(); // Reload the favorites page
+    },
+    error: function (error) {
+      displayMessage = "Produkten gick inte att ta bort från önskelistan.";
+      showAlert("warning", displayMessage, "Försök igen.");
+    }
+  });
+}
+
+
+function addToShoppingCart(productId, orderQuantity, productName) {
+  if (orderQuantity > 0) {
+    $.ajax({
+      url: host + "/cartitems",
+      type: "POST",
+      contentType: "application/json",
+      headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+      data: JSON.stringify({
+        quantity: orderQuantity,
+        product_id: productId,
+        shoppingcart_id: shoppingcartID
+      }),
+      success: function (response) {
+        checkIfInWishlist(productId).then(isInWishlist => {
+          if(isInWishlist) {
+            removeFromWishlist(productId)
+          }
+        });
+        displayMessage = "Produkt: " + productName + " x " + orderQuantity + ".";
+        showAlert("success", "Tillagd i varukorgen:", displayMessage);
+
+      },
+      error: function (error) {
+        displayMessage = "Produkt: " + productName + " x " + orderQuantity + " blev inte tillagd i varukorgen.";
+        showAlert("warning", displayMessage, "Försök igen.");
+        if (error.status == 400) {
+          showAlert("warning", "Ej tillräckligt många i lager.", "Minska antalet!");
+        }
+      },
+    });
+  } else {
+    showAlert("warning", "Den nuvarande kvantiteten är inte tillåten.", "Var snäll och öka antalet!");
+  }
+}
+
+async function checkIfInWishlist(productId) {
+  let inWishlist = false;
+  await $.ajax({
+    url: host + "/wishlist",
+    type: "GET",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+  }).then(function (response) {
+    response.forEach(item => {
+      if (item.id === productId) {
+        inWishlist = true;
+      }
+    });
+  });
+  return inWishlist;
+}
+
+function removeFromShoppingCart(productId) {
+  $.ajax({
+    url: host + "/cartitems/" + productId, 
+    type: "DELETE",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    success: function (response) {
+      displayMessage = "Produkten togs bort från varukorgen.";
+      showAlert("success", displayMessage, "");
+      ShowShoppingcartPage(); 
+    },
+    error: function (error) {
+      displayMessage = "Produkten gick inte att ta bort från varukorgen.";
+      showAlert("warning", displayMessage, "Försök igen.");
+    }
+  });
+}
+
 function ShowPurchasePage() {
   $(".container").html($("#view-purchase").html());
 
@@ -296,7 +457,7 @@ function ShowProductPage(productId) {
                           <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
                       </svg>
                   </button>
-                  <input type="number" id="quantity" class="form-control" value="1" min="1" max="${product.quantity}">
+                  <input type="number" id="quantity${item.product.id}" class="form-control" value="${item.quantity}" min="1" max="${item.product.quantity}" readonly>
                   <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepUp()" id="plus-button">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                           <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
