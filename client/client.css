@@ -188,8 +188,8 @@ p {
 }
   
 .product-image {
-    width: 100%;
-    height: auto;
+    width: auto;
+    height: 100%;
     object-fit: cover;
     transition: transform 0.05s ease-in-out;
 }
