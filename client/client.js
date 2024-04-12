@@ -9,6 +9,7 @@ let eventCheckboxesfilter = [];
 let shoppingcartID;
 let userID;
 let myWishList = [];
+let loggedIn = false;
 
 
 //drop-down for profile 
