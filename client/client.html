@@ -459,45 +459,101 @@
  
   <div class="row">
     <!-- Sidebar filter-->
-    <div class="col-md-3">
+    <div class="col-md-4">
       <div id="sidebar">
         <h2>Filters</h2>
 
         <!-- Year filter -->
-        <div class="form-group">
-          <label>Year:</label>
-          <div id="yearCheckboxes">
-            <!-- Dynamically populated checkboxes -->
+        <div class="col-12 col-sm-12 col-lg-12">
+          <div class="accordion faq-accordian" id="faqAccordion">
+              
+            <div class="card border-0 wow fadeInUp" data-wow-delay="0.2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
+                  <div class="card-header" id="headingOne">
+                      <h6 class="mb-0 collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">År<span class="lni-chevron-up"></span></h6>
+                  </div>
+                  <div class="collapse" id="collapseOne" aria-labelledby="headingOne" data-parent="#faqAccordion">
+                      <div class="card-body">
+                          <!-- Here's a dropdown list -->
+                          <div class="form-group">
+                              <label></label>
+                              <div id="yearCheckboxes">
+                                  <!-- Dynamically populated checkboxes -->
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+            </div>
+         
+       
+      
+
+             <!-- Section filter -->
+        
+            <div class="card border-0 wow fadeInUp" data-wow-delay="0.2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
+                  <div class="card-header" id="headingTwo">
+                      <h6 class="mb-0 collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseOne">Sektion<span class="lni-chevron-up"></span></h6>
+                  </div>
+                  <div class="collapse" id="collapseTwo" aria-labelledby="headingOne" data-parent="#faqAccordion">
+                      <div class="card-body">
+                          <!-- Here's a dropdown list -->
+                          <div class="form-group">
+                              <label></label>
+                              <div id="sectionCheckboxes">
+                                  <!-- Dynamically populated checkboxes -->
+                              </div>
+                          </div>
+                        </div>
+                   </div>
+            </div>
+      
+      
+    
+    
+
+             <!-- Event Organizers filter -->
+        
+            <div class="card border-0 wow fadeInUp" data-wow-delay="0.2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
+                  <div class="card-header" id="headingThree">
+                      <h6 class="mb-0 collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseOne">Organisation<span class="lni-chevron-up"></span></h6>
+                  </div>
+                  <div class="collapse" id="collapseThree" aria-labelledby="headingThree" data-parent="#faqAccordion">
+                      <div class="card-body">
+                          <!-- Here's a dropdown list -->
+                          <div class="form-group">
+                              <label></label>
+                              <div id="organizersCheckboxes">
+                                  <!-- Dynamically populated checkboxes -->
+                              </div>
+                           </div>
+                       </div>
+                   </div>
+            </div>
+        
+             <!-- Event filter -->
+     
+            <div class="card border-0 wow fadeInUp" data-wow-delay="0.2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
+                  <div class="card-header" id="headingFour">
+                      <h6 class="mb-0 collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseOne">Event<span class="lni-chevron-up"></span></h6>
+                  </div>
+                  <div class="collapse" id="collapseFour" aria-labelledby="headingFour" data-parent="#faqAccordion">
+                      <div class="card-body">
+                          <!-- Here's a dropdown list -->
+                          <div class="form-group">
+                              <label></label>
+                              <div id="eventCheckboxes">
+                                  <!-- Dynamically populated checkboxes -->
+                              </div>
+                           </div>
+                       </div>
+                   </div>
+            </div>
           </div>
         </div>
+     </div>
+   </div>
 
-        <!-- Section filter -->
-        <div class="form-group">
-          <label>Section:</label>
-          <div id="sectionCheckboxes">
-            <!-- Dynamically populated checkboxes -->
-          </div>
-        </div>
 
-        <!-- Event Organizers filter -->
-        <div class="form-group">
-          <label>Event Organizers:</label>
-          <div id="organizersCheckboxes">
-            <!-- Dynamically populated checkboxes -->
-          </div>
-        </div>
-
-        <!-- Event filter -->
-        <div class="form-group">
-          <label>Event:</label>
-          <div id="eventCheckboxes">
-            <!-- Dynamically populated checkboxes -->
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-9">
+ <div class="col-md-8">
       <div class="container-fluid">
         <div class="row" id="product-container">
           <!-- Product cards will be dynamically populated here -->
