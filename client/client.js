@@ -6,7 +6,7 @@ var yearCheckboxesfilter = [];
 var sectionCheckboxesfilter = [];
 var organizersCheckboxesfilter = [];
 var eventCheckboxesfilter = [];
-var loggedIn = false;
+//var loggedIn = false;
 
 
 //drop-down for profile 
@@ -751,15 +751,15 @@ $(document).ready(function () {
   });
 
   $(".nav-link.favorites").click(function () {
-    if (loggedIn) {
-      ShowFavoritesPage();
-    } else {
-      showAlert("danger", "Du behöver logga in för att spara favoriter", "");
-      setTimeout(function() {
-        ShowLoginPage();
-      }, 5000);
+    // if (loggedIn) {
+    //   ShowFavoritesPage();
+    // } else {
+    //   showAlert("danger", "Du behöver logga in för att spara favoriter", "");
+    //   setTimeout(function() {
+    //     ShowLoginPage();
+    //   }, 5000);
       
-          }
+    //       }
     
   });
 
@@ -863,17 +863,17 @@ $(document).on("click", "#checkout-button", function() {
 });
 
 //PURCHASE
-$(document).on("click", ".btn.btn-outline-dark", function() {
- if (signedIn) {
-  ShowFavoritesPage()
- } else {
-  showAlert("danger", "Du behöver logga in för att spara favoriter", "");
-  setTimeout(function() {
-    ShowLoginPage();
-  }, 5000);
+// $(document).on("click", ".btn.btn-outline-dark", function() {
+//  if (signedIn) {
+//   ShowFavoritesPage()
+//  } else {
+//   showAlert("danger", "Du behöver logga in för att spara favoriter", "");
+//   setTimeout(function() {
+//     ShowLoginPage();
+//   }, 5000);
   
- }
-});
+//  }
+// });
 
 
 });
