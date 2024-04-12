@@ -39,9 +39,10 @@ function ShowFavoritesPage() {
     success: function (items) {
       let htmlString = items.map(product => {
         return `
-          <div class="col-lg-4 col-md-6 mb-4" style="display: inline;">
+          
+        <div class="col-lg-4 col-md-6 mb-4" style="display: inline;">
             <div class="card wishlist-item h-100">
-              <img class="card-img-top mx-auto d-block show-product" src="/product_images/${product.img}" alt="${product.name}" data-product-id="${product.id}"/>
+            <img class="card-img-top mx-auto d-block show-product" src="/product_images/${product.img}" alt="${product.name}" data-product-id="${product.id}"/>
               <div class="card-body">
                 <h5 class="card-title show-product" data-product-id="${product.id}">${product.name}</h5>
                 <p class="card-text">${product.description}</p>
@@ -69,8 +70,7 @@ function ShowFavoritesPage() {
             </div>
           </div>
       `;
-      }).join('');
-    
+      }).join('');    
       $(".container").html($("#view-favorites").html() + htmlString);
     },
     error: function (error) {
@@ -589,6 +589,9 @@ function ShowShoppingcartPage() {
       console.log(response.cartitems[0].product.id);
       let totalPrice = 0;
       let htmlString = '';
+      htmlString += `<div class="shoppingCartArea section_padding_130" id="shoppingCart">
+      <div class="container">
+      <h2 class="bold-heading">Varukorg</h2>`;
       response.cartitems.forEach(item => {
         totalPrice += item.product.price * item.quantity;
         htmlString += `
@@ -619,9 +622,18 @@ function ShowShoppingcartPage() {
                 </div>
               </div>
             </div>
+        
           </div>`;
-      });
-      htmlString += `totalprice: ${totalPrice}`;
+    });
+    
+    htmlString += `<div class="Totalprice">
+                      <h2> Totalkostnad: ${totalPrice} SEK</h2>
+                      </div>`;
+                      htmlString += `<button id="checkout-button" class ="btn btn-sm btn-outline-dark btn-block" style="height: 50px; font-size: 16px;">Gå till kassan</button>`;
+
+      htmlString += `</div>
+    </div>`; 
+      
       $(".container").append(htmlString);
     }
   });
@@ -999,7 +1011,7 @@ $(document).ready(function () {
   checkLoggedIn();
   ShowHomePage();
   
-   //------------------------------------------
+  //------------------------------------------
   // Navigation click event handlers
 
   function loadView(viewId, productId) {
@@ -1083,8 +1095,6 @@ function handleNavigationClick(viewId, productId = null) {
     previousViewId = viewId;
     previousProductId = productId;
     history.pushState({ viewId: viewId, productId: productId }, "", "");
-    console.log("State object:", history.state);
-    console.log(productId);
   }
 }
 
