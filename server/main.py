@@ -215,10 +215,13 @@ with app.app_context():
     db.session.add(cartitem3)
     user1 = User(email='johndoe@mail.com', firstName='John', lastName='Doe', is_admin=False)
     user2 = User(email='rgn@gmail', firstName='Ragnar', lastName='Lothbrok', is_admin=False)
+    user3 = User(email='test@test', firstName='Test', lastName='Testsson', is_admin=False)
     user1.set_password('password')
     user2.set_password('password')
+    user3.set_password('password')
     db.session.add(user1)
     db.session.add(user2)
+    db.session.add(user3)
     payment1 = Payment(paymentDate=datetime.now(), paymentAmount=100.0)
     db.session.add(payment1)
     user1.add_to_wishlist(product2)
@@ -360,21 +363,29 @@ def cartitems():
 
     elif request.method == 'POST':
         data = request.get_json()
-        user = User.query.get(get_jwt_identity())
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        if user is None:
+            return jsonify("User not found!"), 404
+        product_exists_in_cart = False
         for product in user.shoppingcart.cartitems:
-            if product.product_id == request.get_json()['product_id']:
-                if product.quantity + int(request.get_json()['quantity']) > product.product.quantity:
+            if product.product_id == data['product_id']:
+                if product.quantity + int(data['quantity']) > product.product.quantity:
                     return jsonify("Not enough in stock"), 400
-                product.quantity += int(request.get_json()['quantity'])
+                product.quantity += int(data['quantity'])
                 db.session.commit()
+                product_exists_in_cart = True
                 return jsonify("Product already in cart, increased quantity"), 200
-            else:
-                if int(request.get_json()['quantity']) > product.product.quantity:
-                    return jsonify("Not enough in stock"), 400
-                new_cartitem = CartItem(quantity=data['quantity'], product_id=data['product_id'], shoppingcart_id=data['shoppingcart_id'])
-        db.session.add(new_cartitem)
-        db.session.commit()
-        return jsonify(new_cartitem.serialize()), 201
+        if not product_exists_in_cart:
+            product_to_add = Product.query.get(data['product_id'])
+            if product_to_add is None:
+                return jsonify("Product not found!"), 404
+            if int(data['quantity']) > product_to_add.quantity:
+                return jsonify("Not enough in stock"), 400
+            new_cartitem = CartItem(quantity=data['quantity'], product_id=data['product_id'], shoppingcart_id=data['shoppingcart_id'])
+            db.session.add(new_cartitem)
+            db.session.commit()
+            return jsonify(new_cartitem.serialize()), 201
 
 @app.route('/cartitems/<int:cartitem_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='cartitem_by_id')
 @jwt_required()
