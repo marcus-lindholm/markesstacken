@@ -405,11 +405,9 @@ def cartitem_by_id(cartitem_id):
         return jsonify(cartitem.serialize()), 200
 
     elif request.method == 'DELETE':
-        #We use productID to delete the cartitem instead of CartItemID
-        #cartitem_id = product.id in this case
         identity = get_jwt_identity()
         user = User.query.filter_by(id=identity).first()
-        cartitem = next((item for item in user.shoppingcart.cartitems if item.product.id == cartitem_id), None)
+        cartitem = next((item for item in user.shoppingcart.cartitems if item.id == cartitem_id), None)
         if cartitem is None:
             return jsonify("Cart item not found!"), 404
         db.session.delete(cartitem)
@@ -606,7 +604,107 @@ def login():
     else:
         return jsonify({"error": "Invalid email or password"}), 401  # 401 Unauthorized
     
-    
+
+# @app.route('/cars/<int:car_id>', methods=['PUT', 'GET', 'DELETE'], endpoint='get_car_by_id')
+# @jwt_required()
+# def get_car_by_id(car_id):
+#     current_user = get_jwt_identity()
+#     car = Car.query.get_or_404(car_id)
+ 
+#     if request.method == 'GET':
+#         car_data = car.serialize()
+
+#         if car.user:
+#             car_data['user'] = car.user.serialize()
+#         else:
+#             car_data['user'] = None
+
+#         car_data.pop('user_id', None)
+
+#         return jsonify(car_data)
+
+#     elif request.method == 'PUT':
+#         data = request.get_json()
+
+#         if 'make' in data:
+#             car.make = data['make']
+            
+#         if 'model' in data:
+#             car.model = data['model']
+
+#         if 'user_id' in data:
+#             user_id = data['user_id']
+#             user = None  # Initialize user variable
+
+#             if user_id:  # Check if user_id is provided
+#                 user = User.query.get(user_id)
+
+#                 if user is None:
+#                     abort(404)
+
+#             car.user_id = user.id if user else None
+
+#         db.session.commit()
+#         return jsonify(car.serialize()), 200
+
+
+#     elif request.method == 'DELETE':
+#         db.session.delete(car)
+#         db.session.commit()
+#         return jsonify("Success!"), 200
+
+# @app.route('/cars/<int:car_id>/booking', methods=['POST'], endpoint = 'book_car')
+# @jwt_required()
+# def book_car(car_id):
+
+#     car = Car.query.get_or_404(car_id)
+
+#     if request.method == 'POST':
+#         current_user = get_jwt_identity()
+#         data = request.get_json()
+
+#         if car.user_id:
+#             abort(400, "Car already booked")
+
+#         car.user_id = data['user_id']
+#         db.session.commit()
+
+#         return jsonify({"message": "Car booked successfully"}), 200
+
+# @app.route('/cars', methods=['GET', 'POST'], endpoint = 'cars')
+# @jwt_required()
+# def cars():
+
+#   if request.method == 'GET':
+#      # Handle GET request
+#     cars = Car.query.all()
+#     car_list = []
+
+#     for car in cars:
+#         car_data = car.serialize()
+
+#         if car.user:
+     
+#             car_data['user_id'] = car.user.serialize()
+#         else:
+
+#             car_data['user_id'] = None
+
+#         car_list.append(car_data)
+
+#     return jsonify(car_list)
+
+#   elif request.method == 'POST' :
+
+#     data = request.get_json()
+#     user_id = data.get('user_id', None)
+
+#     new_car = Car(make=data['make'], model=data['model'], user_id=user_id)
+#     db.session.add(new_car)
+#     db.session.commit()
+
+#     return jsonify(new_car.serialize()), 201 
+
 @app.route('/get-identity', methods=['GET'], endpoint = 'get-identity')
 @jwt_required()
 def get_identity():
@@ -667,9 +765,36 @@ def get_user_by_id(user_id):
     elif request.method == 'DELETE':
         user_id = user.id
 
+        # cars_to_reset = Car.query.filter_by(user_id=user_id).all()
+
+        # for car in cars_to_reset:
+        #     car.user = None
+
         db.session.delete(user)
         db.session.commit()
         return jsonify("Success!"), 200
+
+""" @app.route('/users/<int:user_id>/cars', methods=['GET'], endpoint = 'get_cars_by_user')
+@jwt_required()
+def get_cars_by_user(user_id):
+
+    user = User.query.get(user_id)
+
+    if not user:
+        abort(404)
+
+    if request.method == 'GET' :
+
+     cars = user.cars
+     car_list = []
+
+    for car in cars:
+        car_data = car.serialize()
+
+        car_list.append(car_data)
+        car_data.pop('user_id', None)
+
+    return jsonify(car_list) """
 
 #labb2
 @app.route("/")
