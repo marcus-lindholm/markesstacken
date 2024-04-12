@@ -188,8 +188,8 @@ p {
 }
   
 .product-image {
-    width: 100%;
-    height: auto;
+    width: auto;
+    height: 100%;
     object-fit: cover;
     transition: transform 0.05s ease-in-out;
 }
@@ -459,4 +459,3 @@ input[type="number"]::-webkit-outer-spin-button {
     transform: translate(-50%, -50%);
     z-index: 1000; /* Adjust the z-index value as needed */
 }
-

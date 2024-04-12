@@ -30,6 +30,7 @@ function ShowAboutusPage() {
 //FAVORITES-PAGE
 function ShowFavoritesPage() {
   $(".container").html($("#view-favorites").html());
+
 }
 // Function to show the purchase page
 function ShowPurchasePage() {
