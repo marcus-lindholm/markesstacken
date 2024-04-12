@@ -1128,6 +1128,7 @@ $(document).on('click', '.show-product', function() {
   });
   
   $(".nav-link.favorites").click(function () {
+    ShowFavoritesPage();
     // if (loggedIn) {
     //   ShowFavoritesPage();
     // } else {
