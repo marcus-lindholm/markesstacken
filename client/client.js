@@ -6,10 +6,11 @@ var yearCheckboxesfilter = [];
 var sectionCheckboxesfilter = [];
 var organizersCheckboxesfilter = [];
 var eventCheckboxesfilter = [];
-let shoppingcartID;
+var shoppingcartID;
 let userID;
 let myWishList = [];
 let loggedIn = false;
+var cartItems = [];
 
 
 //drop-down for profile 
@@ -615,10 +616,9 @@ function ShowShoppingcartPage() {
     contentType: "application/json",
     headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
     success: function (response) {
-      console.log(response.cartitems);
-      console.log(response.cartitems[0].product.id);
       let totalPrice = 0;
       let htmlString = '';
+      cartItems = response.cartitems;
       htmlString += `<div class="shoppingCartArea section_padding_130" id="shoppingCart">
       <div class="container">
       <h2 class="bold-heading">Varukorg</h2>`;
@@ -745,13 +745,66 @@ function decreaseQuantity(productId, productQuantity) { //lägg till vänta så 
 //CHECKOUT-PAGE
 function ShowCheckoutPage() {
  $(".container").html($("#view-checkout").html());
+
+  let numberOfItemsHtml = `
+      <span class="badge badge-secondary badge-pill">${cartItems.length}</span>
+    `;
+  let totalPrice = 0;
+  let cartitemsHtml = cartItems.map(function(item) {
+    totalPrice += item.product.price*item.quantity;
+    console.log(item);
+    return `
+      <li class="list-group-item d-flex justify-content-between lh-condensed">
+        <div>
+          <h6 class="my-0">${item.quantity} x ${item.product.name}</h6>
+          <small class="text-muted">${item.product.description.substring(0, 32)}</small>
+        </div>
+        <span class="text-muted">${item.product.price} kr</span>
+      </li>
+    `;
+  }).join('');
+
+  let totalPriceHtml = `
+    <li class="list-group-item d-flex justify-content-between">
+      <span>Total (SEK)</span>
+      <strong>${totalPrice}</strong>
+    </li>
+  `;
+
+$(".container .number-of-cartitems").html(numberOfItemsHtml);
+$(".container .list-group").html(cartitemsHtml + totalPriceHtml);
+}
+
+function placeOrder() {
+  const address = document.getElementById("address").value;
+  const city = document.getElementById("city").value;
+  const postalCode = document.getElementById("zip").value;
+  
+  console.log("address: " + address + " city: " + city + " postalCode: " + postalCode + " shoppingcartID: " + shoppingcartID);
+
+  $.ajax({
+    url: host + "/orders",
+    type: "POST",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    data: JSON.stringify({
+      shoppingcart_id: shoppingcartID,
+      address: address,
+      city: city,
+      postal_code: postalCode
+    }),
+    success: function(responseURL) {
+      // console.log("TEEST");
+      // console.log(responseURL);
+      window.location.href = responseURL;
+    }
+  });
 }
 
 //-------------------------------------------------
 //ORDER-CONFIRMATION-PAGE
 function ShowOrderConfirmationPage() {
   $(".container").html($("#view-order-confirmation").html());
-  
     var currentDateElement = document.getElementById("currentDate");
     var currentDate = new Date().toLocaleDateString(); 
   
@@ -1097,7 +1150,7 @@ $(document).ready(function () {
         break; 
       case "view-checkout":
         ShowCheckoutPage();
-        break; 
+        break;
       case "view-product":
         ShowProductPage(productId);
         break;
@@ -1129,6 +1182,7 @@ if (previousViewId !== viewId || previousProductId !== productId) {
 
 
 $(document).on("click", "#checkout-button", function() {
+  
   handleNavigationClick("view-checkout");
 });
 

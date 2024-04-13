@@ -1,17 +1,21 @@
  #!/usr/bin/env python3
+import os
 from datetime import datetime
 import time
 from flask import Flask
 from flask import jsonify
 from flask import abort
 from flask import request
+from flask import redirect
+from flask import render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_bcrypt import generate_password_hash
 from flask_bcrypt import check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
-import os
+from dotenv import load_dotenv
+import stripe
 
 app = Flask(__name__, static_folder='../client', static_url_path='/')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -21,6 +25,9 @@ app.config['JWT_SECRET_KEY'] = 'your_secret_key'
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 db = SQLAlchemy(app)
+
+load_dotenv()
+stripe.api_key = os.environ['STRIPE_SECRET_KEY']
 
 wishlist = db.Table('wishlist',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
@@ -278,19 +285,54 @@ def payments():
         return jsonify(new_payment.serialize()), 201
 
 @app.route('/orders', methods=['GET', 'POST'], endpoint='orders')
-#@jwt_required()
+@jwt_required()
 def orders():
     if request.method == 'GET':
         orders = Order.query.all()
         order_list = [order.serialize() for order in orders]
         return jsonify(order_list)
 
-    elif request.method == 'POST' and get_jwt_identity().is_admin:
+    elif request.method == 'POST':
         data = request.get_json()
-        new_order = Order()
-        db.session.add(new_order)
-        db.session.commit()
+        user = db.session.get(User, get_jwt_identity())
+        shoppingcartItems = user.shoppingcart.cartitems
+        stripe_data_list = []
+        for item in shoppingcartItems:
+            product_data = {
+                'price_data': {
+                    'product_data': {
+                        'name': item.product.name,
+                    },
+                    'unit_amount': int(item.product.price*100),
+                    'currency': 'sek',
+                },
+                'quantity': item.quantity,
+            }
+            stripe_data_list.append(product_data)
+        
+        checkout_session = stripe.checkout.Session.create(
+            line_items=stripe_data_list,
+            payment_method_types=['card'],
+            mode='payment',
+            success_url=request.host_url + 'order/success',
+            cancel_url=request.host_url + 'order/cancel',
+        )
+        return checkout_session.url
+
+
+        # new_order = Order()
+        # db.session.add(new_order)
+        # db.session.commit()
         return jsonify(new_order.serialize()), 201
+@app.route('/order/success')
+def success():
+    print('Success')
+    return render_template('success.html')
+
+@app.route('/order/cancel')
+def cancel():
+    print('Cancel')
+    return render_template('cancel.html')
 
 @app.route('/orders/<int:order_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='order_by_id')
 #@jwt_required()
@@ -315,7 +357,8 @@ def order_by_id(order_id):
 @app.route('/myShoppingCart', methods=['GET'], endpoint='myShoppingCart')
 @jwt_required()
 def myShoppingCart():
-    user = User.query.get(get_jwt_identity())
+    user_id = get_jwt_identity()
+    user = db.session.get(User, user_id)
     return jsonify(user.shoppingcart.serialize())
 
 @app.route('/shoppingcarts', methods=['GET', 'POST'], endpoint='shoppingcarts')
@@ -679,4 +722,5 @@ def client():
 
 if __name__ == "__main__":
     app.run(port=5001, debug=True) # På MacOS, byt till 5001 eller dylikt
+
 
