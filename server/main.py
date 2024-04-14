@@ -248,6 +248,13 @@ with app.app_context():
     admin_user.set_password('admin')
     db.session.add(admin_user)
 
+    ordered_shoppingcart1 = OrderedShoppingCart()
+    db.session.add(ordered_shoppingcart1)
+    ordered_cartitem1 = OrderedCartItem(quantity=4, product_id=10, ordered_shoppingcart_id=1)
+    db.session.add(ordered_cartitem1)
+    order1 = Order(ordered_shoppingcart_id=1, user_id=1, total_price=19, order_date=datetime.now())
+    db.session.add(order1)
+
     db.session.commit()
 
 @app.route('/wishlist', methods=['GET', 'POST'], endpoint='wishlist')
@@ -376,8 +383,9 @@ def myShoppingCart():
     user = db.session.get(User, user_id)
     return jsonify(user.shoppingcart.serialize())
 
+#Eventuellt ta bort ty används ej
 @app.route('/shoppingcarts', methods=['GET', 'POST'], endpoint='shoppingcarts')
-#@jwt_required()
+@jwt_required()
 def shoppingcarts():
     if request.method == 'GET':
         shoppingcarts = ShoppingCart.query.all()
@@ -391,8 +399,9 @@ def shoppingcarts():
         db.session.commit()
         return jsonify(new_shoppingcart.serialize()), 201
 
+#Eventuellt ta bort ty används ej
 @app.route('/shoppingcarts/<int:shoppingcart_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='shoppingcart_by_id')
-#@jwt_required()
+@jwt_required()
 def shoppingcart_by_id(shoppingcart_id):
     shoppingcart = ShoppingCart.query.get_or_404(shoppingcart_id)
 
