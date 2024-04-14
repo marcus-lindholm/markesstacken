@@ -801,10 +801,10 @@ function placeOrder() {
 //ORDER-CONFIRMATION-PAGE
 function ShowOrderConfirmationPage() {
   $(".container").html($("#view-order-confirmation").html());
-    var currentDateElement = document.getElementById("currentDate");
-    var currentDate = new Date().toLocaleDateString(); 
-  
-    currentDateElement.textContent = currentDate;
+    // var currentDateElement = document.getElementById("currentDate");
+    // var currentDate = new Date().toLocaleDateString(); 
+    // currentDateElement.textContent = currentDate;
+    
 
 }
 

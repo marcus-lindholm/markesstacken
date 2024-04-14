@@ -43,7 +43,6 @@ class User(db.Model):
     password_hash = db.Column(db.String, nullable=False)
     shoppingcart_id = db.Column(db.Integer, db.ForeignKey('shopping_cart.id'), nullable=False)
     shoppingcart = db.relationship('ShoppingCart', backref='shopping_cart', lazy=True, uselist=False)
-    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=True)
     orders = db.relationship('Order', backref='order_id', lazy=True, uselist=True)
     wishlist = db.relationship('Product', secondary=wishlist, lazy='subquery',
         backref=db.backref('users', lazy=True))
@@ -109,8 +108,6 @@ class Product(db.Model):
     
     def serialize(self):
         return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity, description=self.description, year=self.year, section=self.section, event=self.event, organizer=self.organizer, img=self.img, number_of_sales=self.number_of_sales, category=self.category.serialize() if self.category else None)
-    
-
 
 class CartItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)    
@@ -138,12 +135,39 @@ class ShoppingCart(db.Model):
             'cartitems': [cartitem.serialize() for cartitem in self.cartitems]
         }
 
+class OrderedCartItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)    
+    quantity = db.Column(db.Integer, nullable=False) #quantity of each product
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    product = db.relationship('Product', backref='ordered_cartitems', lazy=True)
+    ordered_shoppingcart_id = db.Column(db.Integer, db.ForeignKey('ordered_shopping_cart.id'), nullable=False)
+    ordered_shoppingcart = db.relationship('OrderedShoppingCart', backref='ordered_cartitems', lazy=True)
+
+    def __repr__(self):
+        return f'<OrderedCartItem {self.id}: {self.quantity}'
+    
+    def serialize(self):
+        return dict(id=self.id, quantity=self.quantity, product=self.product.serialize() if self.product else None)
+    
+class OrderedShoppingCart(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    def __repr__(self):
+        return f'<OrderedShoppingCart {self.id}>'
+    
+    def serialize(self):
+        return {
+            'id': self.id,
+            'ordered_cartitems': [ordered_cartitem.serialize() for ordered_cartitem in self.ordered_cartitems]
+        }
+
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    shoppingcart_id = db.Column(db.Integer, db.ForeignKey('shopping_cart.id'), nullable=False)
-    shoppingcart = db.relationship('ShoppingCart', backref='orders', lazy=True)
-    payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'), nullable=False)
-    payment = db.relationship('Payment', backref='orders', lazy=True)
+    ordered_shoppingcart_id = db.Column(db.Integer, db.ForeignKey('ordered_shopping_cart.id'), nullable=True)
+    ordered_shoppingcart = db.relationship('OrderedShoppingCart', backref='orders', lazy=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    total_price = db.Column(db.Integer, nullable=False)
+    order_date = db.Column(db.DateTime, nullable=False)
     returned = db.Column(db.Boolean, default=False)
     
     def __repr__(self):
@@ -152,23 +176,10 @@ class Order(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'shoppingcart': self.shoppingcart.serialize() if self.shoppingcart else None,
-            'payment': self.payment.serialize() if self.payment else None
-        }
-
-class Payment(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    paymentDate = db.Column(db.DateTime, nullable=False) 
-    paymentAmount = db.Column(db.Float, nullable=False)
-
-    def __repr__(self):
-        return f'<Payment {self.id}: {self.paymentAmount}'
-    
-    def serialize(self):
-        return {
-            'id': self.id,
-            'paymentDate': self.paymentDate,
-            'paymentAmount': self.paymentAmount
+            'total_price': self.total_price,
+            'order_date': self.order_date,
+            'returned': self.returned,
+            'ordered_shoppingcart': self.ordered_shoppingcart.serialize() if self.ordered_shoppingcart else None,
         }
     
 with app.app_context():
@@ -230,13 +241,8 @@ with app.app_context():
     db.session.add(user1)
     db.session.add(user2)
     db.session.add(user3)
-    payment1 = Payment(paymentDate=datetime.now(), paymentAmount=100.0)
-    db.session.add(payment1)
     user1.add_to_wishlist(product2)
     user1.add_to_wishlist(product2)
-    #order1 = Order(shoppingcart=shoppingcart1, payment=payment1)
-    #db.session.add(order1)
-    #user1.orders.append(order1)
 
     admin_user = User(email = 'admin@markesstacken.se', firstName = 'Admin', lastName = 'Admin', is_admin = True, shoppingcart_id = None)
     admin_user.set_password('admin')
@@ -310,26 +316,41 @@ def orders():
                 'quantity': item.quantity,
             }
             stripe_data_list.append(product_data)
-        
         checkout_session = stripe.checkout.Session.create(
             line_items=stripe_data_list,
             payment_method_types=['card'],
             mode='payment',
-            success_url=request.host_url + 'order/success',
+            success_url=request.host_url + 'order/success?session_id={CHECKOUT_SESSION_ID}',
             cancel_url=request.host_url + 'order/cancel',
+            metadata={
+                'user_id': str(user.id),
+                #data from request
+            },
         )
-        return checkout_session.url
+        return checkout_session.url, 200
 
-
-        # new_order = Order()
-        # db.session.add(new_order)
-        # db.session.commit()
-        return jsonify(new_order.serialize()), 201
+#Handle order if stripe payment successful
 @app.route('/order/success')
 def success():
     print('Success')
+    session_id = request.args.get('session_id')
+    session = stripe.checkout.Session.retrieve(session_id)
+    user_id = session.metadata['user_id']
+    user = db.session.get(User, user_id)
+    ordered_shoppingcart = OrderedShoppingCart()
+    db.session.add(ordered_shoppingcart)
+    for item in user.shoppingcart.cartitems:
+        new_ordered_cartitem = OrderedCartItem(quantity=item.quantity, product_id=item.product.id, ordered_shoppingcart_id=ordered_shoppingcart.id)
+        db.session.add(new_ordered_cartitem)
+        item.product.quantity -= item.quantity
+        db.session.add(item.product)
+    new_order = Order(ordered_shoppingcart_id=ordered_shoppingcart.id, user_id=user.id, total_price=session.amount_total/100, order_date=datetime.now())
+    db.session.add(new_order)
+    CartItem.query.filter_by(shoppingcart_id=user.shoppingcart.id).delete()
+    db.session.commit()
     return redirect('/?view=success')
 
+#Handle order if stripe payment canceled
 @app.route('/order/cancel')
 def cancel():
     print('Cancel')
