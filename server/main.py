@@ -276,21 +276,6 @@ def wishlist_by_id(product_id):
     db.session.commit()
     return jsonify("Success!"), 200
 
-@app.route('/payments', methods=['GET', 'POST'], endpoint='payments')
-#@jwt_required()
-def payments():
-    if request.method == 'GET':
-        payments = Payment.query.all()
-        payment_list = [payment.serialize() for payment in payments]
-        return jsonify(payment_list)
-
-    elif request.method == 'POST' and get_jwt_identity().is_admin:
-        data = request.get_json()
-        new_payment = Payment(paymentDate=datetime.now(), paymentAmount=data['paymentAmount'])
-        db.session.add(new_payment)
-        db.session.commit()
-        return jsonify(new_payment.serialize()), 201
-
 @app.route('/orders', methods=['GET', 'POST'], endpoint='orders')
 @jwt_required()
 def orders():
@@ -348,7 +333,7 @@ def success():
     db.session.add(new_order)
     CartItem.query.filter_by(shoppingcart_id=user.shoppingcart.id).delete()
     db.session.commit()
-    return redirect('/?view=success')
+    return redirect('/?view=success&order_id=' + str(new_order.id))
 
 #Handle order if stripe payment canceled
 @app.route('/order/cancel')
@@ -357,12 +342,20 @@ def cancel():
     return redirect('/?view=cancel')
 
 @app.route('/orders/<int:order_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='order_by_id')
-#@jwt_required()
+@jwt_required()
 def order_by_id(order_id):
     order = Order.query.get_or_404(order_id)
-
+    user = db.session.get(User, get_jwt_identity())
+    if order.user_id != user.id and not user.is_admin:
+        return jsonify("Unauthorized, you either need admin access or this is not your order"), 401
+    
     if request.method == 'GET':
-        return jsonify(order.serialize())
+        order_data = order.serialize()
+        order_data['first_name'] = user.firstName
+        order_data['last_name'] = user.lastName
+        order_data['email'] = user.email
+        print(order_data)
+        return jsonify(order_data)
 
     elif request.method == 'PUT' and get_jwt_identity().is_admin:
         data = request.get_json()

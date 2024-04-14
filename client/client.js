@@ -801,10 +801,27 @@ function placeOrder() {
 //ORDER-CONFIRMATION-PAGE
 function ShowOrderConfirmationPage() {
   $(".container").html($("#view-order-confirmation").html());
-    // var currentDateElement = document.getElementById("currentDate");
-    // var currentDate = new Date().toLocaleDateString(); 
-    // currentDateElement.textContent = currentDate;
-    
+    let urlParams = new URLSearchParams(window.location.search);
+    let orderId = urlParams.get('order_id');
+
+    $.ajax({
+      url: host + "/orders/" + orderId, 
+      type: "GET",
+      contentType: "application/json",
+      headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+      success: function (order) {
+        console.log(order);
+        orderDate = new Date(order.order_date).toLocaleDateString('sv-SE');
+        let htmlString = `
+          <p><strong>Ordernummer:</strong> 1000${order.id}</p>
+          <p><strong>Namn:</strong> ${order.first_name} ${order.last_name}</p>
+          <p><strong>Datum:</strong> <span>${orderDate}</span></p>
+          <p><strong>Email:</strong> ${order.email}</p>
+          `;
+        $(".container .confirmation-details").html(htmlString);
+      } 
+    });
+
 
 }
 
