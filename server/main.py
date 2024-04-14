@@ -1,17 +1,21 @@
  #!/usr/bin/env python3
+import os
 from datetime import datetime
 import time
 from flask import Flask
 from flask import jsonify
 from flask import abort
 from flask import request
+from flask import redirect
+from flask import render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_bcrypt import generate_password_hash
 from flask_bcrypt import check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
-import os
+from dotenv import load_dotenv
+import stripe
 
 app = Flask(__name__, static_folder='../client', static_url_path='/')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -21,6 +25,9 @@ app.config['JWT_SECRET_KEY'] = 'your_secret_key'
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 db = SQLAlchemy(app)
+
+load_dotenv()
+stripe.api_key = os.environ['STRIPE_SECRET_KEY']
 
 wishlist = db.Table('wishlist',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
@@ -36,7 +43,6 @@ class User(db.Model):
     password_hash = db.Column(db.String, nullable=False)
     shoppingcart_id = db.Column(db.Integer, db.ForeignKey('shopping_cart.id'), nullable=False)
     shoppingcart = db.relationship('ShoppingCart', backref='shopping_cart', lazy=True, uselist=False)
-    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=True)
     orders = db.relationship('Order', backref='order_id', lazy=True, uselist=True)
     wishlist = db.relationship('Product', secondary=wishlist, lazy='subquery',
         backref=db.backref('users', lazy=True))
@@ -102,8 +108,6 @@ class Product(db.Model):
     
     def serialize(self):
         return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity, description=self.description, year=self.year, section=self.section, event=self.event, organizer=self.organizer, img=self.img, number_of_sales=self.number_of_sales, category=self.category.serialize() if self.category else None)
-    
-
 
 class CartItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)    
@@ -131,12 +135,40 @@ class ShoppingCart(db.Model):
             'cartitems': [cartitem.serialize() for cartitem in self.cartitems]
         }
 
+class OrderedCartItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)    
+    quantity = db.Column(db.Integer, nullable=False) #quantity of each product
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    product = db.relationship('Product', backref='ordered_cartitems', lazy=True)
+    ordered_shoppingcart_id = db.Column(db.Integer, db.ForeignKey('ordered_shopping_cart.id'), nullable=False)
+    ordered_shoppingcart = db.relationship('OrderedShoppingCart', backref='ordered_cartitems', lazy=True)
+
+    def __repr__(self):
+        return f'<OrderedCartItem {self.id}: {self.quantity}'
+    
+    def serialize(self):
+        return dict(id=self.id, quantity=self.quantity, product=self.product.serialize() if self.product else None)
+    
+class OrderedShoppingCart(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    def __repr__(self):
+        return f'<OrderedShoppingCart {self.id}>'
+    
+    def serialize(self):
+        return {
+            'id': self.id,
+            'ordered_cartitems': [ordered_cartitem.serialize() for ordered_cartitem in self.ordered_cartitems]
+        }
+
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    shoppingcart_id = db.Column(db.Integer, db.ForeignKey('shopping_cart.id'), nullable=False)
-    shoppingcart = db.relationship('ShoppingCart', backref='orders', lazy=True)
-    payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'), nullable=False)
-    payment = db.relationship('Payment', backref='orders', lazy=True)
+    ordered_shoppingcart_id = db.Column(db.Integer, db.ForeignKey('ordered_shopping_cart.id'), nullable=True)
+    ordered_shoppingcart = db.relationship('OrderedShoppingCart', backref='orders', lazy=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    total_price = db.Column(db.Integer, nullable=False)
+    order_date = db.Column(db.DateTime, nullable=False)
+    returned = db.Column(db.Boolean, default=False)
     
     def __repr__(self):
         return f'<Order {self.id}>'
@@ -144,23 +176,10 @@ class Order(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'shoppingcart': self.shoppingcart.serialize() if self.shoppingcart else None,
-            'payment': self.payment.serialize() if self.payment else None
-        }
-
-class Payment(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    paymentDate = db.Column(db.DateTime, nullable=False) 
-    paymentAmount = db.Column(db.Float, nullable=False)
-
-    def __repr__(self):
-        return f'<Payment {self.id}: {self.paymentAmount}'
-    
-    def serialize(self):
-        return {
-            'id': self.id,
-            'paymentDate': self.paymentDate,
-            'paymentAmount': self.paymentAmount
+            'total_price': self.total_price,
+            'order_date': self.order_date,
+            'returned': self.returned,
+            'ordered_shoppingcart': self.ordered_shoppingcart.serialize() if self.ordered_shoppingcart else None,
         }
     
 with app.app_context():
@@ -222,17 +241,19 @@ with app.app_context():
     db.session.add(user1)
     db.session.add(user2)
     db.session.add(user3)
-    payment1 = Payment(paymentDate=datetime.now(), paymentAmount=100.0)
-    db.session.add(payment1)
     user1.add_to_wishlist(product2)
     user1.add_to_wishlist(product2)
-    #order1 = Order(shoppingcart=shoppingcart1, payment=payment1)
-    #db.session.add(order1)
-    #user1.orders.append(order1)
 
     admin_user = User(email = 'admin@markesstacken.se', firstName = 'Admin', lastName = 'Admin', is_admin = True, shoppingcart_id = None)
     admin_user.set_password('admin')
     db.session.add(admin_user)
+
+    ordered_shoppingcart1 = OrderedShoppingCart()
+    db.session.add(ordered_shoppingcart1)
+    ordered_cartitem1 = OrderedCartItem(quantity=4, product_id=10, ordered_shoppingcart_id=1)
+    db.session.add(ordered_cartitem1)
+    order1 = Order(ordered_shoppingcart_id=1, user_id=1, total_price=19, order_date=datetime.now())
+    db.session.add(order1)
 
     db.session.commit()
 
@@ -240,14 +261,14 @@ with app.app_context():
 @jwt_required()
 def wishlist():
     if request.method == 'GET':
-        user = User.query.get(get_jwt_identity())
+        user = db.session.get(User, get_jwt_identity())
         wishlist = user.wishlist
         wishlist_list = [product.serialize() for product in wishlist]
         return jsonify(wishlist_list)
 
     elif request.method == 'POST':
         data = request.get_json()
-        user = User.query.get(get_jwt_identity())
+        user = db.session.get(User, get_jwt_identity())
         product = db.session.get(Product, data['product_id'])
         user.add_to_wishlist(product)
         db.session.commit()
@@ -256,49 +277,92 @@ def wishlist():
 @app.route('/wishlist/<int:product_id>', methods=['DELETE'], endpoint='remove_from_wishlist')
 @jwt_required()
 def wishlist_by_id(product_id):
-    user = User.query.get(get_jwt_identity())
+    user = db.session.get(User, get_jwt_identity())
     product = db.session.get(Product, product_id)
     user.remove_from_wishlist(product)
     db.session.commit()
     return jsonify("Success!"), 200
 
-@app.route('/payments', methods=['GET', 'POST'], endpoint='payments')
-#@jwt_required()
-def payments():
-    if request.method == 'GET':
-        payments = Payment.query.all()
-        payment_list = [payment.serialize() for payment in payments]
-        return jsonify(payment_list)
-
-    elif request.method == 'POST' and get_jwt_identity().is_admin:
-        data = request.get_json()
-        new_payment = Payment(paymentDate=datetime.now(), paymentAmount=data['paymentAmount'])
-        db.session.add(new_payment)
-        db.session.commit()
-        return jsonify(new_payment.serialize()), 201
-
 @app.route('/orders', methods=['GET', 'POST'], endpoint='orders')
-#@jwt_required()
+@jwt_required()
 def orders():
     if request.method == 'GET':
         orders = Order.query.all()
         order_list = [order.serialize() for order in orders]
         return jsonify(order_list)
 
-    elif request.method == 'POST' and get_jwt_identity().is_admin:
+    elif request.method == 'POST':
         data = request.get_json()
-        new_order = Order()
-        db.session.add(new_order)
-        db.session.commit()
-        return jsonify(new_order.serialize()), 201
+        user = db.session.get(User, get_jwt_identity())
+        shoppingcartItems = user.shoppingcart.cartitems
+        stripe_data_list = []
+        for item in shoppingcartItems:
+            product_data = {
+                'price_data': {
+                    'product_data': {
+                        'name': item.product.name,
+                    },
+                    'unit_amount': int(item.product.price*100),
+                    'currency': 'sek',
+                },
+                'quantity': item.quantity,
+            }
+            stripe_data_list.append(product_data)
+        checkout_session = stripe.checkout.Session.create(
+            line_items=stripe_data_list,
+            payment_method_types=['card'],
+            mode='payment',
+            success_url=request.host_url + 'order/success?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url=request.host_url + 'order/cancel',
+            metadata={
+                'user_id': str(user.id),
+                #data from request
+            },
+        )
+        return checkout_session.url, 200
+
+#Handle order if stripe payment successful
+@app.route('/order/success')
+def success():
+    print('Success')
+    session_id = request.args.get('session_id')
+    session = stripe.checkout.Session.retrieve(session_id)
+    user_id = session.metadata['user_id']
+    user = db.session.get(User, user_id)
+    ordered_shoppingcart = OrderedShoppingCart()
+    db.session.add(ordered_shoppingcart)
+    for item in user.shoppingcart.cartitems:
+        new_ordered_cartitem = OrderedCartItem(quantity=item.quantity, product_id=item.product.id, ordered_shoppingcart_id=ordered_shoppingcart.id)
+        db.session.add(new_ordered_cartitem)
+        item.product.quantity -= item.quantity
+        db.session.add(item.product)
+    new_order = Order(ordered_shoppingcart_id=ordered_shoppingcart.id, user_id=user.id, total_price=session.amount_total/100, order_date=datetime.now())
+    db.session.add(new_order)
+    CartItem.query.filter_by(shoppingcart_id=user.shoppingcart.id).delete()
+    db.session.commit()
+    return redirect('/?view=success&order_id=' + str(new_order.id))
+
+#Handle order if stripe payment canceled
+@app.route('/order/cancel')
+def cancel():
+    print('Cancel')
+    return redirect('/?view=cancel')
 
 @app.route('/orders/<int:order_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='order_by_id')
-#@jwt_required()
+@jwt_required()
 def order_by_id(order_id):
     order = Order.query.get_or_404(order_id)
-
+    user = db.session.get(User, get_jwt_identity())
+    if order.user_id != user.id and not user.is_admin:
+        return jsonify("Unauthorized, you either need admin access or this is not your order"), 401
+    
     if request.method == 'GET':
-        return jsonify(order.serialize())
+        order_data = order.serialize()
+        order_data['first_name'] = user.firstName
+        order_data['last_name'] = user.lastName
+        order_data['email'] = user.email
+        print(order_data)
+        return jsonify(order_data)
 
     elif request.method == 'PUT' and get_jwt_identity().is_admin:
         data = request.get_json()
@@ -315,11 +379,13 @@ def order_by_id(order_id):
 @app.route('/myShoppingCart', methods=['GET'], endpoint='myShoppingCart')
 @jwt_required()
 def myShoppingCart():
-    user = User.query.get(get_jwt_identity())
+    user_id = get_jwt_identity()
+    user = db.session.get(User, user_id)
     return jsonify(user.shoppingcart.serialize())
 
+#Eventuellt ta bort ty används ej
 @app.route('/shoppingcarts', methods=['GET', 'POST'], endpoint='shoppingcarts')
-#@jwt_required()
+@jwt_required()
 def shoppingcarts():
     if request.method == 'GET':
         shoppingcarts = ShoppingCart.query.all()
@@ -333,8 +399,9 @@ def shoppingcarts():
         db.session.commit()
         return jsonify(new_shoppingcart.serialize()), 201
 
+#Eventuellt ta bort ty används ej
 @app.route('/shoppingcarts/<int:shoppingcart_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='shoppingcart_by_id')
-#@jwt_required()
+@jwt_required()
 def shoppingcart_by_id(shoppingcart_id):
     shoppingcart = ShoppingCart.query.get_or_404(shoppingcart_id)
 
@@ -679,4 +746,5 @@ def client():
 
 if __name__ == "__main__":
     app.run(port=5001, debug=True) # På MacOS, byt till 5001 eller dylikt
+
 

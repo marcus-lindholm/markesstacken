@@ -6,10 +6,11 @@ var yearCheckboxesfilter = [];
 var sectionCheckboxesfilter = [];
 var organizersCheckboxesfilter = [];
 var eventCheckboxesfilter = [];
-let shoppingcartID;
+var shoppingcartID;
 let userID;
 let myWishList = [];
 let loggedIn = false;
+var cartItems = [];
 
 
 //drop-down for profile 
@@ -617,10 +618,9 @@ function ShowShoppingcartPage() {
     contentType: "application/json",
     headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
     success: function (response) {
-      console.log(response.cartitems);
-      console.log(response.cartitems[0].product.id);
       let totalPrice = 0;
       let htmlString = '';
+      cartItems = response.cartitems;
       htmlString += `<div class="shoppingCartArea section_padding_130" id="shoppingCart">
       <div class="container">
       <h2 class="bold-heading">Varukorg</h2>`;
@@ -747,17 +747,83 @@ function decreaseQuantity(productId, productQuantity) { //lägg till vänta så 
 //CHECKOUT-PAGE
 function ShowCheckoutPage() {
  $(".container").html($("#view-checkout").html());
+
+  let numberOfItemsHtml = `
+      <span class="badge badge-secondary badge-pill">${cartItems.length}</span>
+    `;
+  let totalPrice = 0;
+  let cartitemsHtml = cartItems.map(function(item) {
+    totalPrice += item.product.price*item.quantity;
+    console.log(item);
+    return `
+      <li class="list-group-item d-flex justify-content-between lh-condensed">
+        <div>
+          <h6 class="my-0">${item.quantity} x ${item.product.name}</h6>
+          <small class="text-muted">${item.product.description.substring(0, 32)}</small>
+        </div>
+        <span class="text-muted">${item.product.price} kr</span>
+      </li>
+    `;
+  }).join('');
+
+  let totalPriceHtml = `
+    <li class="list-group-item d-flex justify-content-between">
+      <span>Total (SEK)</span>
+      <strong>${totalPrice}</strong>
+    </li>
+  `;
+
+$(".container .number-of-cartitems").html(numberOfItemsHtml);
+$(".container .list-group").html(cartitemsHtml + totalPriceHtml);
+}
+
+function placeOrder() {
+  const address = document.getElementById("address").value;
+  const city = document.getElementById("city").value;
+  const postalCode = document.getElementById("zip").value;
+  
+  event.preventDefault();
+  $.ajax({
+    url: host + "/orders",
+    type: "POST",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    data: JSON.stringify({
+      address: address,
+      city: city,
+      postal_code: postalCode
+    }),
+    success: function(responseURL) {
+      window.location.href = responseURL;
+    }
+  });
 }
 
 //-------------------------------------------------
 //ORDER-CONFIRMATION-PAGE
 function ShowOrderConfirmationPage() {
   $(".container").html($("#view-order-confirmation").html());
-  
-    var currentDateElement = document.getElementById("currentDate");
-    var currentDate = new Date().toLocaleDateString(); 
-  
-    currentDateElement.textContent = currentDate;
+    let urlParams = new URLSearchParams(window.location.search);
+    let orderId = urlParams.get('order_id');
+
+    $.ajax({
+      url: host + "/orders/" + orderId, 
+      type: "GET",
+      contentType: "application/json",
+      headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+      success: function (order) {
+        console.log(order);
+        orderDate = new Date(order.order_date).toLocaleDateString('sv-SE');
+        let htmlString = `
+          <p><strong>Ordernummer:</strong> 1000${order.id}</p>
+          <p><strong>Namn:</strong> ${order.first_name} ${order.last_name}</p>
+          <p><strong>Datum:</strong> <span>${orderDate}</span></p>
+          <p><strong>Email:</strong> ${order.email}</p>
+          `;
+        $(".container .confirmation-details").html(htmlString);
+      } 
+    });
+
 
 }
 
@@ -1038,8 +1104,16 @@ function ShowLogoutPage() {
 //CLICK-EVENTS
 
 $(document).ready(function () {
+  let urlParams = new URLSearchParams(window.location.search);
+  let view = urlParams.get('view');
   checkLoggedIn();
-  ShowHomePage();
+  if (view === 'success') {
+    ShowOrderConfirmationPage();
+  } else if (view === 'cancel') {
+    ShowCheckoutPage();
+  } else {
+    ShowHomePage();
+  }
   
   //------------------------------------------
   // Navigation click event handlers
@@ -1099,7 +1173,7 @@ $(document).ready(function () {
         break; 
       case "view-checkout":
         ShowCheckoutPage();
-        break; 
+        break;
       case "view-product":
         ShowProductPage(productId);
         break;
@@ -1131,6 +1205,7 @@ if (previousViewId !== viewId || previousProductId !== productId) {
 
 
 $(document).on("click", "#checkout-button", function() {
+  
   handleNavigationClick("view-checkout");
 });
 
