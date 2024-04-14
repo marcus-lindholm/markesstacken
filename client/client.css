@@ -9,6 +9,10 @@ p {
     color: #666;
     margin-bottom: 10px;
 }
+
+img.card-img-top.mx-auto.d-block.show-product.img-list-view {
+    max-width: 150px;
+}
  
  #welcome-paragraph {
     /* Stilar för element med id="welcome-paragraph" */

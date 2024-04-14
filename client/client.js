@@ -44,7 +44,7 @@ function ShowFavoritesPage() {
         return `
           <div class="col-lg-4 col-md-6 mb-4" style="display: inline;">
             <div class="card wishlist-item h-100">
-              <img class="card-img-top mx-auto d-block show-product" src="/product_images/${product.img}" alt="${product.name}" data-product-id="${product.id}"/>
+              <img class="card-img-top mx-auto d-block show-product img-list-view" src="/product_images/${product.img}" alt="${product.name}" data-product-id="${product.id}"/>
               <div class="card-body">
                 <h5 class="card-title show-product" data-product-id="${product.id}">${product.name}</h5>
                 <p class="card-text">${product.description}</p>
@@ -629,7 +629,7 @@ function ShowShoppingcartPage() {
         htmlString += `
           <div class="col-lg-4 col-md-6 mb-4" style="display: inline;">
             <div class="card shoppingcart-item h-100">
-              <img class="card-img-top mx-auto d-block show-product" src="/product_images/${item.product.img}" alt="${item.product.name}" data-product-id="${item.product.id}"/>
+              <img class="card-img-top mx-auto d-block show-product img-list-view" src="/product_images/${item.product.img}" alt="${item.product.name}" data-product-id="${item.product.id}"/>
               <div class="card-body">
                 <h5 class="card-title show-product" data-product-id="${item.product.id}">${item.product.name}</h5>
                 <p class="card-text">${item.product.description}</p>
