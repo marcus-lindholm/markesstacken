@@ -144,6 +144,7 @@ class Order(db.Model):
     shoppingcart = db.relationship('ShoppingCart', backref='orders', lazy=True)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'), nullable=False)
     payment = db.relationship('Payment', backref='orders', lazy=True)
+    returned = db.Column(db.Boolean, default=False)
     
     def __repr__(self):
         return f'<Order {self.id}>'
@@ -247,14 +248,14 @@ with app.app_context():
 @jwt_required()
 def wishlist():
     if request.method == 'GET':
-        user = User.query.get(get_jwt_identity())
+        user = db.session.get(User, get_jwt_identity())
         wishlist = user.wishlist
         wishlist_list = [product.serialize() for product in wishlist]
         return jsonify(wishlist_list)
 
     elif request.method == 'POST':
         data = request.get_json()
-        user = User.query.get(get_jwt_identity())
+        user = db.session.get(User, get_jwt_identity())
         product = db.session.get(Product, data['product_id'])
         user.add_to_wishlist(product)
         db.session.commit()
@@ -263,7 +264,7 @@ def wishlist():
 @app.route('/wishlist/<int:product_id>', methods=['DELETE'], endpoint='remove_from_wishlist')
 @jwt_required()
 def wishlist_by_id(product_id):
-    user = User.query.get(get_jwt_identity())
+    user = db.session.get(User, get_jwt_identity())
     product = db.session.get(Product, product_id)
     user.remove_from_wishlist(product)
     db.session.commit()
@@ -327,12 +328,12 @@ def orders():
 @app.route('/order/success')
 def success():
     print('Success')
-    return render_template('success.html')
+    return redirect('/?view=success')
 
 @app.route('/order/cancel')
 def cancel():
     print('Cancel')
-    return render_template('cancel.html')
+    return redirect('/?view=cancel')
 
 @app.route('/orders/<int:order_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='order_by_id')
 #@jwt_required()

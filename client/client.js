@@ -780,22 +780,18 @@ function placeOrder() {
   const city = document.getElementById("city").value;
   const postalCode = document.getElementById("zip").value;
   
-  console.log("address: " + address + " city: " + city + " postalCode: " + postalCode + " shoppingcartID: " + shoppingcartID);
-
+  event.preventDefault();
   $.ajax({
     url: host + "/orders",
     type: "POST",
     contentType: "application/json",
     headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
     data: JSON.stringify({
-      shoppingcart_id: shoppingcartID,
       address: address,
       city: city,
       postal_code: postalCode
     }),
     success: function(responseURL) {
-      // console.log("TEEST");
-      // console.log(responseURL);
       window.location.href = responseURL;
     }
   });
@@ -1089,8 +1085,16 @@ function ShowLogoutPage() {
 //CLICK-EVENTS
 
 $(document).ready(function () {
+  let urlParams = new URLSearchParams(window.location.search);
+  let view = urlParams.get('view');
   checkLoggedIn();
-  ShowHomePage();
+  if (view === 'success') {
+    ShowOrderConfirmationPage();
+  } else if (view === 'cancel') {
+    ShowCheckoutPage();
+  } else {
+    ShowHomePage();
+  }
   
   //------------------------------------------
   // Navigation click event handlers
