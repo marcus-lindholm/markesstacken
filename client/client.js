@@ -241,10 +241,12 @@ function refreshProducts() {
       filteredProducts.forEach(function(product) {
       //response.forEach(function(product) {
         var productHTML = `
-          <div class="col-md-4">
+          <div class="col-md-4" style="padding: 10px 5px;">
                 <div class="card">
-                  <img src="/product_images/${product.img}" class="card-img-top centered-product-image show-product" data-product-id="${product.id}" alt="Product Image">
-                    <div class="card-body">
+                  <div class="product-listing-image-wrapper">
+                    <img src="/product_images/${product.img}" class="card-img-top centered-product-image show-product" data-product-id="${product.id}" alt="Product Image">
+                  </div>    
+                  <div class="card-body">
                         <h5 class="card-title show-product" data-product-id="${product.id}">${product.name}</h5>
                         <p class="card-text">${product.description.length > 28 ? product.description.substring(0, 25) + '...' : product.description}</p>
                         <p class="card-text"> ${product.price} kr</p>
