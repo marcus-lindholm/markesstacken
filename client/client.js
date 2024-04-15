@@ -136,6 +136,11 @@ function removeFromWishlist(productId) {
 
 
 function addToShoppingCart(productId, orderQuantity, productName) {
+  if (!loggedIn) {
+    showAlert("warning", "Du är inte inloggad", "Logga in för att lägga till i varukorgen");
+    return; 
+  }
+
   return new Promise((resolve, reject) => {
     if (orderQuantity > 0) {
       $.ajax({
