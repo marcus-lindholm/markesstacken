@@ -310,7 +310,7 @@ def orders():
             stripe_data_list.append(product_data)
         checkout_session = stripe.checkout.Session.create(
             line_items=stripe_data_list,
-            payment_method_types=['card'],
+            payment_method_types=['card', 'swish', 'paypal'],
             mode='payment',
             success_url=request.host_url + 'order/success?session_id={CHECKOUT_SESSION_ID}',
             cancel_url=request.host_url + 'order/cancel',
