@@ -839,10 +839,43 @@ function ShowOrderConfirmationPage() {
 }
 
 //-------------------------------------------------
-//ORDERS-PAGE
+//ORDERS-PAGE FOR CUSTOMERS TO SEE WHAT THEY ORDERED
 function ShowOrdersPage() {
   $(".container").html($("#view-orders").html());
+
+  $.ajax({
+    url: host + "/users/" + userID +  "/orders", 
+    type: "GET",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    success: function (order) {
+    
+      order.forEach(function(order) {
+      console.log(order);
+
+        orderDate = new Date(order.order_date).toLocaleDateString('sv-SE');
+        let htmlString = `
+      
+          <div class="card">
+            <div class="card-body">
+            <p><strong>Ordernummer:</strong> 1000${order.id}</p>
+            <p><strong>Totalkostnad:</strong> ${order.total_price} SEK </p>
+            <p><strong>Datum:</strong> <span>${orderDate}</span></p>
+           
+            </div>
+          </div>`;
+        $(".container .customer-orders-history").append(htmlString);
+   
+      });
+    },
+    error: function(xhr, status, error) {
+      console.error("Error fetching orders:", error);
+     
+    }
+  });
 }
+
+
 
 //-------------------------------------------------
 //RETURNS-PAGE
