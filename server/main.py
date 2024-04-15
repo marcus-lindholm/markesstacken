@@ -15,12 +15,14 @@ from flask_bcrypt import check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
+from datetime import timedelta
 import stripe
 
 app = Flask(__name__, static_folder='../client', static_url_path='/')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = 'your_secret_key' 
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=10) #What time should we set for the token to be valid? 
 
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
@@ -457,12 +459,13 @@ def cartitems():
 @app.route('/cartitems/<int:cartitem_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='cartitem_by_id')
 @jwt_required()
 def cartitem_by_id(cartitem_id):
-    cartitem = CartItem.query.get_or_404(cartitem_id)
 
     if request.method == 'GET':
+        cartitem = CartItem.query.get_or_404(cartitem_id)
         return jsonify(cartitem.serialize())
 
     elif request.method == 'PUT':
+        cartitem = CartItem.query.get_or_404(cartitem_id)
         data = request.get_json()
         if 'quantity' in data:
             cartitem.quantity = data['quantity']
