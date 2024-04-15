@@ -86,6 +86,12 @@ function ShowFavoritesPage() {
 // Function to show the purchase page
 
 function addToWishlist(productId, productName) {
+
+  if (!loggedIn) {
+    showAlert("warning", "Du är inte inloggad", "Logga in för att lägga till i önskelistan!");
+    return; 
+  }
+
   if (signedIn) {
     $.ajax({
       url: host + "/wishlist", 
@@ -131,6 +137,12 @@ function removeFromWishlist(productId) {
 
 
 function addToShoppingCart(productId, orderQuantity, productName) {
+
+  if (!loggedIn) {
+    showAlert("warning", "Du är inte inloggad", "Logga in för att lägga till i varukorgen");
+    return; 
+  }
+
   if (orderQuantity > 0) {
     $.ajax({
       url: host + "/cartitems",
@@ -148,9 +160,9 @@ function addToShoppingCart(productId, orderQuantity, productName) {
             removeFromWishlist(productId)
           }
         });
-        displayMessage = "Produkt: " + productName + " x " + orderQuantity + ".";
-        showAlert("success", "Tillagd i varukorgen:", displayMessage);
-
+          displayMessage = "Produkt: " + productName + " x " + orderQuantity + ".";
+          showAlert("success", "Tillagd i varukorgen:", displayMessage);
+        
       },
       error: function (error) {
         displayMessage = "Produkt: " + productName + " x " + orderQuantity + " blev inte tillagd i varukorgen.";
@@ -391,7 +403,7 @@ function addAllCheckbox(containerId) {
     <div class="form-check">
       <input class="form-check-input all-checkbox" type="checkbox" value="All" id="${containerId}-All" checked> <!-- Add checked attribute here -->
       <label class="form-check-label" for="${containerId}-All">
-        All
+        Alla
       </label>
     </div>
   `);
@@ -420,11 +432,10 @@ $(document).on("change", ".form-check-input", function() {
             if (!$(this).prop("checked")) {
                 // If any checkbox (except "All") is unchecked, set allOtherChecked to false
                 allOtherChecked = false;
-                return false; // Exit the loop early
+                return false;
             }
         });
 
-        // Set the state of the "All" checkbox based on allOtherChecked
         $("#" + containerId + "-All").prop("checked", allOtherChecked);
     }
   }
@@ -1010,13 +1021,15 @@ function checkLoggedIn() {
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'block'; 
           sellButton.style.display='none';
-          console.log("admin true", user.user.is_admin);
+      
         }
+       
       },
       
       error: function(jqXHR, error) {
         if (jqXHR.status === 401) {
           logout();
+          console.error("log out in error");
         } else {
           console.error("Error fetching identity:", error);
           adminDropdown.style.display = 'none';
@@ -1032,9 +1045,11 @@ function checkLoggedIn() {
   }
 }
 
+
 function logout() {
   sessionStorage.removeItem('auth');
-  location.reload();
+  checkLoggedIn();
+
 }
  
 
@@ -1098,6 +1113,12 @@ function ShowLogoutPage() {
   });
 
 } 
+
+
+
+setInterval(function() {
+checkLoggedIn();
+}, 30000); 
 
 
 //------------------------------------------
@@ -1254,7 +1275,13 @@ $(document).on('click', '.show-product', function() {
   });
 
   $(".nav-link.shoppingcart").click(function () {
-    handleNavigationClick("view-shoppingcart");
+    if (loggedIn) {
+      handleNavigationClick("view-shoppingcart");
+    } else {
+        handleNavigationClick("view-login");
+        showAlert("danger", "Du behöver logga in för att få tillgång till varukorgen", "");
+      }
+
   });
 
 //Dropdown-logged out
