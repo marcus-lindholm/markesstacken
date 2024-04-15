@@ -131,38 +131,47 @@ function removeFromWishlist(productId) {
 
 
 function addToShoppingCart(productId, orderQuantity, productName) {
-  if (orderQuantity > 0) {
-    $.ajax({
-      url: host + "/cartitems",
-      type: "POST",
-      contentType: "application/json",
-      headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
-      data: JSON.stringify({
-        quantity: orderQuantity,
-        product_id: productId,
-        shoppingcart_id: shoppingcartID
-      }),
-      success: function (response) {
-        checkIfInWishlist(productId).then(isInWishlist => {
-          if(isInWishlist) {
-            removeFromWishlist(productId)
+  return new Promise((resolve, reject) => {
+    if (orderQuantity > 0) {
+      $.ajax({
+        url: host + "/cartitems",
+        type: "POST",
+        contentType: "application/json",
+        headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+        data: JSON.stringify({
+          quantity: orderQuantity,
+          product_id: productId,
+          shoppingcart_id: shoppingcartID
+        }),
+        success: function (response) {
+          checkIfInWishlist(productId).then(isInWishlist => {
+            if(isInWishlist) {
+              removeFromWishlist(productId)
+            }
+          });
+          displayMessage = "Produkt: " + productName + " x " + orderQuantity + ".";
+          showAlert("success", "Tillagd i varukorgen:", displayMessage);
+          resolve();
+        },
+        error: function (error) {
+          displayMessage = "Produkt: " + productName + " x " + orderQuantity + " blev inte tillagd i varukorgen.";
+          showAlert("warning", displayMessage, "Försök igen.");
+          if (error.status == 400) {
+            showAlert("warning", "Ej tillräckligt många i lager.", "Minska antalet!");
           }
-        });
-        displayMessage = "Produkt: " + productName + " x " + orderQuantity + ".";
-        showAlert("success", "Tillagd i varukorgen:", displayMessage);
+          reject(error);
+        },
+      });
+    } else {
+      showAlert("warning", "Den nuvarande kvantiteten är inte tillåten.", "Var snäll och öka antalet!");
+    }
+  });
+}
 
-      },
-      error: function (error) {
-        displayMessage = "Produkt: " + productName + " x " + orderQuantity + " blev inte tillagd i varukorgen.";
-        showAlert("warning", displayMessage, "Försök igen.");
-        if (error.status == 400) {
-          showAlert("warning", "Ej tillräckligt många i lager.", "Minska antalet!");
-        }
-      },
-    });
-  } else {
-    showAlert("warning", "Den nuvarande kvantiteten är inte tillåten.", "Var snäll och öka antalet!");
-  }
+function buyNow(productId, orderQuantity, productName) {
+  addToShoppingCart(productId, orderQuantity, productName).then(() => {
+    ShowCheckoutPage();
+  });
 }
 
 async function checkIfInWishlist(productId) {
@@ -271,7 +280,7 @@ function refreshProducts() {
                         </div>
                         <button id="add-to-cart-btn${product.id}" data-product-id="${product.id}" onclick="addToShoppingCart(${product.id}, document.getElementById('quantity${product.id}').value, '${product.name}')" class="btn btn-light" style="width: 145px; margin: 5px 0;" ${product.quantity === 0 ? 'disabled' : ''}>Lägg i varukorg</button>
                         <div class="product-overview">
-                          <button class="btn btn-dark" style="width: 105px;">Köp nu</button>
+                          <button class="btn btn-dark" style="width: 105px;" id="buynow-btn${product.id}" data-product-id="${product.id}" onclick="buyNow(${product.id}, document.getElementById('quantity${product.id}').value, '${product.name}')">Köp nu</button>
                           <button id="add-to-wishlist-btn${product.id}" data-product-id="${product.id}" onclick="addToWishlist(${product.id}, '${product.name}')" class="btn btn-outline-dark" >
                               <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
                                   <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
@@ -507,7 +516,7 @@ function ShowProductPage(productId) {
                     <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
                 </svg>
             </button><br>
-            <button class="btn btn-dark" style="width: 145px;">Köp nu</button>
+            <button class="btn btn-dark" style="width: 145px;" id="buynow-btn${product.id}" data-product-id="${product.id}" onclick="buyNow(${product.id}, document.getElementById('quantity${product.id}').value, '${product.name}')">Köp nu</button>
           </div>
         </div>
       </div>
@@ -747,34 +756,44 @@ function decreaseQuantity(productId, productQuantity) { //lägg till vänta så 
 //CHECKOUT-PAGE
 function ShowCheckoutPage() {
  $(".container").html($("#view-checkout").html());
+ $.ajax({
+  url: host + "/myShoppingCart", 
+  type: "GET",
+  contentType: "application/json",
+  headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+  success: function (response) {
+    cartItems = response.cartitems;
+    let numberOfItemsHtml = `
+        <span class="badge badge-secondary badge-pill">${cartItems.length}</span>
+      `;
+    let totalPrice = 0;
+    console.log("CARTITEMS: " + cartItems);
+    let cartitemsHtml = cartItems.map(function(item) {
+      totalPrice += item.product.price*item.quantity;
+      console.log(item);
+      return `
+        <li class="list-group-item d-flex justify-content-between lh-condensed">
+          <div>
+            <h6 class="my-0">${item.quantity} x ${item.product.name}</h6>
+            <small class="text-muted">${item.product.description.substring(0, 32)}</small>
+          </div>
+          <span class="text-muted">${item.product.price} kr</span>
+        </li>
+      `;
+    }).join('');
 
-  let numberOfItemsHtml = `
-      <span class="badge badge-secondary badge-pill">${cartItems.length}</span>
-    `;
-  let totalPrice = 0;
-  let cartitemsHtml = cartItems.map(function(item) {
-    totalPrice += item.product.price*item.quantity;
-    console.log(item);
-    return `
-      <li class="list-group-item d-flex justify-content-between lh-condensed">
-        <div>
-          <h6 class="my-0">${item.quantity} x ${item.product.name}</h6>
-          <small class="text-muted">${item.product.description.substring(0, 32)}</small>
-        </div>
-        <span class="text-muted">${item.product.price} kr</span>
+    let totalPriceHtml = `
+      <li class="list-group-item d-flex justify-content-between">
+        <span>Total (SEK)</span>
+        <strong>${totalPrice}</strong>
       </li>
     `;
-  }).join('');
 
-  let totalPriceHtml = `
-    <li class="list-group-item d-flex justify-content-between">
-      <span>Total (SEK)</span>
-      <strong>${totalPrice}</strong>
-    </li>
-  `;
-
-$(".container .number-of-cartitems").html(numberOfItemsHtml);
-$(".container .list-group").html(cartitemsHtml + totalPriceHtml);
+  $(".container .number-of-cartitems").html(numberOfItemsHtml);
+  $(".container .list-group").html(cartitemsHtml + totalPriceHtml);
+  window.scrollTo(0, 0);
+  }
+  });
 }
 
 function placeOrder() {
@@ -1196,8 +1215,6 @@ if (previousViewId !== viewId || previousProductId !== productId) {
   previousViewId = viewId;
   previousProductId = productId;
   history.pushState({ viewId: viewId, productId: productId }, "", "");
-  console.log("State object:", history.state);
-  console.log(productId);
 }
 }
 
