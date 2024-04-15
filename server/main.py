@@ -459,12 +459,13 @@ def cartitems():
 @app.route('/cartitems/<int:cartitem_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='cartitem_by_id')
 @jwt_required()
 def cartitem_by_id(cartitem_id):
-    cartitem = CartItem.query.get_or_404(cartitem_id)
 
     if request.method == 'GET':
+        cartitem = CartItem.query.get_or_404(cartitem_id)
         return jsonify(cartitem.serialize())
 
     elif request.method == 'PUT':
+        cartitem = CartItem.query.get_or_404(cartitem_id)
         data = request.get_json()
         if 'quantity' in data:
             cartitem.quantity = data['quantity']
