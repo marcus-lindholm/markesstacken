@@ -111,7 +111,6 @@ function addToWishlist(productId, productName) {
 }
 
 function removeFromWishlist(productId) {
-  console.log("removing from wishlist");
   $.ajax({
     url: host + "/wishlist/" + productId, 
     type: "DELETE",
@@ -302,8 +301,7 @@ function refreshProducts() {
 
 function search() {
   var input = document.getElementById('searchBar').value;
-  console.log(input); 
-populateSearch(input);
+  populateSearch(input);
 }
 
 function populateSearch(searchInput) {
@@ -439,7 +437,6 @@ $(document).on("change", ".form-check-input", function() {
   }
 
     // Update the corresponding filter list based on checked/unchecked checkboxes
-    console.log(containerId);
     updateFilterList(containerId);
 
     // Refresh products based on the updated filters
@@ -681,7 +678,6 @@ function ShowShoppingcartPage() {
 }
 
 function increaseQuantity(productId, maxQuantity, productQuantity) { //lägg till vänta så att hemsidan inte uppdateras för snabbt
-  console.log("maxQ: " + maxQuantity + " prodQ: " + productQuantity);
   if (maxQuantity > productQuantity) {
      $.ajax({
     url: host + "/myShoppingCart", 
@@ -717,7 +713,6 @@ function increaseQuantity(productId, maxQuantity, productQuantity) { //lägg til
 }
 
 function decreaseQuantity(productId, productQuantity) { //lägg till vänta så att hemsidan inte uppdateras för snabbt
-  console.log("decreasing Q, prodID: " + productId);
   if (productQuantity > 1) {
     $.ajax({
       url: host + "/myShoppingCart", 
@@ -767,10 +762,8 @@ function ShowCheckoutPage() {
         <span class="badge badge-secondary badge-pill">${cartItems.length}</span>
       `;
     let totalPrice = 0;
-    console.log("CARTITEMS: " + cartItems);
     let cartitemsHtml = cartItems.map(function(item) {
       totalPrice += item.product.price*item.quantity;
-      console.log(item);
       return `
         <li class="list-group-item d-flex justify-content-between lh-condensed">
           <div>
@@ -831,7 +824,6 @@ function ShowOrderConfirmationPage() {
       contentType: "application/json",
       headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
       success: function (order) {
-        console.log(order);
         orderDate = new Date(order.order_date).toLocaleDateString('sv-SE');
         let htmlString = `
           <p><strong>Ordernummer:</strong> 1000${order.id}</p>
@@ -1020,8 +1012,6 @@ function checkLoggedIn() {
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'none';
           sellButton.style.display='block';
-          
-          console.log("admin false", user.user.is_admin);
         } else {
           shoppingcartID = user.user.shoppingcart.id;
           userID = user.user.id;
@@ -1029,7 +1019,6 @@ function checkLoggedIn() {
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'block'; 
           sellButton.style.display='none';
-          console.log("admin true", user.user.is_admin);
         }
       },
       
@@ -1080,11 +1069,9 @@ function ShowLoginPage() {
         data: JSON.stringify({email :formData.email, password : formData.password}),
 
         success: function (response) {
-          console.log(response);
           sessionStorage.setItem('auth', JSON.stringify(response));
 
           guserId = JSON.parse(sessionStorage.getItem('auth')).user.id;
-          console.log("guserId", guserId);
 
           ShowHomePage();
           checkLoggedIn();
