@@ -174,8 +174,8 @@ h2 {
 }
 
 .quantity {
-    width: 40px;
     text-align: center;
+    width: 40px;
 }
 
 .centered-product-image {
@@ -290,15 +290,29 @@ h2 {
 
 /*SHOPPING-CART*/
 
-#plus-button{
+.minus-button{
     padding: 0.2rem 0.5rem;
     font-size: 0.8rem; 
+}
+
+.plus-button{
+    padding: 0.2rem 0.5rem;
+    font-size: 0.8rem; 
+   
 }
 
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0; 
+}
+
+#remove-from-cart-button {
+    height: 40px;
+}
+
+.quantity-input {
+    height: 40px; /* Adjust the height as needed */
 }
 
 /*Filter design*/

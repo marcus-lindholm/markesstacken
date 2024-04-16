@@ -895,6 +895,23 @@
      <script id="view-logout" type="text/html">
       <h1>View-logout</h1>
     </script>
+
+<!--MODAL FOR EMPTY CART-->
+    <div class="modal fade" id="emptyCartModal" tabindex="-1" aria-labelledby="emptyCartModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="emptyCartModalLabel">Vill du tömma hela varukorgen?</h5>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary btn-sm" id="cancelEmptyCart" data-dismiss="modal">Nej</button>
+            <button type="button" class="btn btn-primary btn-sm" id="confirmEmptyCart" onclick="emptyShoppingCart()">Ja</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
       
       <!--VIEW-QUESTIONS-->
       <script id="view-questions" type="text/html">

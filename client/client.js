@@ -201,16 +201,38 @@ async function checkIfInWishlist(productId) {
   return inWishlist;
 }
 
-function removeFromShoppingCart(productId) {
+function emptyShoppingCart() {
+if (cartItems.length > 0) {
+  Promise.all(cartItems.map(function(item) {
+    return removeFromShoppingCart(item.product.id, true);
+  })).then(() => {
+    ShowPurchasePage();
+  });
+} else {  
+  displayMessage = "Varukorgen är redan tom!";
+  showAlert("warning", displayMessage, "");
+}
+}
+
+function completeRemovalFromShoppingCart(productId) {
+  removeFromShoppingCart(productId, false)
+  ShowShoppingcartPage();
+} 
+
+function removeFromShoppingCart(productId, emptyAll) {
   $.ajax({
     url: host + "/cartitems/" + productId, 
     type: "DELETE",
     contentType: "application/json",
     headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
     success: function (response) {
-      displayMessage = "Produkten togs bort från varukorgen.";
-      showAlert("success", displayMessage, "");
-      ShowShoppingcartPage(); 
+      if (emptyAll) {
+        displayMessage = "Varukorgen tömdes!";
+        showAlert("success", displayMessage, "välkommen tillbaka till köpsidan!");
+      } else {
+        displayMessage = "Produkten togs bort från varukorgen.";
+        showAlert("success", displayMessage, "");
+      }
     },
     error: function (error) {
       displayMessage = "Produkten gick inte att ta bort från varukorgen.";
@@ -650,22 +672,26 @@ function ShowShoppingcartPage() {
                 <h5 class="card-title show-product" data-product-id="${item.product.id}">${item.product.name}</h5>
                 <p class="card-text">${item.product.description}</p>
                 <p class="card-text"> ${item.product.price} kr</p>
-                <div class="d-flex mb-3 col-2">
+                <div class="d-flex mb-3 align-items-center">
                     <label for="quantity" class="me-2"></label>
                     <div class="input-group">
-                        <button class="btn btn-sm btn-outline-dark" data-product-id="${item.product.id}" onclick="this.parentNode.querySelector('input[type=number]').stepDown(), decreaseQuantity(${item.product.id}, ${item.quantity})" id="minus-button${item.product.id}">
+                        <button class="btn btn-sm btn-outline-dark align-items-stretch" style="height: 38px; padding: 6px;" data-product-id="${item.product.id}" onclick="this.parentNode.querySelector('input[type=number]').stepDown(), decreaseQuantity(${item.product.id}, ${item.quantity})" id="minus-button${item.product.id}">
                             <i class="fas fa-minus"></i>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
                                 <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
                             </svg>
                         </button>
-                        <input type="number" id="quantity${item.product.id}" class="form-control" value="${item.quantity}" min="1" max="${item.product.quantity}">
-                        <button class="btn btn-sm btn-outline-dark" data-product-id="${item.product.id}" onclick="this.parentNode.querySelector('input[type=number]').stepUp(), increaseQuantity(${item.product.id}, ${item.product.quantity}, ${item.quantity})" id="plus-button${item.product.id}">
+                        <input type="number" id="quantity${item.product.id}" readonly class="form-control" style="width: auto; min-width: 20px; max-width: 40px;" value="${item.quantity}" min="1" max="${item.product.quantity}">
+                        <button class="btn btn-sm btn-outline-dark align-items-stretch" style="height: 38px; padding: 6px;" data-product-id="${item.product.id}" onclick="this.parentNode.querySelector('input[type=number]').stepUp(), increaseQuantity(${item.product.id}, ${item.product.quantity}, ${item.quantity})" id="plus-button${item.product.id}">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                                 <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-                            </svg>
+                            </svg>  
                             <i class="fas fa-plus"></i>
                         </button>
+                        <div class="col-auto">
+                        <!-- Empty column to create space -->
+                        </div>
+                        <button id="remove-from-cart-button" onclick="completeRemovalFromShoppingCart(${item.product.id})" class="btn btn-light align-items-stretch" style="width: 145px; margin-right: 200px; background-color: rgb(99, 163, 118); color: rgb(255, 255, 255);" >Ta bort</button>
                     </div>
                 </div>
               </div>
@@ -674,13 +700,23 @@ function ShowShoppingcartPage() {
           </div>`;
     });
     
-    htmlString += `<div class="Totalprice">
-                      <h2> Totalkostnad: ${totalPrice} SEK</h2>
-                      </div>`;
-                      htmlString += `<button id="checkout-button" class ="btn btn-sm btn-outline-dark btn-block" style="height: 50px; font-size: 16px;">Gå till kassan</button>`;
-
-      htmlString += `</div>
-    </div>`; 
+    htmlString += `
+    <div class="Totalprice">
+      <h2> Totalkostnad: ${totalPrice} SEK</h2>
+    </div>
+    <div class="row">
+      <div class="col">
+        <button id="checkout-button" class="btn btn-sm btn-outline-dark btn-block" style="height: 50px; font-size: 16px;">Gå till kassan</button>
+      </div>
+      <div class="col-auto">
+        <!-- Empty column to create space -->
+      </div>
+      <div class="col-auto">
+        <button id="empty-cart-button" class="btn btn-sm btn-outline-danger" style="height: 50px; font-size: 16px;">Töm varukorgen</button>
+      </div>
+    </div>
+    </div>
+    </div>`;
       
       $(".container").append(htmlString);
     }
@@ -746,14 +782,12 @@ function decreaseQuantity(productId, productQuantity) { //lägg till vänta så 
             });
           }
         });
-        ShowShoppingcartPage();
+         ShowShoppingcartPage();
       } 
     });
   } else {
-    removeFromShoppingCart(productId);
+    removeFromShoppingCart(productId, false);
     ShowShoppingcartPage();
-    displayMessage = productId + " togs bort från varukorgen."
-    showAlert("success", displayMessage, "");
   } 
 }
 
@@ -1312,13 +1346,22 @@ $(document).on("click", "#checkout-button", function() {
   handleNavigationClick("view-checkout");
 });
 
+//Button for emptying the shopping cart
+$(document).on("click", "#empty-cart-button", function() {
+  $('#emptyCartModal').modal('show');
+});
+//Close the modal
+$('#confirmEmptyCart, #cancelEmptyCart').on('click', function() {
+  $('#emptyCartModal').modal('hide');
+});
+
+
 
 // Click event handler for product links
 $(document).on('click', '.show-product', function() {
   var productId = $(this).data('product-id');
   handleNavigationClick("view-product", productId);
 });
-
 
 
   //NAVBAR LINKS CLICK
