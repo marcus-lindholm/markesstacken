@@ -211,7 +211,7 @@ with app.app_context():
     product14 = Product(name='B-Klass Gensists 2021', price=30, quantity=50, description='B-klass on Fire ', category=category2, year = 2021,  section = 'I-Sektionen', event = 'Generationssittning', organizer = 'Övrigt', img = 'BKlass.png')
 
 
-    product15 = Product(name='Munchen Hoben 2021', price=100, quantity=37, description='Märke från Munchen Hoben 2021', category=category2, year = 2021,  section = 'övrigt', event = 'Munchen Hoben', organizer = 'LINTEK', img = 'Munchen_Hoben_2021.png')
+    product15 = Product(name='Munchen Hoben 2021', price=100, quantity=37, description='Märke från Munchen Hoben 2021', category=category2, year = 2021,  section = 'Övrigt', event = 'Munchen Hoben', organizer = 'LINTEK', img = 'Munchen_Hoben_2021.png')
     product16 = Product(name='Cykelfesten 2022', price=60, quantity=18, description='Märke från Cykelfesten 2022', category=category2, year = 2022,  section = 'I-Sektionen', event = 'Cykelfesten', organizer = 'CM', img = 'Cykelfesten_2022.png')
     product17 = Product(name='Nolle-P Reunion 2024', price=60, quantity=5, description='Märke från Nolle-P Reunion 2024', category=category2, year = 2024,  section = 'I-Sektionen', event = 'Nolle-P Reunion', organizer = 'CM', img = 'Nolle_p_Reunion_2024.png')
     product18 = Product(name='I-Kravallen 2021', price=999, quantity=13, description='Märke från I-Kravallen 2021.', category=category2, year = 2021, section = 'I-Sektionen', event = 'I-KRAVALLEN', organizer = 'KLASSFÖRÄLDRARNA', img = 'I_Kravallen_2021.png')
