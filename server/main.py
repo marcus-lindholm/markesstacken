@@ -269,7 +269,11 @@ with app.app_context():
     ordered_cartitem1 = OrderedCartItem(quantity=4, product_id=10, ordered_shoppingcart_id=1)
     db.session.add(ordered_cartitem1)
     order1 = Order(ordered_shoppingcart_id=1, user_id=1, total_price=19, order_date=datetime.now())
+    order2 = Order(ordered_shoppingcart_id=2, user_id=1, total_price=200, order_date=datetime.now())
+    order3 = Order(ordered_shoppingcart_id=3, user_id=3, total_price=50, order_date=datetime.now())
     db.session.add(order1)
+    db.session.add(order2)
+    db.session.add(order3)
 
     db.session.commit()
 
@@ -754,6 +758,22 @@ def get_user_by_id(user_id):
         db.session.delete(user)
         db.session.commit()
         return jsonify("Success!"), 200
+    
+
+
+@app.route('/users/<int:user_id>/orders', methods=['GET'], endpoint = 'get-orders-by-user')
+@jwt_required()
+def get_user_orders(user_id):
+    current_user_id = get_jwt_identity()
+
+    if current_user_id != user_id:
+        return jsonify({'message': 'Unauthorized access'}), 401
+
+    user_orders = Order.query.filter_by(user_id=user_id).all()
+    serialized_orders = [order.serialize() for order in user_orders]
+    return jsonify(serialized_orders), 200
+
+
 
 #labb2
 @app.route("/")

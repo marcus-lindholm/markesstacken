@@ -842,17 +842,102 @@ function ShowOrderConfirmationPage() {
           <p><strong>Email:</strong> ${order.email}</p>
           `;
         $(".container .confirmation-details").html(htmlString);
-      } 
+   
+      }
     });
 
 
 }
 
 //-------------------------------------------------
-//ORDERS-PAGE
+//
+
+function MakeOrderReturned(orderId) {
+  $.ajax({
+    url: host + "/users/" + userID +  "/orders/" + orderId,
+    type: "PUT",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    data: JSON.stringify({returned: true }), 
+    success: function(response) {
+      console.log("hej");
+      ShowOrdersPage();
+    },
+    error: function(xhr, status, error) {
+      console.error("Error marking order as returned:", error);
+    }
+  });
+}
+
+//-------------------------------------------------
+//ORDERS-PAGE FOR CUSTOMERS TO SEE WHAT THEY ORDERED
 function ShowOrdersPage() {
   $(".container").html($("#view-orders").html());
+
+  $.ajax({
+    url: host + "/users/" + userID +  "/orders", 
+    type: "GET",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    success: function (order) {
+    
+      order.forEach(function(order) {
+      console.log(order);
+
+        orderDate = new Date(order.order_date).toLocaleDateString('sv-SE');
+        let htmlString = `
+      
+          <div class="card">
+            <div class="card-body">
+            <p><strong>Ordernummer:</strong> 1000${order.id}</p>
+            <p><strong>Totalkostnad:</strong> ${order.total_price} SEK </p>
+            <p><strong>Datum:</strong> <span>${orderDate}</span></p>
+            <button class="btn btn-outline-dark returnPopup" data-toggle="modal" data-target="#returnModal">Instruktioner för retur</button>
+            </div>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="returnModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h3 class="modal-title" id="exampleModalLabel">Vill du göra en retur?</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                  <h5>Så här gör du en retur</h5>
+                  <ol>
+                      <li>Kontakta vår kundtjänst via e-post för att meddela din retur. Ange ditt ordernummer och orsaken till returen.</li>
+                      <li>Du kommer att få en returetikett via e-post som du ska skriva ut och fästa på returpaketet.</li>
+                      <li>Skicka tillbaka dina varor till adressen som anges på returetiketten. Observera att du är ansvarig för returfrakten.</li>
+                  </ol>
+
+                  <h5>Återbetalning</h5>
+                  <p>När vi har mottagit och kontrollerat de returnerade varorna, kommer vi att återbetala köpesumman till ditt ursprungliga betalningssätt. Återbetalningen sker inom 10 arbetsdagar från det att vi mottagit returen.</p>
+
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Stäng</button>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+
+        $(".container .customer-orders-history").append(htmlString);
+
+       
+      });
+    },
+    error: function(xhr, status, error) {
+      console.error("Error fetching orders:", error);
+    }
+  
+  });
 }
+
+
 
 //-------------------------------------------------
 //RETURNS-PAGE
@@ -1119,8 +1204,6 @@ function ShowLogoutPage() {
 
 } 
 
-
-
 setInterval(function() {
 checkLoggedIn();
 }, 30000); 
@@ -1128,7 +1211,7 @@ checkLoggedIn();
 
 //------------------------------------------
 //CLICK-EVENTS
-
+ 
 $(document).ready(function () {
   let urlParams = new URLSearchParams(window.location.search);
   let view = urlParams.get('view');
@@ -1225,11 +1308,7 @@ if (previousViewId !== viewId || previousProductId !== productId) {
 }
 }
 
-
-
-
 $(document).on("click", "#checkout-button", function() {
-  
   handleNavigationClick("view-checkout");
 });
 
@@ -1358,8 +1437,15 @@ window.addEventListener("popstate", function (event) {
     loadView(viewId, productId);
   
   }
+
+  $(document).on("click", "#returnPopup", function() {
+    document.getElementById("returnModal").style.display = "block";
+  });
+
  
 });
+
+
 });
 
 
