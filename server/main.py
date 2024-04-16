@@ -104,12 +104,13 @@ class Product(db.Model):
     organizer = db.Column(db.String, nullable=True)
     img = db.Column(db.String, nullable=True)
     number_of_sales = db.Column(db.Integer, default=0)
+    confirmed_by_admin = db.Column(db.Boolean, default=False, nullable=False)
     
     def __repr__(self):
         return f'<Product {self.id}: {self.name}: {self.price}>'
     
     def serialize(self):
-        return dict(id=self.id, name=self.name, price=self.price, quantity=self.quantity, description=self.description, year=self.year, section=self.section, event=self.event, organizer=self.organizer, img=self.img, number_of_sales=self.number_of_sales, category=self.category.serialize() if self.category else None)
+        return dict(id=self.id, name=self.name, price=self.price, confirmed_by_admin=self.confirmed_by_admin, quantity=self.quantity, description=self.description, year=self.year, section=self.section, event=self.event, organizer=self.organizer, img=self.img, number_of_sales=self.number_of_sales, category=self.category.serialize() if self.category else None)
 
 class CartItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)    
@@ -508,7 +509,7 @@ def cartitem_by_id(cartitem_id):
 #@jwt_required()
 def products():
     if request.method == 'GET':
-        products = Product.query.all()
+        products= Product.query.filter_by(confirmed_by_admin=True).all()
         product_list = [product.serialize() for product in products]
         return jsonify(product_list)
 
@@ -773,6 +774,33 @@ def get_user_orders(user_id):
     serialized_orders = [order.serialize() for order in user_orders]
     return jsonify(serialized_orders), 200
 
+
+@app.route('/confirm-products', methods=['GET'], endpoint='admin_confirm_products')
+def admin_confirm_products():
+        # Retrieve unconfirmed products from the database
+        unconfirmed_products = Product.query.filter_by(confirmed_by_admin=False).all()
+        product_list = [product.serialize() for product in unconfirmed_products]
+        return jsonify(product_list), 200
+
+@app.route('/confirm-products/<int:productId>', methods=['POST', 'DELETE'], endpoint='admin_add_to_purchasepage')
+def admin_add_to_purchasepage(productId): 
+    product = Product.query.get_or_404(productId)
+
+    if request.method == 'POST':
+        
+        product.confirmed_by_admin = True
+        db.session.commit()
+        return jsonify({'message': 'Product confirmed successfully'}), 200
+
+    elif request.method == 'DELETE':
+
+        if product.img:
+            image_path = os.path.join('../client/product_images', product.img)
+            if os.path.exists(image_path):
+                os.remove(image_path)
+        db.session.delete(product)
+        db.session.commit()
+        return jsonify("Success!"), 200
 
 
 #labb2
