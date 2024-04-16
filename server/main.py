@@ -195,20 +195,28 @@ with app.app_context():
     db.session.add(category1)
     db.session.add(category2)
     
-    product1 = Product(name='UK 2022', price=30, quantity=100, description='Märke från UK 2022. Jättefinmärke 10/10, Arian rekomenderar starkt. Rund cirkel typ som hjul eller ett ägg om man tittar på det rakt uppifrån.', category=category1, year = 2022, section = 'I-Sektionen', event = 'UK', organizer = 'CM', img = 'cm.jpeg')
-    product2 = Product(name='Festivallen 1995', price=50, quantity=10, description='Märke från Festivallen 1995.', category=category2, year = 1995, section = 'Läk-Sektionen', event = 'FESTIVALLEN', organizer = 'MEDSEX', img = 'pub.jpeg')
-    product3 = Product(name='Drat i spat 2022', price=25, quantity=40, description='Märke från Drat i spat 2022.', category=category2, year = 2022, section = 'I-Sektionen', event = 'DRAT I SPAT', organizer = 'CM', img = 'pub.jpeg')
+    product1 = Product(name='UK 2022', price=30, quantity=100, description='Märke från UK 2022. Jättefinmärke 10/10, Arian rekomenderar starkt. Rund cirkel typ som hjul eller ett ägg om man tittar på det rakt uppifrån.', category=category1, year = 2022, section = 'I-Sektionen', event = 'UK', organizer = 'CM', img = 'UK_2022.png')
+    product2 = Product(name='Festivallen 2023', price=50, quantity=10, description='Märke från Festivallen 2023.', category=category2, year = 2023, section = 'Läk-Sektionen', event = 'FESTIVALLEN', organizer = 'MEDSEX', img = 'Festivallen_2023.png')
+    product3 = Product(name='Drat i spat 2022', price=25, quantity=40, description='Märke från Drat i spat 2022.', category=category2, year = 2022, section = 'I-Sektionen', event = 'DRAT I SPAT', organizer = 'CM', img = 'Drat_I_Spat_2022.png')
     product4 = Product(name='Lemans 2023', price=40, quantity=10, description='Märke från Lemans 1995.', category=category2, year = 2023, section = 'M-Sektionen', event = 'LEMANS', organizer = 'FM', img = 'pub.jpeg')
     product5 = Product(name='VSR 2021', price=49, quantity=34, description='Märke från VSR 1995.', category=category2, year = 2021, section = 'Y-Sektionen', event = 'VSR', organizer = 'Y-SEX', img = 'pub.jpeg')
     product6 = Product(name='PALLEN 2020', price=19, quantity=5, description='Märke från Pallen 1995.', category=category2, year = 2020, section = 'LING-Sektionen', event = 'PALLEN', organizer = 'VILING', img = 'pub.jpeg')
     product7 = Product(name='I-Kravallen 2022', price=999, quantity=1, description='Märke från I-Kravallen 2022.', category=category2, year = 2022, section = 'I-Sektionen', event = 'I-KRAVALLEN', organizer = 'KLASSFÖRÄLDRARNA', img = 'I-Kravallen_2022.png')
     product8 = Product(name='Pengar & Piller 2023', price=9, quantity=27, description='Märke från Pengar & Piller 2023.', category=category2, year = 2023, section = 'I-Sektionen', event = 'Pengar & Piller', organizer = 'KLASSFÖRÄLDRARNA', img = 'Pengar___Piller_2023.png')
     product9 = Product(name='Nolle-P Reunion 2023', price=19, quantity=27, description='Märke från Nolle-P Reunion 2023.', category=category2, year = 2023, section = 'I-Sektionen', event = 'Nolle-P Reunion', organizer = 'KLASSFÖRÄLDRARNA', img = 'Nolle-P_Reunion_2023.png')
-    product10 = Product(name='Munchen Hoben 2022', price=19, quantity=27, description='Märke från Munchen Hoben 2022.', category=category2, year = 2022,  section = 'LINKTEK', event = 'Munchen Hoben', organizer = 'LINKTEK', img = 'Munchen_hoben_2022.png')
+    product10 = Product(name='Munchen Hoben 2022', price=19, quantity=27, description='Märke från Munchen Hoben 2022.', category=category2, year = 2022,  section = 'övrigt', event = 'Munchen Hoben', organizer = 'LINKTEK', img = 'Munchen_hoben_2022.png')
     product11 = Product(name='Agent Limited Edition Märke', price=100, quantity=1, description='Exklusivt märke av Agent.', category=category2, year = 2021,  section = 'Övrigt', event = 'Övrigt', organizer = 'AGENT', img = 'AgentMärke.png')
     product12 = Product(name='Sydkorea Flagga', price=50, quantity=20, description='Korea.', category=category2, year = 2021,  section = 'Övrigt', event = 'Övrigt', organizer = 'Övrigt', img = 'Sydkorea.png')
     product13 = Product(name='SourFisk Märke', price=1000, quantity=1, description='Skepp och Hoj, SourFisk', category=category2, year = 2021,  section = 'Övrigt', event = 'Övrigt', organizer = 'Övrigt', img = 'SourFiskMärke.png')
     product14 = Product(name='B-Klass Gensists 2021', price=30, quantity=50, description='B-klass on Fire ', category=category2, year = 2021,  section = 'I-Sektionen', event = 'Generationssittning', organizer = 'Övrigt', img = 'BKlass.png')
+
+
+    product15 = Product(name='Munchen Hoben 2021', price=100, quantity=37, description='Märke från Munchen Hoben 2021', category=category2, year = 2021,  section = 'övrigt', event = 'Munchen Hoben', organizer = 'LINTEK', img = 'Munchen_Hoben_2021.png')
+    product16 = Product(name='Cykelfesten 2022', price=60, quantity=18, description='Märke från Cykelfesten 2022', category=category2, year = 2022,  section = 'I-Sektionen', event = 'Cykelfesten', organizer = 'CM', img = 'Cykelfesten_2022.png')
+    product17 = Product(name='Nolle-P Reunion 2024', price=60, quantity=5, description='Märke från Nolle-P Reunion 2024', category=category2, year = 2024,  section = 'I-Sektionen', event = 'Nolle-P Reunion', organizer = 'CM', img = 'Nolle_p_Reunion_2024.png')
+    product18 = Product(name='I-Kravallen 2021', price=999, quantity=13, description='Märke från I-Kravallen 2021.', category=category2, year = 2021, section = 'I-Sektionen', event = 'I-KRAVALLEN', organizer = 'KLASSFÖRÄLDRARNA', img = 'I_Kravallen_2021.png')
+    product19 = Product(name='Snutte Filmen 2022', price=9, quantity=20, description='Märke från Snutte Filmen 2022.', category=category2, year = 2022, section = 'TBI', event = 'SNUTTE FILMEN', organizer = 'BI-SEX', img = 'Snutte_Filmen_2022.png')
+    product20 = Product(name='Tenta Omtenta Kravallen 2021', price=9, quantity=20, description='Märke från Snutte Tenta Omtenta Kravallen 2021.', category=category2, year = 2021, section = 'Y-Sektionen', event = 'Tenta Omtenta Kravallen', organizer = 'Y-SEX', img = 'Tenta_Omtenta_Kravallen_2021.png')
 
 
     db.session.add(product1)
@@ -225,6 +233,12 @@ with app.app_context():
     db.session.add(product12)
     db.session.add(product13)
     db.session.add(product14)
+    db.session.add(product15)
+    db.session.add(product16)
+    db.session.add(product17)
+    db.session.add(product18)
+    db.session.add(product19)
+    db.session.add(product20)
 
     #shoppingcart1 = ShoppingCart()
     #db.session.add(shoppingcart1)
@@ -463,12 +477,13 @@ def cartitems():
 @app.route('/cartitems/<int:cartitem_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='cartitem_by_id')
 @jwt_required()
 def cartitem_by_id(cartitem_id):
-    cartitem = CartItem.query.get_or_404(cartitem_id)
 
     if request.method == 'GET':
+        cartitem = CartItem.query.get_or_404(cartitem_id)
         return jsonify(cartitem.serialize())
 
     elif request.method == 'PUT':
+        cartitem = CartItem.query.get_or_404(cartitem_id)
         data = request.get_json()
         if 'quantity' in data:
             cartitem.quantity = data['quantity']
