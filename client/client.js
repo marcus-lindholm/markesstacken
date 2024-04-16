@@ -117,7 +117,6 @@ function addToWishlist(productId, productName) {
 }
 
 function removeFromWishlist(productId) {
-  console.log("removing from wishlist");
   $.ajax({
     url: host + "/wishlist/" + productId, 
     type: "DELETE",
@@ -137,44 +136,52 @@ function removeFromWishlist(productId) {
 
 
 function addToShoppingCart(productId, orderQuantity, productName) {
-
   if (!loggedIn) {
     showAlert("warning", "Du är inte inloggad", "Logga in för att lägga till i varukorgen");
     return; 
   }
 
-  if (orderQuantity > 0) {
-    $.ajax({
-      url: host + "/cartitems",
-      type: "POST",
-      contentType: "application/json",
-      headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
-      data: JSON.stringify({
-        quantity: orderQuantity,
-        product_id: productId,
-        shoppingcart_id: shoppingcartID
-      }),
-      success: function (response) {
-        checkIfInWishlist(productId).then(isInWishlist => {
-          if(isInWishlist) {
-            removeFromWishlist(productId)
-          }
-        });
+  return new Promise((resolve, reject) => {
+    if (orderQuantity > 0) {
+      $.ajax({
+        url: host + "/cartitems",
+        type: "POST",
+        contentType: "application/json",
+        headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+        data: JSON.stringify({
+          quantity: orderQuantity,
+          product_id: productId,
+          shoppingcart_id: shoppingcartID
+        }),
+        success: function (response) {
+          checkIfInWishlist(productId).then(isInWishlist => {
+            if(isInWishlist) {
+              removeFromWishlist(productId)
+            }
+          });
           displayMessage = "Produkt: " + productName + " x " + orderQuantity + ".";
           showAlert("success", "Tillagd i varukorgen:", displayMessage);
-        
-      },
-      error: function (error) {
-        displayMessage = "Produkt: " + productName + " x " + orderQuantity + " blev inte tillagd i varukorgen.";
-        showAlert("warning", displayMessage, "Försök igen.");
-        if (error.status == 400) {
-          showAlert("warning", "Ej tillräckligt många i lager.", "Minska antalet!");
-        }
-      },
-    });
-  } else {
-    showAlert("warning", "Den nuvarande kvantiteten är inte tillåten.", "Var snäll och öka antalet!");
-  }
+          resolve();
+        },
+        error: function (error) {
+          displayMessage = "Produkt: " + productName + " x " + orderQuantity + " blev inte tillagd i varukorgen.";
+          showAlert("warning", displayMessage, "Försök igen.");
+          if (error.status == 400) {
+            showAlert("warning", "Ej tillräckligt många i lager.", "Minska antalet!");
+          }
+          reject(error);
+        },
+      });
+    } else {
+      showAlert("warning", "Den nuvarande kvantiteten är inte tillåten.", "Var snäll och öka antalet!");
+    }
+  });
+}
+
+function buyNow(productId, orderQuantity, productName) {
+  addToShoppingCart(productId, orderQuantity, productName).then(() => {
+    ShowCheckoutPage();
+  });
 }
 
 async function checkIfInWishlist(productId) {
@@ -305,7 +312,7 @@ function refreshProducts() {
                         </div>
                         <button id="add-to-cart-btn${product.id}" data-product-id="${product.id}" onclick="addToShoppingCart(${product.id}, document.getElementById('quantity${product.id}').value, '${product.name}')" class="btn btn-light" style="width: 145px; margin: 5px 0;" ${product.quantity === 0 ? 'disabled' : ''}>Lägg i varukorg</button>
                         <div class="product-overview">
-                          <button class="btn btn-dark" style="width: 105px;">Köp nu</button>
+                          <button class="btn btn-dark" style="width: 105px;" id="buynow-btn${product.id}" data-product-id="${product.id}" onclick="buyNow(${product.id}, document.getElementById('quantity${product.id}').value, '${product.name}')">Köp nu</button>
                           <button id="add-to-wishlist-btn${product.id}" data-product-id="${product.id}" onclick="addToWishlist(${product.id}, '${product.name}')" class="btn btn-outline-dark" >
                               <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
                                   <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
@@ -327,8 +334,7 @@ function refreshProducts() {
 
 function search() {
   var input = document.getElementById('searchBar').value;
-  console.log(input); 
-populateSearch(input);
+  populateSearch(input);
 }
 
 function populateSearch(searchInput) {
@@ -463,7 +469,6 @@ $(document).on("change", ".form-check-input", function() {
   }
 
     // Update the corresponding filter list based on checked/unchecked checkboxes
-    console.log(containerId);
     updateFilterList(containerId);
 
     // Refresh products based on the updated filters
@@ -540,7 +545,7 @@ function ShowProductPage(productId) {
                     <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
                 </svg>
             </button><br>
-            <button class="btn btn-dark" style="width: 145px;">Köp nu</button>
+            <button class="btn btn-dark" style="width: 145px;" id="buynow-btn${product.id}" data-product-id="${product.id}" onclick="buyNow(${product.id}, document.getElementById('quantity${product.id}').value, '${product.name}')">Köp nu</button>
           </div>
         </div>
       </div>
@@ -719,7 +724,6 @@ function ShowShoppingcartPage() {
 }
 
 function increaseQuantity(productId, maxQuantity, productQuantity) { //lägg till vänta så att hemsidan inte uppdateras för snabbt
-  console.log("maxQ: " + maxQuantity + " prodQ: " + productQuantity);
   if (maxQuantity > productQuantity) {
      $.ajax({
     url: host + "/myShoppingCart", 
@@ -755,7 +759,6 @@ function increaseQuantity(productId, maxQuantity, productQuantity) { //lägg til
 }
 
 function decreaseQuantity(productId, productQuantity) { //lägg till vänta så att hemsidan inte uppdateras för snabbt
-  console.log("decreasing Q, prodID: " + productId);
   if (productQuantity > 1) {
     $.ajax({
       url: host + "/myShoppingCart", 
@@ -792,34 +795,42 @@ function decreaseQuantity(productId, productQuantity) { //lägg till vänta så 
 //CHECKOUT-PAGE
 function ShowCheckoutPage() {
  $(".container").html($("#view-checkout").html());
+ $.ajax({
+  url: host + "/myShoppingCart", 
+  type: "GET",
+  contentType: "application/json",
+  headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+  success: function (response) {
+    cartItems = response.cartitems;
+    let numberOfItemsHtml = `
+        <span class="badge badge-secondary badge-pill">${cartItems.length}</span>
+      `;
+    let totalPrice = 0;
+    let cartitemsHtml = cartItems.map(function(item) {
+      totalPrice += item.product.price*item.quantity;
+      return `
+        <li class="list-group-item d-flex justify-content-between lh-condensed">
+          <div>
+            <h6 class="my-0">${item.quantity} x ${item.product.name}</h6>
+            <small class="text-muted">${item.product.description.substring(0, 32)}</small>
+          </div>
+          <span class="text-muted">${item.product.price} kr</span>
+        </li>
+      `;
+    }).join('');
 
-  let numberOfItemsHtml = `
-      <span class="badge badge-secondary badge-pill">${cartItems.length}</span>
-    `;
-  let totalPrice = 0;
-  let cartitemsHtml = cartItems.map(function(item) {
-    totalPrice += item.product.price*item.quantity;
-    console.log(item);
-    return `
-      <li class="list-group-item d-flex justify-content-between lh-condensed">
-        <div>
-          <h6 class="my-0">${item.quantity} x ${item.product.name}</h6>
-          <small class="text-muted">${item.product.description.substring(0, 32)}</small>
-        </div>
-        <span class="text-muted">${item.product.price} kr</span>
+    let totalPriceHtml = `
+      <li class="list-group-item d-flex justify-content-between">
+        <span>Total (SEK)</span>
+        <strong>${totalPrice}</strong>
       </li>
     `;
-  }).join('');
 
-  let totalPriceHtml = `
-    <li class="list-group-item d-flex justify-content-between">
-      <span>Total (SEK)</span>
-      <strong>${totalPrice}</strong>
-    </li>
-  `;
-
-$(".container .number-of-cartitems").html(numberOfItemsHtml);
-$(".container .list-group").html(cartitemsHtml + totalPriceHtml);
+  $(".container .number-of-cartitems").html(numberOfItemsHtml);
+  $(".container .list-group").html(cartitemsHtml + totalPriceHtml);
+  window.scrollTo(0, 0);
+  }
+  });
 }
 
 function placeOrder() {
@@ -857,7 +868,6 @@ function ShowOrderConfirmationPage() {
       contentType: "application/json",
       headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
       success: function (order) {
-        console.log(order);
         orderDate = new Date(order.order_date).toLocaleDateString('sv-SE');
         let htmlString = `
           <p><strong>Ordernummer:</strong> 1000${order.id}</p>
@@ -866,17 +876,102 @@ function ShowOrderConfirmationPage() {
           <p><strong>Email:</strong> ${order.email}</p>
           `;
         $(".container .confirmation-details").html(htmlString);
-      } 
+   
+      }
     });
 
 
 }
 
 //-------------------------------------------------
-//ORDERS-PAGE
+//
+
+function MakeOrderReturned(orderId) {
+  $.ajax({
+    url: host + "/users/" + userID +  "/orders/" + orderId,
+    type: "PUT",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    data: JSON.stringify({returned: true }), 
+    success: function(response) {
+      console.log("hej");
+      ShowOrdersPage();
+    },
+    error: function(xhr, status, error) {
+      console.error("Error marking order as returned:", error);
+    }
+  });
+}
+
+//-------------------------------------------------
+//ORDERS-PAGE FOR CUSTOMERS TO SEE WHAT THEY ORDERED
 function ShowOrdersPage() {
   $(".container").html($("#view-orders").html());
+
+  $.ajax({
+    url: host + "/users/" + userID +  "/orders", 
+    type: "GET",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    success: function (order) {
+    
+      order.forEach(function(order) {
+      console.log(order);
+
+        orderDate = new Date(order.order_date).toLocaleDateString('sv-SE');
+        let htmlString = `
+      
+          <div class="card">
+            <div class="card-body">
+            <p><strong>Ordernummer:</strong> 1000${order.id}</p>
+            <p><strong>Totalkostnad:</strong> ${order.total_price} SEK </p>
+            <p><strong>Datum:</strong> <span>${orderDate}</span></p>
+            <button class="btn btn-outline-dark returnPopup" data-toggle="modal" data-target="#returnModal">Instruktioner för retur</button>
+            </div>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="returnModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h3 class="modal-title" id="exampleModalLabel">Vill du göra en retur?</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                  <h5>Så här gör du en retur</h5>
+                  <ol>
+                      <li>Kontakta vår kundtjänst via e-post för att meddela din retur. Ange ditt ordernummer och orsaken till returen.</li>
+                      <li>Du kommer att få en returetikett via e-post som du ska skriva ut och fästa på returpaketet.</li>
+                      <li>Skicka tillbaka dina varor till adressen som anges på returetiketten. Observera att du är ansvarig för returfrakten.</li>
+                  </ol>
+
+                  <h5>Återbetalning</h5>
+                  <p>När vi har mottagit och kontrollerat de returnerade varorna, kommer vi att återbetala köpesumman till ditt ursprungliga betalningssätt. Återbetalningen sker inom 10 arbetsdagar från det att vi mottagit returen.</p>
+
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Stäng</button>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+
+        $(".container .customer-orders-history").append(htmlString);
+
+       
+      });
+    },
+    error: function(xhr, status, error) {
+      console.error("Error fetching orders:", error);
+    }
+  
+  });
 }
+
+
 
 //-------------------------------------------------
 //RETURNS-PAGE
@@ -1046,8 +1141,6 @@ function checkLoggedIn() {
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'none';
           sellButton.style.display='block';
-          
-          console.log("admin false", user.user.is_admin);
         } else {
           shoppingcartID = user.user.shoppingcart.id;
           userID = user.user.id;
@@ -1055,7 +1148,6 @@ function checkLoggedIn() {
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'block'; 
           sellButton.style.display='none';
-      
         }
        
       },
@@ -1110,11 +1202,9 @@ function ShowLoginPage() {
         data: JSON.stringify({email :formData.email, password : formData.password}),
 
         success: function (response) {
-          console.log(response);
           sessionStorage.setItem('auth', JSON.stringify(response));
 
           guserId = JSON.parse(sessionStorage.getItem('auth')).user.id;
-          console.log("guserId", guserId);
 
           ShowHomePage();
           checkLoggedIn();
@@ -1148,8 +1238,6 @@ function ShowLogoutPage() {
 
 } 
 
-
-
 setInterval(function() {
 checkLoggedIn();
 }, 30000); 
@@ -1157,7 +1245,7 @@ checkLoggedIn();
 
 //------------------------------------------
 //CLICK-EVENTS
-
+ 
 $(document).ready(function () {
   let urlParams = new URLSearchParams(window.location.search);
   let view = urlParams.get('view');
@@ -1251,15 +1339,10 @@ if (previousViewId !== viewId || previousProductId !== productId) {
   previousViewId = viewId;
   previousProductId = productId;
   history.pushState({ viewId: viewId, productId: productId }, "", "");
-  console.log("State object:", history.state);
 }
 }
-
-
-
 
 $(document).on("click", "#checkout-button", function() {
-  
   handleNavigationClick("view-checkout");
 });
 
@@ -1397,8 +1480,15 @@ window.addEventListener("popstate", function (event) {
     loadView(viewId, productId);
   
   }
+
+  $(document).on("click", "#returnPopup", function() {
+    document.getElementById("returnModal").style.display = "block";
+  });
+
  
 });
+
+
 });
 
 

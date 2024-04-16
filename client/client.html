@@ -55,8 +55,7 @@
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">  
                 <span class="dropdown-item disabled" href="#">Inloggad</span> 
-                  <a class="dropdown-item orders" href="#">Beställningar</a>
-                  <a class="dropdown-item returns" href="#">Returer</a>
+                  <a class="dropdown-item orders" href="#">Mina Ordrar</a>
                   <a class="dropdown-item profileinfo" href="#">Kontouppgifter</a>
                   <a class="dropdown-item settings" href="#">Inställningar</a>
                   <a class="dropdown-item logout" href="#">Logga ut</a>
@@ -454,13 +453,14 @@
     <h1>Köp märken</h1>
 
 <!-- Search Bar -->
- <input type="text" id="searchBar" onkeyup="search()" class="form-control mr-sm-2" placeholder="Sök bland märken" aria-label="Search">
-
+  <div id="sticky-header">
+    <input type="text" id="searchBar" onkeyup="search()" class="form-control mr-sm-2" placeholder="Sök bland märken" aria-label="Search">
+  </div>
  
   <div class="row">
     <!-- Sidebar filter-->
     <div class="col-md-3">
-      <div id="sidebar">
+      <div id="sticky-sidebar">
         <h2>Filters</h2>
 
         <!-- Year filter -->
@@ -468,8 +468,8 @@
           <div class="accordion filter-accordian" id="faqAccordion">
               
             <div class="card border-0 wow fadeInUp" data-wow-delay="0.2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
-                  <div class="card-header" id="headingOne">
-                      <h6 class="mb-0 collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">År<span class="lni-chevron-up"></span></h6>
+                  <div class="card-header" id="headingOne" data-toggle="collapse" data-target="#collapseOne" >
+                      <h6 class="mb-0 collapsed" aria-expanded="true" aria-controls="collapseOne">År<span class="lni-chevron-up"></span></h6>
                   </div>
                   <div class="collapse" id="collapseOne" aria-labelledby="headingOne" data-parent="#faqAccordion">
                       <div class="card-body">
@@ -490,8 +490,8 @@
              <!-- Section filter -->
         
             <div class="card border-0 wow fadeInUp" data-wow-delay="0.2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
-                  <div class="card-header" id="headingTwo">
-                      <h6 class="mb-0 collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseOne">Sektion<span class="lni-chevron-up"></span></h6>
+                  <div class="card-header" id="headingTwo" data-toggle="collapse" data-target="#collapseTwo" >
+                      <h6 class="mb-0 collapsed" aria-expanded="true" aria-controls="collapseOne">Sektion<span class="lni-chevron-up"></span></h6>
                   </div>
                   <div class="collapse" id="collapseTwo" aria-labelledby="headingOne" data-parent="#faqAccordion">
                       <div class="card-body">
@@ -513,8 +513,8 @@
              <!-- Event Organizers filter -->
         
             <div class="card border-0 wow fadeInUp" data-wow-delay="0.2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
-                  <div class="card-header" id="headingThree">
-                      <h6 class="mb-0 collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseOne">Organisation<span class="lni-chevron-up"></span></h6>
+                  <div class="card-header" id="headingThree" data-toggle="collapse" data-target="#collapseThree" >
+                      <h6 class="mb-0 collapsed" aria-expanded="true" aria-controls="collapseOne">Organisation<span class="lni-chevron-up"></span></h6>
                   </div>
                   <div class="collapse" id="collapseThree" aria-labelledby="headingThree" data-parent="#faqAccordion">
                       <div class="card-body">
@@ -532,8 +532,8 @@
              <!-- Event filter -->
      
             <div class="card border-0 wow fadeInUp" data-wow-delay="0.2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
-                  <div class="card-header" id="headingFour">
-                      <h6 class="mb-0 collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseOne">Event<span class="lni-chevron-up"></span></h6>
+                  <div class="card-header" id="headingFour" data-toggle="collapse" data-target="#collapseFour" >
+                      <h6 class="mb-0 collapsed" aria-expanded="true" aria-controls="collapseOne">Event<span class="lni-chevron-up"></span></h6>
                   </div>
                   <div class="collapse" id="collapseFour" aria-labelledby="headingFour" data-parent="#faqAccordion">
                       <div class="card-body">
@@ -859,7 +859,11 @@
 
      <!--VIEW-ORDERS-->
      <script id="view-orders" type="text/html">
-      <h1>View-Orders</h1>
+      <h1>Mina Ordrar</h1>
+      <div class="customer-orders-history">
+        <!--POPULATE INFO ABOUT ORDER-->
+         
+      </div>
     </script>
 
      <!--VIEW-RETURNS-->
