@@ -207,10 +207,16 @@ if (cartItems.length > 0) {
 }
 }
 
-function completeRemovalFromShoppingCart(productId) {
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function completeRemovalFromShoppingCart(productId) {
   removeFromShoppingCart(productId, false)
+  await sleep(300); // behöver eventuellt vara lite högre
   ShowShoppingcartPage();
 } 
+
 
 function removeFromShoppingCart(productId, emptyAll) {
   $.ajax({
@@ -221,7 +227,7 @@ function removeFromShoppingCart(productId, emptyAll) {
     success: function (response) {
       if (emptyAll) {
         displayMessage = "Varukorgen tömdes!";
-        showAlert("success", displayMessage, "välkommen tillbaka till köpsidan!");
+        showAlert("success", displayMessage, "Välkommen tillbaka till köpsidan!");
       } else {
         displayMessage = "Produkten togs bort från varukorgen.";
         showAlert("success", displayMessage, "");
