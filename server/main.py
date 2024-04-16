@@ -756,16 +756,7 @@ def get_user_orders(user_id):
 
     user_orders = Order.query.filter_by(user_id=user_id).all()
     serialized_orders = [order.serialize() for order in user_orders]
-
-    # for order in user_orders:
-    #     serialized_order = order.serialize()
-    #     products = [item.product.serialize() for item in order.ordered_shoppingcart.ordered_cartitems]
-    #     serialized_order['products'] = products
-    #     serialized_orders.append(serialized_order)
-
     return jsonify(serialized_orders), 200
-
-
 
 
 
