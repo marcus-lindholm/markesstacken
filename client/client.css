@@ -114,7 +114,7 @@ img.card-img-top.mx-auto.d-block.show-product.img-list-view {
   }
 
   .footer-link:hover {
-    color: rgb(16, 47, 99); 
+    color: rgb(0, 0, 0); 
 }
 
 .space-between {
@@ -126,7 +126,7 @@ img.card-img-top.mx-auto.d-block.show-product.img-list-view {
 .product-page {
     max-width: 100%;
     margin: 0 auto;
-    background-color: #fff;
+    background-color: #fff9e5;
     padding: 20px;
     border-radius: 10px;
     display: flex;
@@ -589,4 +589,5 @@ input[type="number"]::-webkit-outer-spin-button {
   .form-check-label {
     margin-left: 1px;
   }
+
   
