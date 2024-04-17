@@ -269,6 +269,7 @@ with app.app_context():
     ordered_shoppingcart1 = OrderedShoppingCart()
     db.session.add(ordered_shoppingcart1)
     ordered_cartitem1 = OrderedCartItem(quantity=4, product_id=10, ordered_shoppingcart_id=1)
+    ordered_cartitem2 = OrderedCartItem(quantity=2, product_id=9, ordered_shoppingcart_id=1)
     db.session.add(ordered_cartitem1)
     ordered_shoppingcart2 = OrderedShoppingCart()
     db.session.add(ordered_shoppingcart2)
