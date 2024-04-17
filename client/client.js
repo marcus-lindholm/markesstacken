@@ -250,7 +250,7 @@ function removeFromShoppingCart(productId, emptyAll) {
 function ShowPurchasePage() {
   $(".container").html($("#view-purchase").html());
 
-  // Initial fetc of products
+  // Initial fetch of products
   $.ajax({
       url: host + "/products", 
       type: "GET",
@@ -445,7 +445,7 @@ function addAllCheckbox(containerId) {
 }
 
 
-
+//-------------------------------------------------
 // Function to handle checkbox selection
 $(document).on("change", ".form-check-input", function() {
   var checkbox = $(this);
@@ -482,6 +482,7 @@ $(document).on("change", ".form-check-input", function() {
 
 });
 
+//-------------------------------------------------
 // Show the PRODUCT PAGE
 
 //Zoom image on hover
@@ -561,6 +562,8 @@ function ShowProductPage(productId) {
     }
   });
 }
+
+//-------------------------------------------------
 // Function to update the global filter lists based on checked/unchecked checkboxes
 function updateFilterList(containerId) {
   // Get the checked checkboxes and update the corresponding global filter list
@@ -593,11 +596,7 @@ function updateFilterList(containerId) {
   });
 }
 
-//
-//
-//
-//
-//
+//-------------------------------------------------
 //SELL-PAGE
 function ShowSellPage() {
   $(".container").html($("#view-sell").html());
@@ -653,6 +652,7 @@ function addProduct(){
   });
 }
 
+//-------------------------------------------------
 //SHOPPINGCART-PAGE
 function ShowShoppingcartPage() {
   $(".container").html($("#view-shoppingcart").html());
@@ -876,17 +876,32 @@ function ShowOrderConfirmationPage() {
       success: function (order) {
         orderDate = new Date(order.order_date).toLocaleDateString('sv-SE');
         let htmlString = `
+          <h5>Ordersummering</h5>
           <p><strong>Ordernummer:</strong> 1000${order.id}</p>
-          <p><strong>Namn:</strong> ${order.first_name} ${order.last_name}</p>
           <p><strong>Datum:</strong> <span>${orderDate}</span></p>
+          <p><strong>Totalkostnad:</strong> ${order.total_price} SEK</p>
+          <p><strong>Mottgarens namn:</strong> ${order.first_name} ${order.last_name}</p>
           <p><strong>Email:</strong> ${order.email}</p>
+          <p><strong>Beställda produkter:</strong></p>
           `;
+
+          order.ordered_shoppingcart.ordered_cartitems.forEach(function(orderedCartItem) {
+            htmlString += `
+            <div style="display: flex; align-items: center; margin-right: 10px; margin-bottom: 20px;"> <!-- Adjust margin-right -->
+              <img src="/product_images/${orderedCartItem.product.img}" alt="${orderedCartItem.product.name}" style="max-width: 100px;">
+              <div style="margin-left: 10px;"> <!-- Add margin between image and text -->
+                <div>${orderedCartItem.product.name}</div> <!-- Product name -->
+                <div>Antal: ${orderedCartItem.quantity}</div> <!-- Quantity -->
+              </div>
+            </div>
+          `;
+        });
+          
+          htmlString += `</ul>`;
+
         $(".container .confirmation-details").html(htmlString);
-   
       }
     });
-
-
 }
 
 //-------------------------------------------------
@@ -1244,6 +1259,7 @@ function ShowLogoutPage() {
 
 } 
 
+//Interval to check if token is active
 setInterval(function() {
 checkLoggedIn();
 }, 30000); 
@@ -1361,8 +1377,6 @@ $('#confirmEmptyCart, #cancelEmptyCart').on('click', function() {
   $('#emptyCartModal').modal('hide');
 });
 
-
-
 // Click event handler for product links
 $(document).on('click', '.show-product', function() {
   var productId = $(this).data('product-id');
@@ -1445,6 +1459,8 @@ $(".nav-item.dropdown .dropdown-menu .logout").click(function () {
   handleNavigationClick("view-logout");
 });
 
+
+
 //Dropdown Admin
 $(".nav-item.dropdown .dropdown-menu .adminOrders").click(function () {
   handleNavigationClick("view-adminOrders");
@@ -1490,9 +1506,9 @@ window.addEventListener("popstate", function (event) {
   $(document).on("click", "#returnPopup", function() {
     document.getElementById("returnModal").style.display = "block";
   });
-
  
 });
+
 
 
 });
