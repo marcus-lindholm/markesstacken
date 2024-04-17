@@ -150,7 +150,7 @@ class OrderedCartItem(db.Model):
         return f'<OrderedCartItem {self.id}: {self.quantity}'
     
     def serialize(self):
-        return dict(id=self.id, quantity=self.quantity, product=self.product.serialize() if self.product else None)
+        return dict(id=self.id, quantity=self.quantity,product_id= self.product_id, product=self.product.serialize() if self.product else None)
     
 class OrderedShoppingCart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -177,10 +177,11 @@ class Order(db.Model):
         return f'<Order {self.id}>'
     
     def serialize(self):
-        return {
+         return {
             'id': self.id,
             'total_price': self.total_price,
             'order_date': self.order_date,
+            'user_id': self.user_id,
             'returned': self.returned,
             'ordered_shoppingcart': self.ordered_shoppingcart.serialize() if self.ordered_shoppingcart else None,
         }
@@ -794,10 +795,11 @@ def admin_add_to_purchasepage(productId):
 
     elif request.method == 'DELETE':
 
-        if product.img:
-            image_path = os.path.join('../client/product_images', product.img)
-            if os.path.exists(image_path):
-                os.remove(image_path)
+        # The code below is to delete the picture to a product. For our testing we comment it out.
+        #if product.img:
+         #   image_path = os.path.join('../client/product_images', product.img)
+          #  if os.path.exists(image_path):
+           #     os.remove(image_path)
         db.session.delete(product)
         db.session.commit()
         return jsonify("Success!"), 200

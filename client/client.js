@@ -751,7 +751,6 @@ function increaseQuantity(productId, maxQuantity, productQuantity) { //lägg til
     }
   });
   } else {
-    ShowShoppingcartPage();
     displayMessage = "Ej tillräckligt många varor i lager.";
     showAlert("warning", displayMessage, "");
   }
@@ -1004,27 +1003,35 @@ function ShowAdminOrdersPage(){
     headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
     success: function (order) {
     
-      order.forEach(function(order) {
-      console.log(order);
+      order.forEach(function(singleOrder) {
+      console.log(singleOrder);
 
-        orderDate = new Date(order.order_date).toLocaleDateString('sv-SE');
+        orderDate = new Date(singleOrder.order_date).toLocaleDateString('sv-SE');
         let htmlString = `
-      
-          <div class="card">
+        <div class="card">
             <div class="card-body">
-            <p><strong>Ordernummer:</strong> 1000${order.id}</p>
-            <p><strong>AnvändarID:</strong> ${order.user_id}</p>
-          
-            <p><strong>shopping cart id:</strong> ${order.ordered_shoppingcart_id} SEK </p>
-            <p><strong>Totalkostnad:</strong> ${order.total_price} SEK </p>
-            <p><strong>Datum:</strong> <span>${orderDate}</span></p>
-            </div>
-            </div>`;
+                <p><strong>Ordernummer:</strong> 1000${singleOrder.id}</p>
+                <p><strong>AnvändarID:</strong> ${singleOrder.user_id}</p>
+                <p><strong>Varukorg:</strong></p>
+                <ul id="${singleOrder.ordered_shoppingcart_id}">`;
 
-        $(".container .admin-orders-history").append(htmlString);
+        singleOrder.ordered_shoppingcart.ordered_cartitems.forEach(function(cartItem) {
+          htmlString += `
+              <li>Produkt ID: ${cartItem.product_id}, Antal: ${cartItem.quantity}</li>`;
+              });
+              
+        htmlString += `
+              </ul>
+              <p><strong>Totalkostnad:</strong> ${singleOrder.total_price} SEK</p>
+              <p><strong>Datum:</strong> <span>${orderDate}</span></p>
+          </div>
+      </div>`;
 
-       
-      });
+      // Append the htmlString to the container
+     
+    $(".container .admin-orders-history").append(htmlString);
+    });
+     
     },
     error: function(xhr, status, error) {
       console.error("Error fetching orders:", error);
