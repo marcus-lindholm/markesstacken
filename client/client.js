@@ -1583,9 +1583,9 @@ $(".nav-item.dropdown .dropdown-menu .adminOrders").click(function () {
   handleNavigationClick("view-adminOrders");
 });
 
-$(".nav-item.dropdown .dropdown-menu .adminReturns").click(function () {
+/*$(".nav-item.dropdown .dropdown-menu .adminReturns").click(function () {
   handleNavigationClick("view-adminReturns");
-});
+});*/
 
 $(".nav-item.dropdown .dropdown-menu .adminConfirmProducts").click(function () {
   handleNavigationClick("view-admin-confirm-products");
