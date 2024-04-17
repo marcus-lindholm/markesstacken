@@ -757,7 +757,6 @@ function increaseQuantity(productId, maxQuantity, productQuantity) { //lägg til
     }
   });
   } else {
-    ShowShoppingcartPage();
     displayMessage = "Ej tillräckligt många varor i lager.";
     showAlert("warning", displayMessage, "");
   }
@@ -1001,6 +1000,54 @@ function ShowSettingsPage(){
 //ADMIN-ORDERS-PAGE
 function ShowAdminOrdersPage(){
   $(".container").html($("#view-admin-orders").html());
+
+  
+  $.ajax({
+    url: host +  "/orders", 
+    type: "GET",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    success: function (order) {
+    
+      order.forEach(function(singleOrder) {
+      console.log(singleOrder);
+
+        orderDate = new Date(singleOrder.order_date).toLocaleDateString('sv-SE');
+        let htmlString = `
+        <div class="card">
+            <div class="card-body">
+                <p><strong>Ordernummer:</strong> 1000${singleOrder.id}</p>
+                <p><strong>AnvändarID:</strong> ${singleOrder.user_id}</p>
+                <p><strong>Varukorg:</strong></p>
+                <ul id="${singleOrder.ordered_shoppingcart_id}">`;
+
+        singleOrder.ordered_shoppingcart.ordered_cartitems.forEach(function(cartItem) {
+          htmlString += `
+              <li>Produkt ID: ${cartItem.product_id}, Antal: ${cartItem.quantity}</li>`;
+              });
+              
+        htmlString += `
+              </ul>
+              <p><strong>Totalkostnad:</strong> ${singleOrder.total_price} SEK</p>
+              <p><strong>Datum:</strong> <span>${orderDate}</span></p>
+          </div>
+      </div>`;
+
+      // Append the htmlString to the container
+     
+    $(".container .admin-orders-history").append(htmlString);
+    });
+     
+    },
+    error: function(xhr, status, error) {
+      console.error("Error fetching orders:", error);
+    }
+  
+  });
+
+
+
+
 }
 
 //-------------------------------------------------
@@ -1008,6 +1055,89 @@ function ShowAdminOrdersPage(){
 function ShowAdminReturnsPage(){
   $(".container").html($("#view-admin-returns").html());
 }
+
+//-------------------------------------------------
+//ADMIN-CONFIRM-PRODUCTS-PAGE
+
+function ShowAdminConfirmProductsPage(){
+  $(".container").html($("#view-admin-confirm-products").html());
+
+  $.ajax({
+    url: host + "/confirm-products",
+    type: "GET",
+    success: function(response) {
+        // Handle successful response
+        displayUnconfirmedProducts(response);
+    },
+    error: function(error) {
+        console.error("Error fetching unconfirmed products:", error);
+    }
+});
+}
+
+
+function displayUnconfirmedProducts(products) {
+  // Clear the product container before appending new products
+  $("#unconfirmed-product-container").empty();
+
+  // Loop through each unconfirmed product and generate HTML dynamically
+  products.forEach(function(product) {
+      var productHTML = `
+          <div class="col-md-12" style="padding: 10px 5px;">
+              <div class="card">
+                  <div class="product-listing-image-wrapper">
+                      <img src="/product_images/${product.img}" class="card-img-top centered-product-image show-product" data-product-id="${product.id}" alt="Product Image">
+                  </div>    
+                  <div class="card-body">
+                      <h5 class="card-title show-product" data-product-id="${product.id}">${product.name}</h5>
+                      <p class="card-text">${product.description.length > 28 ? product.description.substring(0, 25) + '...' : product.description}</p>
+                      <p class="card-text"> ${product.price} kr</p>
+                      <div style="margin-top: 10px; text-align: center;">
+                       <button id="confirm-product-btn${product.id}" data-product-id="${product.id}" onclick="confirmProduct(${product.id})" class="btn btn-primary" style="display: inline-block; width: 300px; height: 40px; margin-right: 10px;">Confirm Product</button>
+                       <button id="delete-product-btn${product.id}" data-product-id="${product.id}" onclick="deleteProduct(${product.id})" class="btn btn-danger" style="display: inline-block; width: 300px; height: 40px; ">Delete Product</button>
+                      </div>
+
+                  </div>
+              </div>
+          </div>`;
+      // Append product HTML to the container
+      $("#unconfirmed-product-container").append(productHTML);
+      console.log(productHTML);
+  });
+}
+
+function confirmProduct(productId) {
+  $.ajax({
+    url: "/confirm-products/" + productId,
+    type: "POST", 
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    success: function(response) {
+      ShowAdminConfirmProductsPage()
+    },
+    error: function(error) {
+        
+        console.error("Error confirming product:", error);
+    }
+});
+}
+
+function deleteProduct(productId) {
+  $.ajax({
+    url: "/confirm-products/" + productId, 
+    type: "DELETE",
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    success: function(response) {
+      ShowAdminConfirmProductsPage()
+    },
+    error: function(error) {
+        // Handle error
+        console.error("Error deleting product:", error);
+    }
+});
+}
+
 
 //-------------------------------------------------
 //LOGOUT-PAGE
@@ -1317,6 +1447,9 @@ $(document).ready(function () {
       case "view-adminReturns":
         ShowAdminReturnsPage();
         break;
+      case "view-admin-confirm-products":
+        ShowAdminConfirmProductsPage();
+        break;
       case "view-questions":
         ShowQuestionsPage();
         break; 
@@ -1452,6 +1585,10 @@ $(".nav-item.dropdown .dropdown-menu .adminOrders").click(function () {
 
 $(".nav-item.dropdown .dropdown-menu .adminReturns").click(function () {
   handleNavigationClick("view-adminReturns");
+});
+
+$(".nav-item.dropdown .dropdown-menu .adminConfirmProducts").click(function () {
+  handleNavigationClick("view-admin-confirm-products");
 });
 
 //FOOTER-LINKS
