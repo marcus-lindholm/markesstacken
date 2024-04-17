@@ -84,6 +84,7 @@
              </a>
              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">   
                <span class="dropdown-item disabled" href="#">Admin</span> 
+                <a class="dropdown-item adminConfirmProducts" href="#">Admin Förfrågningar</a>
                  <a class="dropdown-item adminOrders" href="#">Admin Beställningar</a>
                  <a class="dropdown-item adminReturns" href="#">Admin Returer</a>
                  <a class="dropdown-item settings" href="#">Inställningar</a>
@@ -876,12 +877,21 @@
 
     <!--VIEW-ADMIN-ORDERS--> 
     <script id="view-admin-orders" type="text/html">
-      <h1>View-adminOrders</h1>
+      <h1>Orderhistorik</h1>
+      <div class="admin-orders-history">
+        <div>
     </script>
 
-      <!--VIEW-ADMIN-ORDERS--> 
+      <!--VIEW-ADMIN-RETURNS 
       <script id="view-admin-returns" type="text/html">
-        <h1>View-adminReturns</h1>
+        <h1>Returhistoik</h1>
+      </script>-->
+
+      <!--VIEW-ADMIN-CONFIRM-PRODUCTS--> 
+
+      <script id="view-admin-confirm-products" type="text/html">
+        <h1>Produktförfrågningar</h1>
+        <div id="unconfirmed-product-container"></div>
       </script>
 
      <!--VIEW-SETTINGS-->
