@@ -17,6 +17,7 @@ from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 from datetime import timedelta
 import stripe
+from operator import itemgetter
 
 app = Flask(__name__, static_folder='../client', static_url_path='/')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -813,6 +814,36 @@ def admin_add_to_purchasepage(productId):
         db.session.commit()
         return jsonify("Success!"), 200
 
+
+@app.route('/ordered_cart_item/<int:numberofShown>', methods=['GET'], endpoint='ordered_cart_item')
+#@jwt_required()
+def ordered_cart_item(numberofShown):
+    if request.method == 'GET':
+        ordered_cart_item = OrderedCartItem.query.all()
+        numberofSales = {}
+        productsList = []
+        for item in ordered_cart_item:
+            itemID = item.product_id
+            if itemID in numberofSales:
+                numberofSales[itemID] += item.quantity
+            else:
+                numberofSales[itemID] = item.quantity
+
+        #sorts the dictionary with the highest value first
+        
+        length_dic = len(numberofSales)
+
+        if length_dic < numberofShown:
+            numberofShown = length_dic
+
+        numberofSalesSorted = sorted(numberofSales.items(), key=itemgetter(1), reverse=True)[:numberofShown]
+
+        # Fetch the corresponding products from the database
+        product_ids = [item[0] for item in numberofSalesSorted]
+        productsList = Product.query.filter(Product.id.in_(product_ids)).all()
+        
+        mostPopularProducts = [item.serialize() for item in productsList]
+        return jsonify(mostPopularProducts), 200
 
 #labb2
 @app.route("/")
