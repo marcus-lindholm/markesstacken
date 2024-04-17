@@ -900,7 +900,6 @@ function MakeOrderReturned(orderId) {
     headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
     data: JSON.stringify({returned: true }), 
     success: function(response) {
-      console.log("hej");
       ShowOrdersPage();
     },
     error: function(xhr, status, error) {
@@ -920,19 +919,24 @@ function ShowOrdersPage() {
     contentType: "application/json",
     headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
     success: function (order) {
-    
+      let htmlString = '';
       order.forEach(function(order) {
       console.log(order);
 
         orderDate = new Date(order.order_date).toLocaleDateString('sv-SE');
-        let htmlString = `
+        htmlString += `
       
           <div class="card">
             <div class="card-body">
             <p><strong>Ordernummer:</strong> 1000${order.id}</p>
             <p><strong>Totalkostnad:</strong> ${order.total_price} SEK </p>
             <p><strong>Datum:</strong> <span>${orderDate}</span></p>
-            <button class="btn btn-outline-dark returnPopup" data-toggle="modal" data-target="#returnModal">Instruktioner för retur</button>
+            <p><strong>Produkter:</strong></p>`;
+            order.ordered_shoppingcart.ordered_cartitems.forEach(function(item) {
+              htmlString += ` <p>${item.quantity} x ${item.product.name}</p>`;
+            });
+
+            htmlString += `<button class="btn btn-outline-dark returnPopup" data-toggle="modal" data-target="#returnModal">Instruktioner för retur</button>
             </div>
             </div>
 

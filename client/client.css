@@ -126,7 +126,7 @@ img.card-img-top.mx-auto.d-block.show-product.img-list-view {
 .product-page {
     max-width: 100%;
     margin: 0 auto;
-    background-color: #fff9e5;
+    /* background-color: #fff9e5; */
     padding: 20px;
     border-radius: 10px;
     display: flex;
