@@ -399,7 +399,7 @@ function refreshProducts() {
 }
 
 function search() {
-  var input = document.getElementById('searchBar').value;
+  var input = document.getElementById('searchBar').value.toLowerCase();
   populateSearch(input);
 }
 
