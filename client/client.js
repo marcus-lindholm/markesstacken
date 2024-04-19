@@ -556,10 +556,10 @@ function ShowProductPage(productId) {
           <h3>${product.price} kr</h3>
           <p class="card-text">${product.description}</p>
           <p>Antal i lager: ${product.quantity === 0 ? 'Ej i lager' : product.quantity}</p>
-          ${product.year ? `<p>År: ${product.year}</p>` : ''}
-          ${product.section ? `<p>Sektion: ${product.section}</p>` : ''}
-          ${product.event ? `<p>Event: ${product.event}</p>` : ''}
-          ${product.event_organizer ? `<p>Arrangör: ${product.event_organizer}</p>` : ''}
+          ${product.year && product.year !== 'null' ? `<p>År: ${product.year}</p>` : ''}
+          ${product.section && product.section !== 'null' ? `<p>Sektion: ${product.section}</p>` : ''}
+          ${product.event && product.event !== 'null' ? `<p>Event: ${product.event}</p>` : ''}
+          ${product.event_organizer && product.event_organizer !== 'null' ? `<p>Arrangör: ${product.event_organizer}</p>` : ''}
           <div class="d-flex align-items-center mb-3">
               <label for="quantity" class="me-2"></label>
               <div class="input-group quantity-input-group">
