@@ -26,7 +26,7 @@ function ShowHomePage() {
 }
 
 function ShowCommonlyBoughtProducts() {
-var numberofShown = "4"; //number of Commonly bought products shown
+var numberofShown = "3"; //number of Commonly bought products shown
 
 $.ajax({
   url: host + "/ordered_cart_item/" + numberofShown, 
