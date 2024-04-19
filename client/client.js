@@ -71,8 +71,10 @@ $.ajax({
                       </button>
                     </div>
                 </div>
-            </div>
+                <button id="view-all-products-btn" onclick="ShowPurchasePage()" class="btn btn-outline-dark" >Se alla produkter</button>
+            </div> 
         </div>`;
+        
         // Append product HTML to the container
         $("#CBP").append(productHTML);
       });
