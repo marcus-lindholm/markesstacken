@@ -78,8 +78,6 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-
-
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
@@ -243,8 +241,6 @@ with app.app_context():
     db.session.add(product19)
     db.session.add(product20)
 
-    #shoppingcart1 = ShoppingCart()
-    #db.session.add(shoppingcart1)
     cartitem1 = CartItem(quantity=2, product=product1, shoppingcart_id=1)
     cartitem2 = CartItem(quantity=3, product=product2, shoppingcart_id=1)
     db.session.add(cartitem1)
@@ -348,7 +344,6 @@ def orders():
             cancel_url=request.host_url + 'order/cancel',
             metadata={
                 'user_id': str(user.id),
-                #data from request
             },
         )
         return checkout_session.url, 200
@@ -415,7 +410,7 @@ def myShoppingCart():
     user = db.session.get(User, user_id)
     return jsonify(user.shoppingcart.serialize())
 
-#Eventuellt ta bort ty används ej
+""" #Eventuellt ta bort ty används ej
 @app.route('/shoppingcarts', methods=['GET', 'POST'], endpoint='shoppingcarts')
 @jwt_required()
 def shoppingcarts():
@@ -450,7 +445,7 @@ def shoppingcart_by_id(shoppingcart_id):
     elif request.method == 'DELETE' and get_jwt_identity().is_admin:
         db.session.delete(shoppingcart)
         db.session.commit()
-        return jsonify("Success!"), 200
+        return jsonify("Success!"), 200 """
 
 @app.route('/cartitems', methods=['GET', 'POST'], endpoint='cartitems')
 @jwt_required()
@@ -505,8 +500,6 @@ def cartitem_by_id(cartitem_id):
         return jsonify(cartitem.serialize()), 200
 
     elif request.method == 'DELETE':
-        #We use productID to delete the cartitem instead of CartItemID
-        #cartitem_id = product.id in this case
         identity = get_jwt_identity()
         user = User.query.filter_by(id=identity).first()
         cartitem = next((item for item in user.shoppingcart.cartitems if item.product.id == cartitem_id), None)
@@ -524,13 +517,13 @@ def products():
         product_list = [product.serialize() for product in products]
         return jsonify(product_list)
 
-    elif request.method == 'POST': #and get_jwt_identity().is_admin:
+    elif request.method == 'POST':
         data = request.form
         file = request.files.get('img')
     if file:
         print('File uploaded')
         filename = secure_filename(file.filename)
-        timestamp = str(time.time()).replace('.', '_')  # get current timestamp and replace '.' with '_'
+        timestamp = str(time.time()).replace('.', '_') 
         filename = f"{timestamp}_{filename}"
         dir_path = os.path.join('../client/product_images')
         os.makedirs(dir_path, exist_ok=True)
@@ -564,8 +557,6 @@ def product_by_id(product_id):
             product.description = data['description']
         if 'img' in data:
             product.img = data['img']
-        # if 'subcategory_id' in data:
-        #     product.subcategory_id = data['subcategory_id']
         db.session.commit()
         return jsonify(product.serialize()), 200
 
@@ -577,43 +568,6 @@ def product_by_id(product_id):
         db.session.delete(product)
         db.session.commit()
     return jsonify("Success!"), 200
-
-# @app.route('/subcategories', methods=['GET', 'POST'], endpoint='subcategories')
-# #@jwt_required()
-# def subcategories():
-#     if request.method == 'GET':
-#         subcategories = Subcategory.query.all()
-#         subcategory_list = [subcategory.serialize() for subcategory in subcategories]
-#         return jsonify(subcategory_list)
-
-#     elif request.method == 'POST' and get_jwt_identity().is_admin:
-#         data = request.get_json()
-#         new_subcategory = Subcategory(name=data['name'], category_id=data['category_id'])
-#         db.session.add(new_subcategory)
-#         db.session.commit()
-#         return jsonify(new_subcategory.serialize()), 201
-
-# @app.route('/subcategories/<int:subcategory_id>', methods=['GET', 'PUT', 'DELETE'], endpoint='subcategory_by_id')
-# #@jwt_required()
-# def subcategory_by_id(subcategory_id):
-#     subcategory = Subcategory.query.get_or_404(subcategory_id)
-
-#     if request.method == 'GET':
-#         return jsonify(subcategory.serialize())
-
-#     elif request.method == 'PUT' and get_jwt_identity().is_admin:
-#         data = request.get_json()
-#         if 'name' in data:
-#             subcategory.name = data['name']
-#         if 'category_id' in data:
-#             subcategory.category_id = data['category_id']
-#         db.session.commit()
-#         return jsonify(subcategory.serialize()), 200
-
-#     elif request.method == 'DELETE' and get_jwt_identity().is_admin:
-#         db.session.delete(subcategory)
-#         db.session.commit()
-#         return jsonify("Success!"), 200
 
 @app.route('/categories', methods=['GET', 'POST'], endpoint='categories')
 #@jwt_required()
@@ -656,29 +610,25 @@ def sign_up():
     data = request.get_json()
 
     if 'email' not in data or 'firstName' not in data and 'lastName' not in data or 'password' not in data:
-        return jsonify({"error": "Missing required fields"}), 400  # 400 Bad Request
+        return jsonify({"error": "Missing required fields"}), 400  
     email = data['email']
     firstName = data['firstName']
     lastName = data['lastName']
     password = data['password']
-    
 
-    # Email has to be unique for every user signing up
     existing_user = User.query.filter_by(email=email).first()
     if existing_user:
-        return jsonify({"error": "Email address already in use"}), 400  # 400 Bad Request
+        return jsonify({"error": "Email address already in use"}), 400  
 
-    # Create a new user
     new_user = User(email=email, firstName=firstName, lastName=lastName)
     new_user.set_password(password)
 
-    # Save the new user to the database
     db.session.add(new_user)
     db.session.commit()
 
     access_token = create_access_token(identity=new_user.id)
 
-    return jsonify({"message": "User created successfully", "access_token": access_token}), 201  # 200 OK
+    return jsonify({"message": "User created successfully", "access_token": access_token}), 201  
 
 
 @app.route('/login', methods=['POST'])
@@ -686,7 +636,7 @@ def login():
     data = request.get_json()
 
     if 'email' not in data or 'password' not in data:
-        return jsonify({"error": "Missing required fields"}), 400  # 400 Bad Request
+        return jsonify({"error": "Missing required fields"}), 400  
 
     email = data['email']
     password = data['password']
@@ -694,17 +644,15 @@ def login():
     user = User.query.filter_by(email=data['email']).first()
 
     if user and user.check_password(password):
-        # Password is correct, generate an access token
         access_token = create_access_token(identity=user.id)
 
-        # Return the token and user data (excluding password hash)
         response = {
             'token' : access_token,
             'user' : user.serialize()
         }
         return jsonify(response)
     else:
-        return jsonify({"error": "Invalid email or password"}), 401  # 401 Unauthorized
+        return jsonify({"error": "Invalid email or password"}), 401
     
     
 @app.route('/get-identity', methods=['GET'], endpoint = 'get-identity')
@@ -719,19 +667,15 @@ def get_identity():
     else:
         return jsonify(message="User not found"), 404
 
-
-
 @app.route('/users', methods=['GET', 'POST'], endpoint = 'users')
-#@jwt_required()
+@jwt_required()
 def users():
     if request.method == 'GET':
-        # Handle GET request
         users = User.query.all()
         user_list = [user.serialize() for user in users]
         return jsonify(user_list)
 
     elif request.method == 'POST':
-        # Handle POST request
         data = request.get_json()
 
         new_user = User(name=data['name'], email=data['email'])
@@ -770,8 +714,6 @@ def get_user_by_id(user_id):
         db.session.delete(user)
         db.session.commit()
         return jsonify("Success!"), 200
-    
-
 
 @app.route('/users/<int:user_id>/orders', methods=['GET'], endpoint = 'get-orders-by-user')
 @jwt_required()
@@ -788,7 +730,6 @@ def get_user_orders(user_id):
 
 @app.route('/confirm-products', methods=['GET'], endpoint='admin_confirm_products')
 def admin_confirm_products():
-        # Retrieve unconfirmed products from the database
         unconfirmed_products = Product.query.filter_by(confirmed_by_admin=False).all()
         product_list = [product.serialize() for product in unconfirmed_products]
         return jsonify(product_list), 200
@@ -804,7 +745,6 @@ def admin_add_to_purchasepage(productId):
         return jsonify({'message': 'Product confirmed successfully'}), 200
 
     elif request.method == 'DELETE':
-
         # The code below is to delete the picture to a product. For our testing we comment it out.
         #if product.img:
          #   image_path = os.path.join('../client/product_images', product.img)
@@ -829,8 +769,6 @@ def ordered_cart_item(numberofShown):
             else:
                 numberofSales[itemID] = item.quantity
 
-        #sorts the dictionary with the highest value first
-        
         length_dic = len(numberofSales)
 
         if length_dic < numberofShown:
@@ -838,14 +776,12 @@ def ordered_cart_item(numberofShown):
 
         numberofSalesSorted = sorted(numberofSales.items(), key=itemgetter(1), reverse=True)[:numberofShown]
 
-        # Fetch the corresponding products from the database
         product_ids = [item[0] for item in numberofSalesSorted]
         productsList = Product.query.filter(Product.id.in_(product_ids)).all()
         
         mostPopularProducts = [item.serialize() for item in productsList]
         return jsonify(mostPopularProducts), 200
 
-#labb2
 @app.route("/")
 def client():
     return app.send_static_file("client.html")

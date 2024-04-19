@@ -1,4 +1,3 @@
-//var signedIn = false;
 host = window.location.protocol + '//' + location.host;
 
 var guserId;
@@ -26,7 +25,7 @@ function ShowHomePage() {
 }
 
 function ShowCommonlyBoughtProducts() {
-var numberofShown = "4"; //number of Commonly bought products shown
+var numberofShown = "3"; //number of Commonly bought products shown
 
 $.ajax({
   url: host + "/ordered_cart_item/" + numberofShown, 
@@ -71,11 +70,12 @@ $.ajax({
                       </button>
                     </div>
                 </div>
-            </div>
+            </div> 
         </div>`;
-        // Append product HTML to the container
         $("#CBP").append(productHTML);
       });
+      var buttonHTML = `<span style="width: 100%; text-align: center; margin: 10px 0;"><button id="view-all-products-btn" onclick="ShowPurchasePage()" class="btn btn-outline-dark">Se alla produkter</button></span>`;
+      $("#CBP").append(buttonHTML);
   },
   error: function(error) {
       console.error("Error fetching commonly bought products:", error);
@@ -139,11 +139,9 @@ function ShowFavoritesPage() {
     error: function (error) {
       displayMessage = "Product: " + productName + " was not added to your wishlist.";
       showAlert("warning", displayMessage, "Please try again later.");
-      console.error("Error adding product to wishlist:", error); // Remove later
     },
   });
 }
-// Function to show the purchase page
 
 function addToWishlist(productId, productName) {
 
@@ -185,7 +183,7 @@ function removeFromWishlist(productId) {
     success: function (response) {
       displayMessage = "Produkten togs bort från önskelistan."; 
       showAlert("success", displayMessage, "");
-      ShowFavoritesPage(); // Reload the favorites page
+      ShowFavoritesPage();
     },
     error: function (error) {
       displayMessage = "Produkten gick inte att ta bort från önskelistan.";
@@ -193,7 +191,6 @@ function removeFromWishlist(productId) {
     }
   });
 }
-
 
 function addToShoppingCart(productId, orderQuantity, productName) {
   if (!loggedIn) {
@@ -310,7 +307,6 @@ function removeFromShoppingCart(productId, emptyAll) {
 function ShowPurchasePage() {
   $(".container").html($("#view-purchase").html());
 
-  // Initial fetch of products
   $.ajax({
       url: host + "/products", 
       type: "GET",
@@ -325,15 +321,11 @@ function ShowPurchasePage() {
 }
 
 function refreshProducts() {
-  // Make AJAX request to fetch products
   $.ajax({
     url: host + "/products",
     type: "GET",
-
     success: function(response) {
-
       var filteredProducts = response.filter(function(product) {
-        // Check if the product matches all selected filters
         return (
           (yearCheckboxesfilter.length === 0 || yearCheckboxesfilter.includes(product.year)) &&
           (sectionCheckboxesfilter.length === 0 || sectionCheckboxesfilter.includes(product.section)) &&
@@ -341,13 +333,10 @@ function refreshProducts() {
           (eventCheckboxesfilter.length === 0 || eventCheckboxesfilter.includes(product.event))
         );
       });
-
-      // Clear the product container before appending new products
       $("#product-container").empty();
 
       // Loop through each product and generate HTML dynamically
       filteredProducts.forEach(function(product) {
-      //response.forEach(function(product) {
         var productHTML = `
           <div class="col-md-4" style="padding: 10px 5px;">
                 <div class="card">
@@ -388,7 +377,6 @@ function refreshProducts() {
                     </div>
                 </div>
             </div>`;
-        // Append product HTML to the container
         $("#product-container").append(productHTML);
       });
     },
@@ -404,21 +392,14 @@ function search() {
 }
 
 function populateSearch(searchInput) {
-      // Select all items within the product container
       var items = document.getElementById('product-container').getElementsByClassName('col-md-4');
 
       for (var i = 0; i < items.length; i++) {
-          // Get the product name within the current item
           var productName = items[i].getElementsByClassName('card-title')[0].textContent.toLowerCase();
-
           if (productName.includes(searchInput)) {
-            // Show the item by setting its display property to "block"
             items[i].style.display = 'block';
-           
         } else {
-            // Hide the item if it doesn't match the search input
             items[i].style.display = 'none';
-  
         }
       }  
 }
@@ -514,30 +495,22 @@ $(document).on("change", ".form-check-input", function() {
   if (checkbox.hasClass("all-checkbox")) {
     var isChecked = checkbox.prop("checked");
     $("." + containerId + " .form-check-input").prop("checked", isChecked);
-    // Set all individual checkboxes to checked or unchecked based on the state of the "All" checkbox
     $("#" + containerId + " .form-check-input:not(.all-checkbox)").prop("checked", isChecked);
   } else {
-    // If an individual checkbox is unchecked, uncheck the "All" checkbox
     if (!checkbox.prop("checked")) {
       $("#" + containerId + "-All").prop("checked", false);
     } else {
-      var allOtherChecked = true; // Assume all other checkboxes are checked initially
+      var allOtherChecked = true;
         $("#" + containerId + " .form-check-input:not(.all-checkbox)").each(function() {
             if (!$(this).prop("checked")) {
-                // If any checkbox (except "All") is unchecked, set allOtherChecked to false
                 allOtherChecked = false;
                 return false;
             }
         });
-
         $("#" + containerId + "-All").prop("checked", allOtherChecked);
     }
   }
-
-    // Update the corresponding filter list based on checked/unchecked checkboxes
     updateFilterList(containerId);
-
-    // Refresh products based on the updated filters
     refreshProducts();
 
 });
@@ -583,10 +556,10 @@ function ShowProductPage(productId) {
           <h3>${product.price} kr</h3>
           <p class="card-text">${product.description}</p>
           <p>Antal i lager: ${product.quantity === 0 ? 'Ej i lager' : product.quantity}</p>
-          ${product.year ? `<p>År: ${product.year}</p>` : ''}
-          ${product.section ? `<p>Sektion: ${product.section}</p>` : ''}
-          ${product.event ? `<p>Event: ${product.event}</p>` : ''}
-          ${product.event_organizer ? `<p>Arrangör: ${product.event_organizer}</p>` : ''}
+          ${product.year && product.year !== 'null' ? `<p>År: ${product.year}</p>` : ''}
+          ${product.section && product.section !== 'null' ? `<p>Sektion: ${product.section}</p>` : ''}
+          ${product.event && product.event !== 'null' ? `<p>Event: ${product.event}</p>` : ''}
+          ${product.event_organizer && product.event_organizer !== 'null' ? `<p>Arrangör: ${product.event_organizer}</p>` : ''}
           <div class="d-flex align-items-center mb-3">
               <label for="quantity" class="me-2"></label>
               <div class="input-group quantity-input-group">
@@ -626,13 +599,9 @@ function ShowProductPage(productId) {
 //-------------------------------------------------
 // Function to update the global filter lists based on checked/unchecked checkboxes
 function updateFilterList(containerId) {
-  // Get the checked checkboxes and update the corresponding global filter list
   $("#" + containerId + " .form-check-input").each(function() {
     var value = $(this).val();
-    // Check if the checkbox is checked
     if ($(this).prop("checked")) {
-      // If checked and not already in the filter list, add to the corresponding global filter list
-
       if (containerId === "yearCheckboxes") {
         if (!window[containerId + 'filter'].includes(parseInt(value))) {
           window[containerId + 'filter'].push(parseInt(value));
@@ -643,7 +612,6 @@ function updateFilterList(containerId) {
         }
       }
     } else {
-      // If unchecked, remove from the corresponding global filter list if present
       if (containerId === "yearCheckboxes") {
         var index = window[containerId + 'filter'].indexOf(parseInt(value));
       } else {
@@ -700,8 +668,8 @@ function addProduct(){
     url: '/products',
     type: 'POST',
     //headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
-    processData: false,  // tell jQuery not to process the data
-    contentType: false,  // tell jQuery not to set contentType
+    processData: false,
+    contentType: false,
     data: formData,
     success: function (response) {
         showAlert("success", "Product Added!", "Nice!");
@@ -789,7 +757,7 @@ function ShowShoppingcartPage() {
   });
 }
 
-function increaseQuantity(productId, maxQuantity, productQuantity) { //lägg till vänta så att hemsidan inte uppdateras för snabbt
+function increaseQuantity(productId, maxQuantity, productQuantity) {
   if (maxQuantity > productQuantity) {
      $.ajax({
     url: host + "/myShoppingCart", 
@@ -808,7 +776,6 @@ function increaseQuantity(productId, maxQuantity, productQuantity) { //lägg til
               quantity: item.quantity + 1
             }),
             success: function (response) {
-              console.log(response);
             }
           });
         }
@@ -823,7 +790,7 @@ function increaseQuantity(productId, maxQuantity, productQuantity) { //lägg til
 
 }
 
-function decreaseQuantity(productId, productQuantity) { //lägg till vänta så att hemsidan inte uppdateras för snabbt
+function decreaseQuantity(productId, productQuantity) { 
   if (productQuantity > 1) {
     $.ajax({
       url: host + "/myShoppingCart", 
@@ -842,7 +809,6 @@ function decreaseQuantity(productId, productQuantity) { //lägg till vänta så 
                 quantity: item.quantity - 1
               }),
               success: function (response) {
-                console.log(response);
               }
             });
           }
@@ -995,7 +961,6 @@ function ShowOrdersPage() {
     success: function (order) {
       let htmlString = '';
       order.forEach(function(order) {
-      console.log(order);
 
         orderDate = new Date(order.order_date).toLocaleDateString('sv-SE');
         htmlString += `
@@ -1055,8 +1020,6 @@ function ShowOrdersPage() {
   });
 }
 
-
-
 //-------------------------------------------------
 //RETURNS-PAGE
 function ShowReturnsPage(){
@@ -1089,7 +1052,6 @@ function ShowAdminOrdersPage(){
     success: function (order) {
     
       order.forEach(function(singleOrder) {
-      console.log(singleOrder);
 
         orderDate = new Date(singleOrder.order_date).toLocaleDateString('sv-SE');
         let htmlString = `
@@ -1111,9 +1073,6 @@ function ShowAdminOrdersPage(){
               <p><strong>Datum:</strong> <span>${orderDate}</span></p>
           </div>
       </div>`;
-
-      // Append the htmlString to the container
-     
     $(".container .admin-orders-history").append(htmlString);
     });
      
@@ -1123,10 +1082,6 @@ function ShowAdminOrdersPage(){
     }
   
   });
-
-
-
-
 }
 
 //-------------------------------------------------
@@ -1154,12 +1109,9 @@ function ShowAdminConfirmProductsPage(){
 });
 }
 
-
 function displayUnconfirmedProducts(products) {
-  // Clear the product container before appending new products
   $("#unconfirmed-product-container").empty();
 
-  // Loop through each unconfirmed product and generate HTML dynamically
   products.forEach(function(product) {
       var productHTML = `
           <div class="col-md-12" style="padding: 10px 5px;">
@@ -1179,9 +1131,7 @@ function displayUnconfirmedProducts(products) {
                   </div>
               </div>
           </div>`;
-      // Append product HTML to the container
       $("#unconfirmed-product-container").append(productHTML);
-      console.log(productHTML);
   });
 }
 
@@ -1211,7 +1161,6 @@ function deleteProduct(productId) {
       ShowAdminConfirmProductsPage()
     },
     error: function(error) {
-        // Handle error
         console.error("Error deleting product:", error);
     }
 });
@@ -1317,9 +1266,7 @@ function ShowSignUpPage() {
 }
 
 //___________________________________________________________
-
 //Functions do decide which dropdown is showed depending on if logged in or not 
-
 function checkLoggedIn() {
   auth = JSON.parse(sessionStorage.getItem('auth'));
   signedIn = auth !== null;
@@ -1393,8 +1340,6 @@ function logout() {
 
 }
  
-
-
 //--------------------------------------------------------------
 //SHOW-LOGIN-PAGE 
 function ShowLoginPage() {
@@ -1433,7 +1378,6 @@ function ShowLoginPage() {
     });
 }
 
-
 //-----------------------------------------------------------
 //SHOW-LOGOUT-PAGE
 function ShowLogoutPage() {
@@ -1457,7 +1401,6 @@ function ShowLogoutPage() {
 setInterval(function() {
 checkLoggedIn();
 }, 30000); 
-
 
 //------------------------------------------
 //CLICK-EVENTS
@@ -1548,7 +1491,6 @@ $(document).ready(function () {
 
 //This function stores the navigationClicks i.e. the different views the user has "visited" and enables for the user to go back and 
 //forward in the browser-history using the arrows
-
 let previousViewId = null;
 let previousProductId = null;
 
@@ -1656,16 +1598,10 @@ $(".nav-item.dropdown .dropdown-menu .logout").click(function () {
   handleNavigationClick("view-logout");
 });
 
-
-
 //Dropdown Admin
 $(".nav-item.dropdown .dropdown-menu .adminOrders").click(function () {
   handleNavigationClick("view-adminOrders");
 });
-
-/*$(".nav-item.dropdown .dropdown-menu .adminReturns").click(function () {
-  handleNavigationClick("view-adminReturns");
-});*/
 
 $(".nav-item.dropdown .dropdown-menu .adminConfirmProducts").click(function () {
   handleNavigationClick("view-admin-confirm-products");
@@ -1709,9 +1645,4 @@ window.addEventListener("popstate", function (event) {
   });
  
 });
-
-
-
 });
-
-
