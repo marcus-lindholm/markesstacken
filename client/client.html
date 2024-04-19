@@ -437,7 +437,7 @@
             <input type="text" id="event_organizer" name="event_organizer" class="form-control">
         </div>
         <div class="form-group">
-            <button type="submit" class="btn btn-primary" onclick="addProduct()">Skicka</button>
+            <button class="btn btn-primary" onclick="addProduct()">Skicka</button>
         </div>
         <script>
             fetch('/categories')
@@ -604,6 +604,20 @@
      <script id="view-favorites" type="text/html">
       <h1>Min önskelista</h1>
     </script>
+
+     <!--SELL-CONFIRMATION-->
+     <script id="view-sell-confirmation" type="text/html">
+      <style>
+        .confirmation-header {
+          padding: 20px; /* You can adjust the value as needed */
+        }
+      </style>
+      <div class="confirmation-header">
+        <h1><strong>Tack för din förfrågan!</strong></h1>
+        <p style="color: #000000;">Märkesstacken har nu mottagit din säljförfrågan och en administratör kommer granska den inom 5 arbetsdagar. Du kommer få ett mail från administratören om din förfrågan blir godkänd.</p> 
+      </div>
+    </script>
+    
 
      <!--VIEW-SHOPPINGCART-->
      <script id="view-shoppingcart" type="text/html">

@@ -673,6 +673,7 @@ function addProduct(){
     data: formData,
     success: function (response) {
         showAlert("success", "Product Added!", "Nice!");
+        ShowSellConfirmationPage();
     },
     error: function (error) {
         console.error(error);
@@ -1019,6 +1020,10 @@ function ShowOrdersPage() {
   
   });
 }
+function ShowSellConfirmationPage(){
+  $(".container").html($("#view-sell-confirmation").html());
+}
+
 
 //-------------------------------------------------
 //RETURNS-PAGE
@@ -1424,6 +1429,9 @@ $(document).ready(function () {
     switch (viewId) {
       case "view-home":
         ShowHomePage();
+        break;
+      case "view-sell-confirmation":
+        ShowSellConfirmationPage();
         break;
       case "view-aboutus":
         ShowAboutusPage();
