@@ -86,7 +86,6 @@
                <span class="dropdown-item disabled" href="#">Admin</span> 
                 <a class="dropdown-item adminConfirmProducts" href="#">Admin Förfrågningar</a>
                  <a class="dropdown-item adminOrders" href="#">Admin Beställningar</a>
-                 <!--<a class="dropdown-item adminReturns" href="#">Admin Returer</a>-->
                  <a class="dropdown-item settings" href="#">Inställningar</a>
                  <a class="dropdown-item logout" href="#">Logga ut</a>
              </div->
@@ -122,7 +121,6 @@
    <!--FOOTER-->
     <div class="footer-container" id="footer-container">
       <footer class="footer">
-          <!--<div class="container" id="footer-container"-->
           <h3> <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
             <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
             <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286m1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94"/>
@@ -189,12 +187,9 @@
                         </p>
                    </div>
                   </div>
-                  <!--</div-->
         </footer>
       </div>
     </div>
-
-    <!--.js CODE WAS PLACED HERE BEFORE-->
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
@@ -326,7 +321,7 @@
                   font-size: 2em;
                   text-align: center;
                   color: #444444;
-                  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Text shadow */
+                  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
                   animation: neon 2.5s infinite alternate; 
               }
       
@@ -504,11 +499,9 @@
                   </div>
                   <div class="collapse" id="collapseOne" aria-labelledby="headingOne" data-parent="#faqAccordion">
                       <div class="card-body">
-                          <!-- Here's a dropdown list -->
                           <div class="form-group">
                               <label></label>
                               <div id="yearCheckboxes">
-                                  <!-- Dynamically populated checkboxes -->
                               </div>
                           </div>
                       </div>
@@ -526,11 +519,9 @@
                   </div>
                   <div class="collapse" id="collapseTwo" aria-labelledby="headingOne" data-parent="#faqAccordion">
                       <div class="card-body">
-                          <!-- Here's a dropdown list -->
                           <div class="form-group">
                               <label></label>
                               <div id="sectionCheckboxes">
-                                  <!-- Dynamically populated checkboxes -->
                               </div>
                           </div>
                         </div>
@@ -549,11 +540,9 @@
                   </div>
                   <div class="collapse" id="collapseThree" aria-labelledby="headingThree" data-parent="#faqAccordion">
                       <div class="card-body">
-                          <!-- dropdown list -->
                           <div class="form-group">
                               <label></label>
                               <div id="organizersCheckboxes">
-                                  <!-- Dynamically populated checkboxes -->
                               </div>
                            </div>
                        </div>
@@ -568,11 +557,9 @@
                   </div>
                   <div class="collapse" id="collapseFour" aria-labelledby="headingFour" data-parent="#faqAccordion">
                       <div class="card-body">
-                          <!-- dropdown list -->
                           <div class="form-group">
                               <label></label>
                               <div id="eventCheckboxes">
-                                  <!-- Dynamically populated checkboxes -->
                               </div>
                            </div>
                        </div>
@@ -587,7 +574,6 @@
  <div class="col-md-9">
       <div class="container-fluid">
         <div class="row" id="product-container">
-          <!-- Product cards will be dynamically populated here -->
         </div>
       </div>
     </div>
@@ -621,141 +607,7 @@
 
      <!--VIEW-SHOPPINGCART-->
      <script id="view-shoppingcart" type="text/html">
-    <!-- <section class="h-100 gradient-custom">
-      <div class="container py-5">
-        <div class="row d-flex justify-content-center my-4">
-          <div class="col-md-8">
-            <div class="card mb-4">
-              <div class="card-header py-3">
-                <h5 class="mb-0">Varukorg (antal varor)</h5>
-              </div>
-              <div class="card-body">
-                
-                <div class="row">
-                  <div class="col-lg-3 col-md-12 mb-4 mb-lg-0">
-                    
-                    <div class="bg-image hover-overlay hover-zoom ripple rounded" data-mdb-ripple-color="light">
-                      <img src="https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Vertical/12a.webp"
-                        class="w-100" alt="Blue Jeans Jacket" />
-                      <a href="#!">
-                        <div class="mask" style="background-color: rgba(251, 251, 251, 0.2)"></div>
-                      </a>
-                    </div>
-                    
-                  </div>
     
-                  <div class="col-lg-5 col-md-6 mb-4 mb-lg-0">
-                    
-                    <p><strong>Blue denim shirt</strong></p>
-                    <p>Color: blue</p>
-                    <p>Size: M</p>
-                    <button type="button" class="btn btn-outline-dark btn-sm me-1 mb-2" data-mdb-toggle="tooltip"
-                      title="Remove item">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
-                        <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
-                      </svg>
-                      <i class="fas fa-trash"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-dark btn-sm mb-2" data-mdb-toggle="tooltip"
-                      title="Move to the wish list">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
-                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
-                      </svg>
-                      <i class="fas fa-heart"></i>
-                    </button>
-                    
-                  </div>
-    
-                 
-                    
-                    <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
-                      <label for="quantity" class="me-2">Antal:</label>
-                      <div class="input-group">
-                        <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepDown()" id="minus-button">
-                          <i class="fas fa-minus"></i>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
-                              <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
-                          </svg>
-                        </button>
-                        <input type="number" id="quantity" class="form-control" value="1" min="1">
-                        <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepUp()" id="plus-button">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-                          </svg>
-                          <i class="fas fa-plus"></i>
-                        </button>
-                      </div>
-                  </div>
-                  
-    
-                    
-                    <p class="text-start text-md-center">
-                      <strong>$17.99</strong>
-                    </p>
-                    
-                  </div>
-                </div>
-                
-    
-                <hr class="my-4" />
-    
-              
-            </div>
-            <div class="card mb-4">
-              <div class="card-body">
-                <p><strong>Förväntat leveransdatum</strong></p>
-                <p class="mb-0">??</p>
-              </div>
-            </div>
-            <div class="card mb-4 mb-lg-0">
-              <div class="card-body">
-                <p><strong>We accept</strong></p>
-                <img class="me-2" width="45px"
-                  src="https://mdbcdn.b-cdn.net/wp-content/plugins/woocommerce-gateway-stripe/assets/images/visa.svg"
-                  alt="Visa" />
-                <img class="me-2" width="45px"
-                  src="https://mdbcdn.b-cdn.net/wp-content/plugins/woocommerce-gateway-stripe/assets/images/mastercard.svg"
-                  alt="Mastercard" />
-                <img class="me-2" width="45px"
-                  src="https://mdbcdn.b-cdn.net/wp-content/plugins/woocommerce/includes/gateways/paypal/assets/images/paypal.webp"
-                  alt="PayPal" />
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card mb-4">
-              <div class="card-header py-3">
-                <h5 class="mb-0">Totalsumma</h5>
-              </div>
-              <div class="card-body">
-                <ul class="list-group list-group-flush">
-                  <li
-                    class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0">
-                    Orderkostnad
-                    <span>$53.98</span>
-                  </li>
-                  <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                    Fraktkostnad
-                    <span>Gratis</span>
-                  </li>
-                  <li
-                    class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3">
-                    <div>
-                      <strong>Totalkostnad</strong>
-                      <strong>
-                        <p class="mb-0">(inklusive moms)</p>
-                      </strong>
-                    </div>
-                    <span><strong>$53.98</strong></span>
-                  </li>
-                </ul>
-                <button id="checkout-button" class="btn btn-outline-dark">Gå till kassan</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section> -->
   </script>
 
     <!--VIEW-CHECKOUT-->
@@ -772,7 +624,6 @@
                 <span class="number-of-cartitems"></span>
               </h4>
                 <ul class="list-group mb-3">
-                    <!--Populate products in shopping cart-->
                 </ul>
                 <form class="card p-2">
                     <div class="input-group">
@@ -786,23 +637,6 @@
             <div class="col-md-8 order-md-1">
                 <h4 class="mb-3">Fraktuppgifter</h4>
                 <form class="needs-validation" novalidate="">
-                    <!-- <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="firstName">Förnamn<span class="text-muted">*</span></label>
-                            <input type="text" class="form-control" id="firstName" placeholder="Förnamn" value="" required="">
-                            <div class="invalid-feedback"> Valid first name is required. </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="lastName">Efternamn<span class="text-muted">*</span></label>
-                            <input type="text" class="form-control" id="lastName" placeholder="Efternamn" value="" required="">
-                            <div class="invalid-feedback"> Valid last name is required. </div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email">Email <span class="text-muted">*</span></label>
-                        <input type="email" class="form-control" id="email" placeholder="namn@example.com" requierd="">
-                        <div class="invalid-feedback"> Please enter a valid email address for shipping updates. </div>
-                    </div> -->
                     <div class="mb-3">
                         <label for="address">Adress<span class="text-muted">*</span></label>
                         <input type="text" class="form-control" id="address" placeholder="Märkesbacken 1" required="">
@@ -822,53 +656,7 @@
                         </div>
                         <p>Uppgifter markerade med * är obligatoriska.</p>
                     </div>
-                    <!-- <hr class="mb-4">
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="same-address">
-                        <label class="custom-control-label" for="same-address">Fraktadress samma som fakturaadress.</label>
-                    </div>
-                    <hr class="mb-4"> -->
                     <h4 class="mb-3">Betalning</h4>
-                    <!-- <div class="d-block my-3">
-                        <div class="custom-control custom-radio">
-                            <input id="credit" name="paymentMethod" type="radio" class="custom-control-input" checked="" required="">
-                            <label class="custom-control-label" for="credit">Credit card</label>
-                        </div>
-                        <div class="custom-control custom-radio">
-                            <input id="debit" name="paymentMethod" type="radio" class="custom-control-input" required="">
-                            <label class="custom-control-label" for="debit">Debit card</label>
-                        </div>
-                        <div class="custom-control custom-radio">
-                            <input id="paypal" name="paymentMethod" type="radio" class="custom-control-input" required="">
-                            <label class="custom-control-label" for="paypal">PayPal</label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="cc-name">Namn på kortet</label>
-                            <input type="text" class="form-control" id="cc-name" placeholder="" required="">
-                            <small class="text-muted">Full name as displayed on card</small>
-                            <div class="invalid-feedback"> Name on card is required </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="cc-number">Kortnummer</label>
-                            <input type="text" class="form-control" id="cc-number" placeholder="" required="">
-                            <div class="invalid-feedback"> Credit card number is required </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <label for="cc-expiration">Giltigt (MM/ÅÅ)</label>
-                            <input type="text" class="form-control" id="cc-expiration" placeholder="" required="">
-                            <div class="invalid-feedback"> Expiration date required </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="cc-cvv">CVV</label>
-                            <input type="text" class="form-control" id="cc-cvv" placeholder="" required="">
-                            <div class="invalid-feedback"> Security code required </div>
-                        </div>
-                    </div>
-                    <hr class="mb-4"> -->
                     <button class="btn btn-primary btn-lg btn-block" type="submit" onclick="placeOrder()">Betalning via Stripe</button>
                 </form>
             </div>
@@ -888,7 +676,6 @@
      <script id="view-orders" type="text/html">
       <h1>Mina Ordrar</h1>
       <div class="customer-orders-history">
-        <!--POPULATE INFO ABOUT ORDER-->
          
       </div>
     </script>
@@ -910,10 +697,6 @@
         <div>
     </script>
 
-      <!--VIEW-ADMIN-RETURNS 
-      <script id="view-admin-returns" type="text/html">
-        <h1>Returhistoik</h1>
-      </script>-->
 
       <!--VIEW-ADMIN-CONFIRM-PRODUCTS--> 
 
