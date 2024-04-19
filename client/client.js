@@ -22,69 +22,7 @@ $(document).ready(function () {
 //HOME-PAGE
 function ShowHomePage() {
   $(".container").html($("#view-home").html());
-  ShowCommonlyBoughtProducts()
 }
-
-function ShowCommonlyBoughtProducts() {
-var numberofShown = "4"; //number of Commonly bought products shown
-
-$.ajax({
-  url: host + "/ordered_cart_item/" + numberofShown, 
-  type: "GET",
-  success: function(response) { 
-    response.forEach(function(product) {
-      var productHTML = `
-      <div class="col-md-4" style="padding: 10px 5px;">
-            <div class="card">
-              <div class="product-listing-image-wrapper">
-                <img src="/product_images/${product.img}" class="card-img-top centered-product-image show-product" data-product-id="${product.id}" alt="Product Image">
-              </div>    
-              <div class="card-body">
-                    <h5 class="card-title show-product" data-product-id="${product.id}">${product.name}</h5>
-                    <p class="card-text">${product.description.length > 28 ? product.description.substring(0, 25) + '...' : product.description}</p>
-                    <p class="card-text"> ${product.price} kr</p>
-                    <div class="d-flex align-items-center mb-3">
-                        <label for="quantity" class="me-2"></label>
-                        <div class="input-group">
-                            <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepDown()" id="minus-button">
-                                <i class="fas fa-minus"></i>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
-                                    <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
-                                </svg>
-                            </button>
-                            <input type="number" id="quantity${product.id}" class="form-control" value="1" min="1" max="${product.quantity}">
-                            <button class="btn btn-sm btn-outline-dark" onclick="this.parentNode.querySelector('input[type=number]').stepUp()" id="plus-button">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-                                </svg>
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <button id="add-to-cart-btn${product.id}" data-product-id="${product.id}" onclick="addToShoppingCart(${product.id}, document.getElementById('quantity${product.id}').value, '${product.name}')" class="btn btn-light" style="width: 145px; margin: 5px 0;" ${product.quantity === 0 ? 'disabled' : ''}>Lägg i varukorg</button>
-                    <div class="product-overview">
-                      <button class="btn btn-dark" style="width: 105px;" id="buynow-btn${product.id}" data-product-id="${product.id}" onclick="buyNow(${product.id}, document.getElementById('quantity${product.id}').value, '${product.name}')">Köp nu</button>
-                      <button id="add-to-wishlist-btn${product.id}" data-product-id="${product.id}" onclick="addToWishlist(${product.id}, '${product.name}')" class="btn btn-outline-dark" >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
-                              <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
-                          </svg>
-                      </button>
-                    </div>
-                </div>
-                <button id="view-all-products-btn" onclick="ShowPurchasePage()" class="btn btn-outline-dark" >Se alla produkter</button>
-            </div> 
-        </div>`;
-        
-        // Append product HTML to the container
-        $("#CBP").append(productHTML);
-      });
-  },
-  error: function(error) {
-      console.error("Error fetching commonly bought products:", error);
-  }
-});
-}
-
 
 //-------------------------------------------------
 //ABOUTUS-PAGE
@@ -141,12 +79,11 @@ function ShowFavoritesPage() {
     error: function (error) {
       displayMessage = "Product: " + productName + " was not added to your wishlist.";
       showAlert("warning", displayMessage, "Please try again later.");
-      console.error("Error adding product to wishlist:", error); // Remove later
     },
   });
 }
-// Function to show the purchase page
 
+// Function to show the purchase page
 function addToWishlist(productId, productName) {
 
   if (!loggedIn) {
@@ -187,7 +124,7 @@ function removeFromWishlist(productId) {
     success: function (response) {
       displayMessage = "Produkten togs bort från önskelistan."; 
       showAlert("success", displayMessage, "");
-      ShowFavoritesPage(); // Reload the favorites page
+      ShowFavoritesPage(); 
     },
     error: function (error) {
       displayMessage = "Produkten gick inte att ta bort från önskelistan.";
@@ -198,52 +135,44 @@ function removeFromWishlist(productId) {
 
 
 function addToShoppingCart(productId, orderQuantity, productName) {
+
   if (!loggedIn) {
     showAlert("warning", "Du är inte inloggad", "Logga in för att lägga till i varukorgen");
     return; 
   }
 
-  return new Promise((resolve, reject) => {
-    if (orderQuantity > 0) {
-      $.ajax({
-        url: host + "/cartitems",
-        type: "POST",
-        contentType: "application/json",
-        headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
-        data: JSON.stringify({
-          quantity: orderQuantity,
-          product_id: productId,
-          shoppingcart_id: shoppingcartID
-        }),
-        success: function (response) {
-          checkIfInWishlist(productId).then(isInWishlist => {
-            if(isInWishlist) {
-              removeFromWishlist(productId)
-            }
-          });
+  if (orderQuantity > 0) {
+    $.ajax({
+      url: host + "/cartitems",
+      type: "POST",
+      contentType: "application/json",
+      headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+      data: JSON.stringify({
+        quantity: orderQuantity,
+        product_id: productId,
+        shoppingcart_id: shoppingcartID
+      }),
+      success: function (response) {
+        checkIfInWishlist(productId).then(isInWishlist => {
+          if(isInWishlist) {
+            removeFromWishlist(productId)
+          }
+        });
           displayMessage = "Produkt: " + productName + " x " + orderQuantity + ".";
           showAlert("success", "Tillagd i varukorgen:", displayMessage);
-          resolve();
-        },
-        error: function (error) {
-          displayMessage = "Produkt: " + productName + " x " + orderQuantity + " blev inte tillagd i varukorgen.";
-          showAlert("warning", displayMessage, "Försök igen.");
-          if (error.status == 400) {
-            showAlert("warning", "Ej tillräckligt många i lager.", "Minska antalet!");
-          }
-          reject(error);
-        },
-      });
-    } else {
-      showAlert("warning", "Den nuvarande kvantiteten är inte tillåten.", "Var snäll och öka antalet!");
-    }
-  });
-}
-
-function buyNow(productId, orderQuantity, productName) {
-  addToShoppingCart(productId, orderQuantity, productName).then(() => {
-    ShowCheckoutPage();
-  });
+        
+      },
+      error: function (error) {
+        displayMessage = "Produkt: " + productName + " x " + orderQuantity + " blev inte tillagd i varukorgen.";
+        showAlert("warning", displayMessage, "Försök igen.");
+        if (error.status == 400) {
+          showAlert("warning", "Ej tillräckligt många i lager.", "Minska antalet!");
+        }
+      },
+    });
+  } else {
+    showAlert("warning", "Den nuvarande kvantiteten är inte tillåten.", "Var snäll och öka antalet!");
+  }
 }
 
 async function checkIfInWishlist(productId) {
@@ -286,7 +215,6 @@ async function completeRemovalFromShoppingCart(productId) {
   ShowShoppingcartPage();
 } 
 
-
 function removeFromShoppingCart(productId, emptyAll) {
   $.ajax({
     url: host + "/cartitems/" + productId, 
@@ -312,7 +240,6 @@ function removeFromShoppingCart(productId, emptyAll) {
 function ShowPurchasePage() {
   $(".container").html($("#view-purchase").html());
 
-  // Initial fetch of products
   $.ajax({
       url: host + "/products", 
       type: "GET",
@@ -327,7 +254,6 @@ function ShowPurchasePage() {
 }
 
 function refreshProducts() {
-  // Make AJAX request to fetch products
   $.ajax({
     url: host + "/products",
     type: "GET",
@@ -343,11 +269,8 @@ function refreshProducts() {
           (eventCheckboxesfilter.length === 0 || eventCheckboxesfilter.includes(product.event))
         );
       });
-
-      // Clear the product container before appending new products
       $("#product-container").empty();
 
-      // Loop through each product and generate HTML dynamically
       filteredProducts.forEach(function(product) {
       //response.forEach(function(product) {
         var productHTML = `
@@ -380,7 +303,7 @@ function refreshProducts() {
                         </div>
                         <button id="add-to-cart-btn${product.id}" data-product-id="${product.id}" onclick="addToShoppingCart(${product.id}, document.getElementById('quantity${product.id}').value, '${product.name}')" class="btn btn-light" style="width: 145px; margin: 5px 0;" ${product.quantity === 0 ? 'disabled' : ''}>Lägg i varukorg</button>
                         <div class="product-overview">
-                          <button class="btn btn-dark" style="width: 105px;" id="buynow-btn${product.id}" data-product-id="${product.id}" onclick="buyNow(${product.id}, document.getElementById('quantity${product.id}').value, '${product.name}')">Köp nu</button>
+                          <button class="btn btn-dark" style="width: 105px;">Köp nu</button>
                           <button id="add-to-wishlist-btn${product.id}" data-product-id="${product.id}" onclick="addToWishlist(${product.id}, '${product.name}')" class="btn btn-outline-dark" >
                               <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
                                   <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
@@ -390,7 +313,6 @@ function refreshProducts() {
                     </div>
                 </div>
             </div>`;
-        // Append product HTML to the container
         $("#product-container").append(productHTML);
       });
     },
@@ -402,23 +324,19 @@ function refreshProducts() {
 
 function search() {
   var input = document.getElementById('searchBar').value;
-  populateSearch(input);
+populateSearch(input);
 }
 
 function populateSearch(searchInput) {
-      // Select all items within the product container
       var items = document.getElementById('product-container').getElementsByClassName('col-md-4');
 
       for (var i = 0; i < items.length; i++) {
-          // Get the product name within the current item
           var productName = items[i].getElementsByClassName('card-title')[0].textContent.toLowerCase();
 
           if (productName.includes(searchInput)) {
-            // Show the item by setting its display property to "block"
             items[i].style.display = 'block';
            
         } else {
-            // Hide the item if it doesn't match the search input
             items[i].style.display = 'none';
   
         }
@@ -506,8 +424,6 @@ function addAllCheckbox(containerId) {
   container.find(".form-check-input:not(.all-checkbox)").prop("checked", true);
 }
 
-
-//-------------------------------------------------
 // Function to handle checkbox selection
 $(document).on("change", ".form-check-input", function() {
   var checkbox = $(this);
@@ -516,17 +432,14 @@ $(document).on("change", ".form-check-input", function() {
   if (checkbox.hasClass("all-checkbox")) {
     var isChecked = checkbox.prop("checked");
     $("." + containerId + " .form-check-input").prop("checked", isChecked);
-    // Set all individual checkboxes to checked or unchecked based on the state of the "All" checkbox
     $("#" + containerId + " .form-check-input:not(.all-checkbox)").prop("checked", isChecked);
   } else {
-    // If an individual checkbox is unchecked, uncheck the "All" checkbox
     if (!checkbox.prop("checked")) {
       $("#" + containerId + "-All").prop("checked", false);
     } else {
-      var allOtherChecked = true; // Assume all other checkboxes are checked initially
+      var allOtherChecked = true; 
         $("#" + containerId + " .form-check-input:not(.all-checkbox)").each(function() {
             if (!$(this).prop("checked")) {
-                // If any checkbox (except "All") is unchecked, set allOtherChecked to false
                 allOtherChecked = false;
                 return false;
             }
@@ -536,15 +449,13 @@ $(document).on("change", ".form-check-input", function() {
     }
   }
 
-    // Update the corresponding filter list based on checked/unchecked checkboxes
     updateFilterList(containerId);
 
-    // Refresh products based on the updated filters
     refreshProducts();
 
 });
 
-//-------------------------------------------------
+//-----------------------------------------------------------------
 // Show the PRODUCT PAGE
 
 //Zoom image on hover
@@ -614,7 +525,7 @@ function ShowProductPage(productId) {
                     <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
                 </svg>
             </button><br>
-            <button class="btn btn-dark" style="width: 145px;" id="buynow-btn${product.id}" data-product-id="${product.id}" onclick="buyNow(${product.id}, document.getElementById('quantity${product.id}').value, '${product.name}')">Köp nu</button>
+            <button class="btn btn-dark" style="width: 145px;">Köp nu</button>
           </div>
         </div>
       </div>
@@ -625,16 +536,12 @@ function ShowProductPage(productId) {
   });
 }
 
-//-------------------------------------------------
+
 // Function to update the global filter lists based on checked/unchecked checkboxes
 function updateFilterList(containerId) {
-  // Get the checked checkboxes and update the corresponding global filter list
   $("#" + containerId + " .form-check-input").each(function() {
     var value = $(this).val();
-    // Check if the checkbox is checked
     if ($(this).prop("checked")) {
-      // If checked and not already in the filter list, add to the corresponding global filter list
-
       if (containerId === "yearCheckboxes") {
         if (!window[containerId + 'filter'].includes(parseInt(value))) {
           window[containerId + 'filter'].push(parseInt(value));
@@ -645,7 +552,6 @@ function updateFilterList(containerId) {
         }
       }
     } else {
-      // If unchecked, remove from the corresponding global filter list if present
       if (containerId === "yearCheckboxes") {
         var index = window[containerId + 'filter'].indexOf(parseInt(value));
       } else {
@@ -658,7 +564,8 @@ function updateFilterList(containerId) {
   });
 }
 
-//-------------------------------------------------
+
+//--------------------------------------------------------------
 //SELL-PAGE
 function ShowSellPage() {
   $(".container").html($("#view-sell").html());
@@ -701,7 +608,7 @@ function addProduct(){
   $.ajax({
     url: '/products',
     type: 'POST',
-    //headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
+    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
     processData: false,  // tell jQuery not to process the data
     contentType: false,  // tell jQuery not to set contentType
     data: formData,
@@ -714,7 +621,6 @@ function addProduct(){
   });
 }
 
-//-------------------------------------------------
 //SHOPPINGCART-PAGE
 function ShowShoppingcartPage() {
   $(".container").html($("#view-shoppingcart").html());
@@ -791,7 +697,7 @@ function ShowShoppingcartPage() {
   });
 }
 
-function increaseQuantity(productId, maxQuantity, productQuantity) { //lägg till vänta så att hemsidan inte uppdateras för snabbt
+function increaseQuantity(productId, maxQuantity, productQuantity) { 
   if (maxQuantity > productQuantity) {
      $.ajax({
     url: host + "/myShoppingCart", 
@@ -810,7 +716,6 @@ function increaseQuantity(productId, maxQuantity, productQuantity) { //lägg til
               quantity: item.quantity + 1
             }),
             success: function (response) {
-              console.log(response);
             }
           });
         }
@@ -822,10 +727,10 @@ function increaseQuantity(productId, maxQuantity, productQuantity) { //lägg til
     displayMessage = "Ej tillräckligt många varor i lager.";
     showAlert("warning", displayMessage, "");
   }
-
+ 
 }
 
-function decreaseQuantity(productId, productQuantity) { //lägg till vänta så att hemsidan inte uppdateras för snabbt
+function decreaseQuantity(productId, productQuantity) { 
   if (productQuantity > 1) {
     $.ajax({
       url: host + "/myShoppingCart", 
@@ -844,7 +749,6 @@ function decreaseQuantity(productId, productQuantity) { //lägg till vänta så 
                 quantity: item.quantity - 1
               }),
               success: function (response) {
-                console.log(response);
               }
             });
           }
@@ -862,42 +766,33 @@ function decreaseQuantity(productId, productQuantity) { //lägg till vänta så 
 //CHECKOUT-PAGE
 function ShowCheckoutPage() {
  $(".container").html($("#view-checkout").html());
- $.ajax({
-  url: host + "/myShoppingCart", 
-  type: "GET",
-  contentType: "application/json",
-  headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
-  success: function (response) {
-    cartItems = response.cartitems;
-    let numberOfItemsHtml = `
-        <span class="badge badge-secondary badge-pill">${cartItems.length}</span>
-      `;
-    let totalPrice = 0;
-    let cartitemsHtml = cartItems.map(function(item) {
-      totalPrice += item.product.price*item.quantity;
-      return `
-        <li class="list-group-item d-flex justify-content-between lh-condensed">
-          <div>
-            <h6 class="my-0">${item.quantity} x ${item.product.name}</h6>
-            <small class="text-muted">${item.product.description.substring(0, 32)}</small>
-          </div>
-          <span class="text-muted">${item.product.price} kr</span>
-        </li>
-      `;
-    }).join('');
 
-    let totalPriceHtml = `
-      <li class="list-group-item d-flex justify-content-between">
-        <span>Total (SEK)</span>
-        <strong>${totalPrice}</strong>
+  let numberOfItemsHtml = `
+      <span class="badge badge-secondary badge-pill">${cartItems.length}</span>
+    `;
+  let totalPrice = 0;
+  let cartitemsHtml = cartItems.map(function(item) {
+    totalPrice += item.product.price*item.quantity;
+    return `
+      <li class="list-group-item d-flex justify-content-between lh-condensed">
+        <div>
+          <h6 class="my-0">${item.quantity} x ${item.product.name}</h6>
+          <small class="text-muted">${item.product.description.substring(0, 32)}</small>
+        </div>
+        <span class="text-muted">${item.product.price} kr</span>
       </li>
     `;
+  }).join('');
 
-  $(".container .number-of-cartitems").html(numberOfItemsHtml);
-  $(".container .list-group").html(cartitemsHtml + totalPriceHtml);
-  window.scrollTo(0, 0);
-  }
-  });
+  let totalPriceHtml = `
+    <li class="list-group-item d-flex justify-content-between">
+      <span>Total (SEK)</span>
+      <strong>${totalPrice}</strong>
+    </li>
+  `;
+
+$(".container .number-of-cartitems").html(numberOfItemsHtml);
+$(".container .list-group").html(cartitemsHtml + totalPriceHtml);
 }
 
 function placeOrder() {
@@ -937,127 +832,23 @@ function ShowOrderConfirmationPage() {
       success: function (order) {
         orderDate = new Date(order.order_date).toLocaleDateString('sv-SE');
         let htmlString = `
-          <h5>Ordersummering</h5>
           <p><strong>Ordernummer:</strong> 1000${order.id}</p>
+          <p><strong>Namn:</strong> ${order.first_name} ${order.last_name}</p>
           <p><strong>Datum:</strong> <span>${orderDate}</span></p>
-          <p><strong>Totalkostnad:</strong> ${order.total_price} SEK</p>
-          <p><strong>Mottgarens namn:</strong> ${order.first_name} ${order.last_name}</p>
           <p><strong>Email:</strong> ${order.email}</p>
-          <p><strong>Beställda produkter:</strong></p>
           `;
-
-          order.ordered_shoppingcart.ordered_cartitems.forEach(function(orderedCartItem) {
-            htmlString += `
-            <div style="display: flex; align-items: center; margin-right: 10px; margin-bottom: 20px;"> <!-- Adjust margin-right -->
-              <img src="/product_images/${orderedCartItem.product.img}" alt="${orderedCartItem.product.name}" style="max-width: 100px;">
-              <div style="margin-left: 10px;"> <!-- Add margin between image and text -->
-                <div>${orderedCartItem.product.name}</div> <!-- Product name -->
-                <div>Antal: ${orderedCartItem.quantity}</div> <!-- Quantity -->
-              </div>
-            </div>
-          `;
-        });
-          
-          htmlString += `</ul>`;
-
         $(".container .confirmation-details").html(htmlString);
-      }
+      } 
     });
+
+
 }
 
 //-------------------------------------------------
-//
-
-function MakeOrderReturned(orderId) {
-  $.ajax({
-    url: host + "/users/" + userID +  "/orders/" + orderId,
-    type: "PUT",
-    contentType: "application/json",
-    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
-    data: JSON.stringify({returned: true }), 
-    success: function(response) {
-      ShowOrdersPage();
-    },
-    error: function(xhr, status, error) {
-      console.error("Error marking order as returned:", error);
-    }
-  });
-}
-
-//-------------------------------------------------
-//ORDERS-PAGE FOR CUSTOMERS TO SEE WHAT THEY ORDERED
+//ORDERS-PAGE
 function ShowOrdersPage() {
   $(".container").html($("#view-orders").html());
-
-  $.ajax({
-    url: host + "/users/" + userID +  "/orders", 
-    type: "GET",
-    contentType: "application/json",
-    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
-    success: function (order) {
-      let htmlString = '';
-      order.forEach(function(order) {
-      console.log(order);
-
-        orderDate = new Date(order.order_date).toLocaleDateString('sv-SE');
-        htmlString += `
-      
-          <div class="card">
-            <div class="card-body">
-            <p><strong>Ordernummer:</strong> 1000${order.id}</p>
-            <p><strong>Totalkostnad:</strong> ${order.total_price} SEK </p>
-            <p><strong>Datum:</strong> <span>${orderDate}</span></p>
-            <p><strong>Produkter:</strong></p>`;
-            order.ordered_shoppingcart.ordered_cartitems.forEach(function(item) {
-              htmlString += ` <p>${item.quantity} x ${item.product.name}</p>`;
-            });
-
-            htmlString += `<button class="btn btn-outline-dark returnPopup" data-toggle="modal" data-target="#returnModal">Instruktioner för retur</button>
-            </div>
-            </div>
-
-            <!-- Modal -->
-            <div class="modal fade" id="returnModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h3 class="modal-title" id="exampleModalLabel">Vill du göra en retur?</h3>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                  <h5>Så här gör du en retur</h5>
-                  <ol>
-                      <li>Kontakta vår kundtjänst via e-post för att meddela din retur. Ange ditt ordernummer och orsaken till returen.</li>
-                      <li>Du kommer att få en returetikett via e-post som du ska skriva ut och fästa på returpaketet.</li>
-                      <li>Skicka tillbaka dina varor till adressen som anges på returetiketten. Observera att du är ansvarig för returfrakten.</li>
-                  </ol>
-
-                  <h5>Återbetalning</h5>
-                  <p>När vi har mottagit och kontrollerat de returnerade varorna, kommer vi att återbetala köpesumman till ditt ursprungliga betalningssätt. Återbetalningen sker inom 10 arbetsdagar från det att vi mottagit returen.</p>
-
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Stäng</button>
-                  </div>
-                </div>
-              </div>
-            </div>`;
-
-        $(".container .customer-orders-history").append(htmlString);
-
-       
-      });
-    },
-    error: function(xhr, status, error) {
-      console.error("Error fetching orders:", error);
-    }
-  
-  });
 }
-
-
 
 //-------------------------------------------------
 //RETURNS-PAGE
@@ -1081,54 +872,6 @@ function ShowSettingsPage(){
 //ADMIN-ORDERS-PAGE
 function ShowAdminOrdersPage(){
   $(".container").html($("#view-admin-orders").html());
-
-  
-  $.ajax({
-    url: host +  "/orders", 
-    type: "GET",
-    contentType: "application/json",
-    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
-    success: function (order) {
-    
-      order.forEach(function(singleOrder) {
-      console.log(singleOrder);
-
-        orderDate = new Date(singleOrder.order_date).toLocaleDateString('sv-SE');
-        let htmlString = `
-        <div class="card">
-            <div class="card-body">
-                <p><strong>Ordernummer:</strong> 1000${singleOrder.id}</p>
-                <p><strong>AnvändarID:</strong> ${singleOrder.user_id}</p>
-                <p><strong>Varukorg:</strong></p>
-                <ul id="${singleOrder.ordered_shoppingcart_id}">`;
-
-        singleOrder.ordered_shoppingcart.ordered_cartitems.forEach(function(cartItem) {
-          htmlString += `
-              <li>Produkt ID: ${cartItem.product_id}, Antal: ${cartItem.quantity}</li>`;
-              });
-              
-        htmlString += `
-              </ul>
-              <p><strong>Totalkostnad:</strong> ${singleOrder.total_price} SEK</p>
-              <p><strong>Datum:</strong> <span>${orderDate}</span></p>
-          </div>
-      </div>`;
-
-      // Append the htmlString to the container
-     
-    $(".container .admin-orders-history").append(htmlString);
-    });
-     
-    },
-    error: function(xhr, status, error) {
-      console.error("Error fetching orders:", error);
-    }
-  
-  });
-
-
-
-
 }
 
 //-------------------------------------------------
@@ -1136,89 +879,6 @@ function ShowAdminOrdersPage(){
 function ShowAdminReturnsPage(){
   $(".container").html($("#view-admin-returns").html());
 }
-
-//-------------------------------------------------
-//ADMIN-CONFIRM-PRODUCTS-PAGE
-
-function ShowAdminConfirmProductsPage(){
-  $(".container").html($("#view-admin-confirm-products").html());
-
-  $.ajax({
-    url: host + "/confirm-products",
-    type: "GET",
-    success: function(response) {
-        // Handle successful response
-        displayUnconfirmedProducts(response);
-    },
-    error: function(error) {
-        console.error("Error fetching unconfirmed products:", error);
-    }
-});
-}
-
-
-function displayUnconfirmedProducts(products) {
-  // Clear the product container before appending new products
-  $("#unconfirmed-product-container").empty();
-
-  // Loop through each unconfirmed product and generate HTML dynamically
-  products.forEach(function(product) {
-      var productHTML = `
-          <div class="col-md-12" style="padding: 10px 5px;">
-              <div class="card">
-                  <div class="product-listing-image-wrapper">
-                      <img src="/product_images/${product.img}" class="card-img-top centered-product-image show-product" data-product-id="${product.id}" alt="Product Image">
-                  </div>    
-                  <div class="card-body">
-                      <h5 class="card-title show-product" data-product-id="${product.id}">${product.name}</h5>
-                      <p class="card-text">${product.description.length > 28 ? product.description.substring(0, 25) + '...' : product.description}</p>
-                      <p class="card-text"> ${product.price} kr</p>
-                      <div style="margin-top: 10px; text-align: center;">
-                       <button id="confirm-product-btn${product.id}" data-product-id="${product.id}" onclick="confirmProduct(${product.id})" class="btn btn-primary" style="display: inline-block; width: 300px; height: 40px; margin-right: 10px;">Confirm Product</button>
-                       <button id="delete-product-btn${product.id}" data-product-id="${product.id}" onclick="deleteProduct(${product.id})" class="btn btn-danger" style="display: inline-block; width: 300px; height: 40px; ">Delete Product</button>
-                      </div>
-
-                  </div>
-              </div>
-          </div>`;
-      // Append product HTML to the container
-      $("#unconfirmed-product-container").append(productHTML);
-      console.log(productHTML);
-  });
-}
-
-function confirmProduct(productId) {
-  $.ajax({
-    url: "/confirm-products/" + productId,
-    type: "POST", 
-    contentType: "application/json",
-    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
-    success: function(response) {
-      ShowAdminConfirmProductsPage()
-    },
-    error: function(error) {
-        
-        console.error("Error confirming product:", error);
-    }
-});
-}
-
-function deleteProduct(productId) {
-  $.ajax({
-    url: "/confirm-products/" + productId, 
-    type: "DELETE",
-    contentType: "application/json",
-    headers: {"Authorization": "Bearer " + JSON.parse(sessionStorage.getItem('auth')).token},
-    success: function(response) {
-      ShowAdminConfirmProductsPage()
-    },
-    error: function(error) {
-        // Handle error
-        console.error("Error deleting product:", error);
-    }
-});
-}
-
 
 //-------------------------------------------------
 //LOGOUT-PAGE
@@ -1321,7 +981,6 @@ function ShowSignUpPage() {
 //___________________________________________________________
 
 //Functions do decide which dropdown is showed depending on if logged in or not 
-
 function checkLoggedIn() {
   auth = JSON.parse(sessionStorage.getItem('auth'));
   signedIn = auth !== null;
@@ -1337,8 +996,6 @@ function checkLoggedIn() {
     loggedOutDropdown.style.display = 'none';
     adminDropdown.style.display = 'none'; 
     sellButton.style.display='block';
-
-    console.log("auth.access", auth.token);
 
     $.ajax({
       url: '/get-identity',
@@ -1358,6 +1015,7 @@ function checkLoggedIn() {
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'none';
           sellButton.style.display='block';
+          
         } else {
           shoppingcartID = user.user.shoppingcart.id;
           userID = user.user.id;
@@ -1365,6 +1023,7 @@ function checkLoggedIn() {
           loggedOutDropdown.style.display = 'none';
           adminDropdown.style.display = 'block'; 
           sellButton.style.display='none';
+      
         }
        
       },
@@ -1455,7 +1114,8 @@ function ShowLogoutPage() {
 
 } 
 
-//Interval to check if token is active
+
+
 setInterval(function() {
 checkLoggedIn();
 }, 30000); 
@@ -1463,7 +1123,7 @@ checkLoggedIn();
 
 //------------------------------------------
 //CLICK-EVENTS
- 
+
 $(document).ready(function () {
   let urlParams = new URLSearchParams(window.location.search);
   let view = urlParams.get('view');
@@ -1529,9 +1189,6 @@ $(document).ready(function () {
       case "view-adminReturns":
         ShowAdminReturnsPage();
         break;
-      case "view-admin-confirm-products":
-        ShowAdminConfirmProductsPage();
-        break;
       case "view-questions":
         ShowQuestionsPage();
         break; 
@@ -1554,7 +1211,7 @@ $(document).ready(function () {
 let previousViewId = null;
 let previousProductId = null;
 
-function handleNavigationClick(viewId, productId = null) {  
+function handleNavigationClick(viewId, productId = null) {
 if (previousViewId !== viewId || previousProductId !== productId) {
   loadView(viewId, productId);
   previousViewId = viewId;
@@ -1563,7 +1220,11 @@ if (previousViewId !== viewId || previousProductId !== productId) {
 }
 }
 
+
+
+
 $(document).on("click", "#checkout-button", function() {
+  
   handleNavigationClick("view-checkout");
 });
 
@@ -1575,6 +1236,8 @@ $(document).on("click", "#empty-cart-button", function() {
 $('#confirmEmptyCart, #cancelEmptyCart').on('click', function() {
   $('#emptyCartModal').modal('hide');
 });
+
+
 
 // Click event handler for product links
 $(document).on('click', '.show-product', function() {
@@ -1658,19 +1321,13 @@ $(".nav-item.dropdown .dropdown-menu .logout").click(function () {
   handleNavigationClick("view-logout");
 });
 
-
-
 //Dropdown Admin
 $(".nav-item.dropdown .dropdown-menu .adminOrders").click(function () {
   handleNavigationClick("view-adminOrders");
 });
 
-/*$(".nav-item.dropdown .dropdown-menu .adminReturns").click(function () {
+$(".nav-item.dropdown .dropdown-menu .adminReturns").click(function () {
   handleNavigationClick("view-adminReturns");
-});*/
-
-$(".nav-item.dropdown .dropdown-menu .adminConfirmProducts").click(function () {
-  handleNavigationClick("view-admin-confirm-products");
 });
 
 //FOOTER-LINKS
@@ -1705,15 +1362,8 @@ window.addEventListener("popstate", function (event) {
     loadView(viewId, productId);
   
   }
-
-  $(document).on("click", "#returnPopup", function() {
-    document.getElementById("returnModal").style.display = "block";
-  });
  
 });
-
-
-
 });
 
 
