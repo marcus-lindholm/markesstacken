@@ -591,7 +591,7 @@ function ShowProductPage(productId) {
       </div>
       `;
       $(".container").html(productPageHTML);
-
+      window.scrollTo(0, 0);
     }
   });
 }
