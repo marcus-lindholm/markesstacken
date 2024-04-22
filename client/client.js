@@ -1008,11 +1008,8 @@ function ShowOrdersPage() {
                 </div>
               </div>
             </div>`;
-
-        $(".container .customer-orders-history").append(htmlString);
-
-       
       });
+      $(".container .customer-orders-history").append(htmlString);
     },
     error: function(xhr, status, error) {
       console.error("Error fetching orders:", error);
